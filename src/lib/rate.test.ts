@@ -20,6 +20,11 @@ describe("parseRate", () => {
 		expect(parseRate(text)).toEqual({ ok: true, value: micros });
 	});
 
+	it("rejects malformed thousands grouping", () => {
+		expect(parseRate("1,2")).toEqual({ ok: false, error: "invalid" });
+		expect(parseRate("1,000")).toEqual({ ok: true, value: 10_000_000 });
+	});
+
 	it("returns errors for empty, invalid and negative text", () => {
 		expect(parseRate("")).toEqual({ ok: false, error: "empty" });
 		expect(parseRate("abc")).toEqual({ ok: false, error: "invalid" });

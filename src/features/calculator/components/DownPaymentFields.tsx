@@ -42,7 +42,9 @@ const DownPaymentFields = ({
 						variant={mode === item.mode ? "primary" : "secondary"}
 						aria-pressed={mode === item.mode}
 						onClick={() => onModeChange(item.mode)}
-						className={cn("px-3 py-1 first:rounded-r-none last:rounded-l-none")}
+						className={cn(
+							"min-h-11 px-3 py-1 first:rounded-r-none last:rounded-l-none",
+						)}
 					>
 						{item.label}
 					</Button>

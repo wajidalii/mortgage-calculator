@@ -9,7 +9,7 @@ interface PmiSummaryProps {
 const PmiSummary = ({ result }: PmiSummaryProps) => (
 	<section
 		aria-labelledby="pmi-heading"
-		className="rounded-lg bg-white p-6 ring-1 ring-slate-300"
+		className="rounded-lg bg-white p-4 sm:p-6 ring-1 ring-slate-300"
 	>
 		<h2 id="pmi-heading" className="text-sm font-medium text-slate-700">
 			Private mortgage insurance (PMI)

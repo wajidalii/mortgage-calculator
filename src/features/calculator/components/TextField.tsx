@@ -40,7 +40,7 @@ const TextField = ({
 			</label>
 			<div
 				className={cn(
-					"mt-1 flex items-center rounded-md bg-white ring-1 ring-slate-300 focus-within:ring-2 focus-within:ring-brand-500",
+					"mt-1 flex min-h-11 items-center rounded-md bg-white ring-1 ring-slate-300 focus-within:ring-2 focus-within:ring-brand-500",
 					error && "ring-2 ring-red-600 focus-within:ring-red-600",
 					readOnly && "bg-slate-100 text-slate-600",
 				)}

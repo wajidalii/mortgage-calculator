@@ -9,7 +9,7 @@ interface LoanSummaryProps {
 const LoanSummary = ({ loan }: LoanSummaryProps) => (
 	<section
 		aria-labelledby="loan-summary-heading"
-		className="rounded-lg bg-brand-50 p-6 ring-1 ring-brand-500/30"
+		className="rounded-lg bg-brand-50 p-4 sm:p-6 ring-1 ring-brand-500/30"
 	>
 		<h2
 			id="loan-summary-heading"

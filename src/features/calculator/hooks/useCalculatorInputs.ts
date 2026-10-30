@@ -5,6 +5,7 @@ import {
 	initialCalculatorState,
 } from "../calculatorReducer";
 import { deriveLoan } from "../loanMath";
+import { derivePropertyTax } from "../propertyTax";
 
 /**
  * Owns the calculator input state. Typing updates `state` immediately; the
@@ -18,6 +19,10 @@ export const useCalculatorInputs = () => {
 	);
 	const deferredInputs = useDeferredValue(state.inputs);
 	const derived = useMemo(() => deriveLoan(deferredInputs), [deferredInputs]);
+	const propertyTax = useMemo(
+		() => derivePropertyTax(deferredInputs),
+		[deferredInputs],
+	);
 	const schedule = useMemo(() => {
 		const loan = derived.loan;
 		return loan
@@ -28,5 +33,5 @@ export const useCalculatorInputs = () => {
 				})
 			: null;
 	}, [derived.loan]);
-	return { state, dispatch, derived, schedule };
+	return { state, dispatch, derived, propertyTax, schedule };
 };

@@ -10,6 +10,15 @@ import type { DefaultRecord } from "./types";
 
 export type StateCode = "NY" | "FL" | "CA" | "TX" | "NJ";
 
+/** Display names for the states in the table. */
+export const STATE_NAMES: Record<StateCode, string> = {
+	NY: "New York",
+	FL: "Florida",
+	CA: "California",
+	TX: "Texas",
+	NJ: "New Jersey",
+};
+
 /** Column label shown above the rates. The rates are not confirmed. */
 export const STATE_TAX_COLUMN_LABEL = "Illustrative new-buyer estimate";
 

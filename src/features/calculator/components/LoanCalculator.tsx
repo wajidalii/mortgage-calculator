@@ -2,16 +2,21 @@ import Card from "@/components/ui/Card";
 import { useCalculatorInputs } from "../hooks/useCalculatorInputs";
 import DownPaymentFields from "./DownPaymentFields";
 import LoanSummary from "./LoanSummary";
+import PropertyTaxFields from "./PropertyTaxFields";
+import PropertyTaxSummary from "./PropertyTaxSummary";
 import ScheduleTable from "./ScheduleTable";
 import TermSelector from "./TermSelector";
 import TextField from "./TextField";
 
 const LoanCalculator = () => {
-	const { state, dispatch, derived, schedule } = useCalculatorInputs();
+	const { state, dispatch, derived, propertyTax, schedule } =
+		useCalculatorInputs();
 	const { inputs, touched } = state;
 	// Show a message only after the user has left the field.
 	const shown = (field: keyof typeof touched) =>
-		touched[field] ? derived.errors[field] : undefined;
+		touched[field]
+			? (derived.errors[field] ?? propertyTax.errors[field])
+			: undefined;
 
 	return (
 		<div className="grid gap-6">
@@ -62,9 +67,24 @@ const LoanCalculator = () => {
 						}
 						onBlur={() => dispatch({ type: "blur", field: "interestRate" })}
 					/>
+					<PropertyTaxFields
+						state={inputs.state}
+						override={inputs.annualTaxOverride}
+						error={shown("annualTaxOverride")}
+						onStateChange={(value) =>
+							dispatch({ type: "setState", state: value })
+						}
+						onOverrideChange={(value) =>
+							dispatch({ type: "edit", field: "annualTaxOverride", value })
+						}
+						onBlur={() =>
+							dispatch({ type: "blur", field: "annualTaxOverride" })
+						}
+					/>
 				</form>
 			</Card>
 			<LoanSummary loan={derived.loan} />
+			<PropertyTaxSummary tax={propertyTax.tax} />
 			{schedule ? <ScheduleTable rows={schedule} /> : null}
 		</div>
 	);

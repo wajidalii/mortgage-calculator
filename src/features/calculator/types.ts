@@ -1,3 +1,4 @@
+import type { StateCode } from "@/config/defaults/stateTaxTable";
 import type { Cents, Micros } from "@/types/units";
 
 export const LOAN_TERMS = [15, 20, 30] as const;
@@ -6,7 +7,11 @@ export type LoanTerm = (typeof LOAN_TERMS)[number];
 export type DownPaymentMode = "percent" | "amount";
 
 /** Fields whose validation message is shown after the user leaves the field. */
-export type ErrorField = "homePrice" | "downPayment" | "interestRate";
+export type ErrorField =
+	| "homePrice"
+	| "downPayment"
+	| "interestRate"
+	| "annualTaxOverride";
 
 /** Raw text the user typed, plus which down payment form is the source. */
 export interface CalculatorInputs {
@@ -16,6 +21,9 @@ export interface CalculatorInputs {
 	downPaymentMode: DownPaymentMode;
 	termYears: LoanTerm;
 	interestRate: string;
+	state: StateCode;
+	/** Annual property tax typed by the user. Empty means use the state rate. */
+	annualTaxOverride: string;
 }
 
 export interface CalculatorState {
@@ -27,13 +35,15 @@ export type EditableField =
 	| "homePrice"
 	| "downPaymentPercent"
 	| "downPaymentAmount"
-	| "interestRate";
+	| "interestRate"
+	| "annualTaxOverride";
 
 export type CalculatorAction =
 	| { type: "edit"; field: EditableField; value: string }
 	| { type: "blur"; field: EditableField }
 	| { type: "setDownPaymentMode"; mode: DownPaymentMode }
-	| { type: "setTerm"; years: LoanTerm };
+	| { type: "setTerm"; years: LoanTerm }
+	| { type: "setState"; state: StateCode };
 
 export interface LoanDerivation {
 	homePrice: Cents;

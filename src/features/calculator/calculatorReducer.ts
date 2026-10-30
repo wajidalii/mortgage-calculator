@@ -26,6 +26,8 @@ export const initialCalculatorState: CalculatorState = {
 		downPaymentMode: "percent",
 		termYears: DEFAULT_TERM,
 		interestRate: "6.50",
+		state: "NJ",
+		annualTaxOverride: "",
 	},
 	touched: {},
 };
@@ -70,7 +72,7 @@ export const calculatorReducer = (
 			const touched = { ...state.touched, [errorFieldFor(action.field)]: true };
 			// Price and down payment edits both change the synced counterpart.
 			const inputs =
-				action.field === "interestRate"
+				action.field === "interestRate" || action.field === "annualTaxOverride"
 					? state.inputs
 					: syncDownPayment(state.inputs);
 			return { inputs, touched };
@@ -83,5 +85,7 @@ export const calculatorReducer = (
 			};
 		case "setTerm":
 			return { ...state, inputs: { ...state.inputs, termYears: action.years } };
+		case "setState":
+			return { ...state, inputs: { ...state.inputs, state: action.state } };
 	}
 };

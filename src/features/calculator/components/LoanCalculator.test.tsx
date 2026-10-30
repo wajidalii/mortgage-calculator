@@ -1,5 +1,11 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+	cleanup,
+	fireEvent,
+	render,
+	screen,
+	within,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import LoanCalculator from "./LoanCalculator";
 
@@ -100,5 +106,47 @@ describe("LoanCalculator", () => {
 		render(<LoanCalculator />);
 		type("Interest rate", "abc");
 		expect(screen.getByText("An interest rate must be a number")).toBeTruthy();
+	});
+
+	describe("amortization schedule", () => {
+		it("shows lifetime interest and a $0 final balance for the golden loan", () => {
+			render(<LoanCalculator />);
+			// Default inputs are $400,000 at 6.50% over 30 years.
+			expect(screen.getByText("$510,179.81")).toBeTruthy();
+			fireEvent.click(screen.getByRole("button", { name: "Monthly" }));
+			const table = screen.getByRole("table");
+			const rows = within(table).getAllByRole("row");
+			expect(rows).toHaveLength(361); // header + 360 months
+			const last = within(rows[360] as HTMLElement).getAllByRole("cell");
+			expect(last.at(-1)?.textContent).toBe("$0.00");
+		});
+
+		it("switches to yearly rows that sum their months", () => {
+			render(<LoanCalculator />);
+			fireEvent.click(screen.getByRole("button", { name: "Monthly" }));
+			const monthly = within(screen.getByRole("table")).getAllByRole("row");
+			const cents = (row: HTMLElement, column: number) =>
+				Number(
+					(within(row).getAllByRole("cell")[column]?.textContent ?? "").replace(
+						/[$,.]/g,
+						"",
+					),
+				);
+			const firstYearInterest = monthly
+				.slice(1, 13)
+				.reduce((sum, row) => sum + cents(row, 2), 0);
+
+			fireEvent.click(screen.getByRole("button", { name: "Yearly" }));
+			const yearly = within(screen.getByRole("table")).getAllByRole("row");
+			expect(yearly).toHaveLength(31); // header + 30 years
+			expect(cents(yearly[1] as HTMLElement, 2)).toBe(firstYearInterest);
+		});
+
+		it("explains there is no schedule for a $0 loan", () => {
+			render(<LoanCalculator />);
+			type("Down payment (%)", "100");
+			expect(screen.queryByRole("table")).toBeNull();
+			expect(screen.getByText(/no schedule/i)).toBeTruthy();
+		});
 	});
 });

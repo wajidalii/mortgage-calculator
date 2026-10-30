@@ -2,11 +2,12 @@ import Card from "@/components/ui/Card";
 import { useCalculatorInputs } from "../hooks/useCalculatorInputs";
 import DownPaymentFields from "./DownPaymentFields";
 import LoanSummary from "./LoanSummary";
+import ScheduleTable from "./ScheduleTable";
 import TermSelector from "./TermSelector";
 import TextField from "./TextField";
 
 const LoanCalculator = () => {
-	const { state, dispatch, derived } = useCalculatorInputs();
+	const { state, dispatch, derived, schedule } = useCalculatorInputs();
 	const { inputs, touched } = state;
 	// Show a message only after the user has left the field.
 	const shown = (field: keyof typeof touched) =>
@@ -64,6 +65,7 @@ const LoanCalculator = () => {
 				</form>
 			</Card>
 			<LoanSummary loan={derived.loan} />
+			{schedule ? <ScheduleTable rows={schedule} /> : null}
 		</div>
 	);
 };

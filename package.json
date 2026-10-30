@@ -12,6 +12,8 @@
 		"build": "tsc -b && vite build",
 		"start": "yarn build && serve -s dist -l ${PORT:-3000}",
 		"typecheck": "tsc -b --noEmit",
+		"test": "vitest run",
+		"test:watch": "vitest",
 		"lint": "biome lint .",
 		"lint:fix": "biome lint --write .",
 		"format": "biome format --write . && prettier --write \"**/*.{md,yml,yaml}\"",
@@ -37,6 +39,7 @@
 		"prettier": "3.9.10",
 		"tailwindcss": "4.3.3",
 		"typescript": "7.0.2",
-		"vite": "8.3.5"
+		"vite": "8.3.5",
+		"vitest": "5.0.5"
 	}
 }

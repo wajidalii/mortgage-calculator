@@ -67,7 +67,19 @@ describe("formatMoney", () => {
 		[1999, "$19.99"],
 		[252827, "$2,528.27"],
 		[40000000, "$400,000.00"],
+		[-5, "-$0.05"],
+		[-100, "-$1.00"],
+		[-12345, "-$123.45"],
+		[-123456789, "-$1,234,567.89"],
+		[-0, "$0.00"],
 	])("formats %i cents as %s", (cents, text) => {
 		expect(formatMoney(cents as Cents)).toBe(text);
 	});
+
+	it.each([Number.NaN, Number.POSITIVE_INFINITY, 1.5, -0.5])(
+		"throws RangeError for %s",
+		(cents) => {
+			expect(() => formatMoney(cents as Cents)).toThrow(RangeError);
+		},
+	);
 });

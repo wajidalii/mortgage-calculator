@@ -15,10 +15,18 @@ export const parseMoney = (text: string): ParseResult<Cents> => {
 	return result.ok ? { ok: true, value: result.value as Cents } : result;
 };
 
-/** Integer cents to "$1,234.56". Uses integer math only. */
+/**
+ * Integer cents to "$1,234.56", or "-$1,234.56" for negatives. Uses integer
+ * math on the absolute value. Throws RangeError for non-integer input.
+ */
 export const formatMoney = (cents: Cents): string => {
-	const dollars = Math.floor(cents / 100);
-	const rest = cents - dollars * 100;
+	if (!Number.isSafeInteger(cents)) {
+		throw new RangeError("formatMoney needs an integer number of cents");
+	}
+	const magnitude = Math.abs(cents);
+	const dollars = Math.floor(magnitude / 100);
+	const rest = magnitude - dollars * 100;
 	const grouped = String(dollars).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-	return `$${grouped}.${String(rest).padStart(2, "0")}`;
+	const sign = cents < 0 ? "-" : "";
+	return `${sign}$${grouped}.${String(rest).padStart(2, "0")}`;
 };

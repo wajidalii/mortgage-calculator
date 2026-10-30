@@ -1,6 +1,6 @@
 # Mortgage Calculator
 
-Web calculator for U.S. home buyers and owners (see `PRD.md`, `user-stories.md`, `app-roles.md`, `jobs-to-be-done.md` for product scope). This repo currently holds the **boilerplate only**: routing, layout, tooling and Docker. No mortgage logic exists yet.
+Web calculator for U.S. home buyers and owners (see `PRD.md`, `user-stories.md`, `app-roles.md`, `jobs-to-be-done.md` for product scope). This repo holds the boilerplate (routing, layout, tooling, Docker) plus the first foundations: integer money/rate primitives, the defaults registry and the shared Disclaimer. Calculator features are tracked as GitHub issues and milestones (see `PLAN.md` section 9).
 
 ## Stack
 
@@ -9,7 +9,7 @@ Web calculator for U.S. home buyers and owners (see `PRD.md`, `user-stories.md`,
 - Biome 2.6 for lint and format; Prettier only for `*.md`, `*.yml`, `*.yaml`
 - Yarn 4 (Berry) through Corepack, `nodeLinker: node-modules`. Node >= 22 (`.nvmrc`)
 - Husky + lint-staged
-- Vitest 5 for tests (co-located `*.test.ts` files in `src/`)
+- Vitest 5 for tests (co-located `*.test.ts` / `*.test.tsx` files in `src/`)
 - No state library (no Zustand/Redux). `useState` / `useReducer` in feature hooks; Context only for stable global data
 - Versions are pinned exactly in `package.json`
 
@@ -17,16 +17,16 @@ Web calculator for U.S. home buyers and owners (see `PRD.md`, `user-stories.md`,
 
 Use `yarn`, not `npm`. If `yarn` is not found, add `~/.local/bin` to PATH (the Corepack shim lives there; the Husky hook needs it too).
 
-| Command                         | What it does                                                                          |
-| ------------------------------- | ------------------------------------------------------------------------------------- |
-| `yarn dev`                      | Local dev server (`vite --host`, port 5173). Needs a `.env` (copy `.env.example`)     |
-| `yarn start`                    | Production: `yarn build && serve -s dist -l ${PORT:-3000}`                            |
-| `yarn build`                    | `tsc -b && vite build`                                                                |
-| `yarn typecheck`                | `tsc -b --noEmit`                                                                     |
-| `yarn test` / `yarn test:watch` | Vitest: single run / watch mode. Tests are `src/**/*.test.{ts,tsx}`, node environment |
-| `yarn lint` / `yarn lint:fix`   | `biome lint .` / `biome lint --write .`                                               |
-| `yarn check` / `yarn check:fix` | Biome lint + format + import sorting, check / write                                   |
-| `yarn format`                   | Biome format, then Prettier on md/yml/yaml                                            |
+| Command                         | What it does                                                                                         |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `yarn dev`                      | Local dev server (`vite --host`, port 5173). Needs a `.env` (copy `.env.example`)                    |
+| `yarn start`                    | Production: `yarn build && serve -s dist -l ${PORT:-3000}`                                           |
+| `yarn build`                    | `tsc -b && vite build`                                                                               |
+| `yarn typecheck`                | `tsc -b --noEmit`                                                                                    |
+| `yarn test` / `yarn test:watch` | Vitest: single run / watch mode. Tests are `src/**/*.test.{ts,tsx}`; the default environment is node |
+| `yarn lint` / `yarn lint:fix`   | `biome lint .` / `biome lint --write .`                                                              |
+| `yarn check` / `yarn check:fix` | Biome lint + format + import sorting, check / write                                                  |
+| `yarn format`                   | Biome format, then Prettier on md/yml/yaml                                                           |
 
 Yarn Berry does not run `pre*`/`post*` hooks on custom scripts (so `start` calls `yarn build` explicitly) and does not run `prepare` (so Husky installs via `postinstall`).
 
@@ -43,11 +43,14 @@ src/
   pages/                 HomePage, CalculatorPage, NotFoundPage (one lazy chunk each)
   features/              feature folders: components/ hooks/ types.ts
   components/ui/         Tailwind primitives (Button, Card)
-  components/feedback/   PageLoader, ErrorBoundary
+  components/feedback/   PageLoader, ErrorBoundary, Disclaimer
   hooks/                 shared hooks (useDebouncedValue)
   services/api/client.ts typed fetch wrapper; only code that touches the network
   config/env.ts          validates VITE_* once at import, throws if missing
-  lib/                   pure helpers (cn)
+  config/defaults/       defaults registry (values with source, as-of date, confidence) and state tax table
+  config/disclaimer.ts   PRD section 11 disclaimer text
+  lib/                   pure helpers: cn, money (cents), rate (micros), decimal parsing, rounding
+  types/units.ts         branded Cents and Micros types
   types/  assets/  styles/index.css
 ```
 
@@ -140,7 +143,7 @@ No nginx: production serves the built `dist/` with `serve` (SPA fallback on).
 
 ## Open items
 
-- Mortgage logic and features from `PRD.md` are not started.
+- Calculator features from `PRD.md` are not started; only primitives, defaults and the Disclaimer exist. Progress is tracked in GitHub milestones.
 - Navbar is a placeholder slot in `MainLayout`.
 - `Providers` (`src/app/providers.tsx`) is a pass-through.
 - Closing the default-export lint gap (see Code conventions, item 2) would need a small check script.

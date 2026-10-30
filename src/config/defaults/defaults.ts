@@ -1,5 +1,6 @@
+import type { Cents, Micros } from "../../types/units";
 import { STATE_TAX_TABLE } from "./stateTaxTable";
-import type { DefaultRecord, IsoDate, MoneyCents, RateMicros } from "./types";
+import type { DefaultRecord, IsoDate } from "./types";
 
 /**
  * Registry of every illustrative default (PRD 9.2 and 9.3).
@@ -44,7 +45,7 @@ export const DEFAULTS = {
 	stateTaxRates: STATE_TAX_TABLE,
 	homeownersInsurance: {
 		/** Annual, flat. Does not scale with home price. $2,400.00 per year. */
-		value: 240000 as MoneyCents,
+		value: 240000 as Cents,
 		source:
 			"Four public 2026 estimates between $2,377 and $2,543, based on about $300,000 of dwelling coverage",
 		asOf: AS_OF,
@@ -52,7 +53,7 @@ export const DEFAULTS = {
 	},
 	pmiRate: {
 		/** Annual rate on the loan amount. 0.75% per year. */
-		value: 7500 as RateMicros,
+		value: 7500 as Micros,
 		source:
 			"Midpoint of the commonly cited 0.5% to 1.0% range. No authoritative rate matrix was found.",
 		asOf: AS_OF,
@@ -61,11 +62,11 @@ export const DEFAULTS = {
 	armTerms: {
 		value: {
 			/** 2.75% margin. */
-			marginMicros: 27500 as RateMicros,
+			marginMicros: 27500 as Micros,
 			/** Caps 2/1/5 in rate points: initial 2%, periodic 1%, lifetime 5%. */
-			initialCapMicros: 20000 as RateMicros,
-			periodicCapMicros: 10000 as RateMicros,
-			lifetimeCapMicros: 50000 as RateMicros,
+			initialCapMicros: 20000 as Micros,
+			periodicCapMicros: 10000 as Micros,
+			lifetimeCapMicros: 50000 as Micros,
 		},
 		source:
 			"Author's knowledge of typical 5/6 SOFR terms. Not checked against a Loan Estimate.",
@@ -75,9 +76,9 @@ export const DEFAULTS = {
 	dtiThresholds: {
 		value: {
 			/** 28% front-end. */
-			frontEndMicros: 280000 as RateMicros,
+			frontEndMicros: 280000 as Micros,
 			/** 36% back-end. */
-			backEndMicros: 360000 as RateMicros,
+			backEndMicros: 360000 as Micros,
 		},
 		source: "Common industry rules of thumb. Not verified.",
 		asOf: AS_OF,

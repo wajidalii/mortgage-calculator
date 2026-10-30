@@ -1,4 +1,5 @@
-import type { DefaultRecord, RateMicros } from "./types";
+import type { Micros } from "../../types/units";
+import type { DefaultRecord } from "./types";
 
 /**
  * Demo state property tax rates (PRD 9.1).
@@ -13,13 +14,13 @@ export type StateCode = "NY" | "FL" | "CA" | "TX" | "NJ";
 export const STATE_TAX_COLUMN_LABEL = "Illustrative new-buyer estimate";
 
 /** Annual rate on the home price, in millionths. 1.40% is 14000. */
-export const STATE_TAX_TABLE: DefaultRecord<Record<StateCode, RateMicros>> = {
+export const STATE_TAX_TABLE: DefaultRecord<Record<StateCode, Micros>> = {
 	value: {
-		NY: 14000,
-		FL: 9500,
-		CA: 11000,
-		TX: 16000,
-		NJ: 20000,
+		NY: 14000 as Micros,
+		FL: 9500 as Micros,
+		CA: 11000 as Micros,
+		TX: 16000 as Micros,
+		NJ: 20000 as Micros,
 	},
 	source: "Product owner table. Not fully confirmed.",
 	asOf: "2026-10-30",

@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
+import type { Cents, Micros } from "../../types/units";
 import { DEFAULTS, isStale, STALE_AFTER_DAYS } from "./defaults";
 import { STATE_TAX_COLUMN_LABEL, STATE_TAX_TABLE } from "./stateTaxTable";
 
@@ -113,5 +114,24 @@ describe("defaults registry", () => {
 			  },
 			}
 		`);
+	});
+});
+
+describe("defaults registry units", () => {
+	it("types money as Cents and rates as Micros", () => {
+		expectTypeOf(DEFAULTS.homeownersInsurance.value).toEqualTypeOf<Cents>();
+		expectTypeOf(DEFAULTS.pmiRate.value).toEqualTypeOf<Micros>();
+		expectTypeOf(DEFAULTS.armTerms.value.marginMicros).toEqualTypeOf<Micros>();
+		expectTypeOf(DEFAULTS.stateTaxRates.value.NY).toEqualTypeOf<Micros>();
+	});
+
+	it("rejects plain numbers where Cents or Micros are required", () => {
+		const takesCents = (_cents: Cents): void => {};
+		const takesMicros = (_micros: Micros): void => {};
+		// @ts-expect-error a plain number is not Cents
+		takesCents(240000);
+		// @ts-expect-error a plain number is not Micros
+		takesMicros(7500);
+		expect(true).toBe(true);
 	});
 });

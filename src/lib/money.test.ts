@@ -19,6 +19,31 @@ describe("parseMoney (PRD 12.2)", () => {
 		expect(parseMoney(text)).toEqual({ ok: true, value: cents });
 	});
 
+	it.each([
+		["1,234,567.89", 123456789],
+		["$1,000", 100000],
+		["999", 99900],
+	])("accepts valid thousands grouping %s", (text, cents) => {
+		expect(parseMoney(text)).toEqual({ ok: true, value: cents });
+	});
+
+	it.each([
+		"1,2,3",
+		"1,,000",
+		",1",
+		"12,34",
+		"1,234,5",
+		"1,234,",
+		"1.234,5",
+		"1,000.5,0",
+	])("rejects malformed thousands grouping %s", (text) => {
+		expect(parseMoney(text)).toEqual({ ok: false, error: "invalid" });
+	});
+
+	it("still reports negatives with valid grouping as negative", () => {
+		expect(parseMoney("-1,234")).toEqual({ ok: false, error: "negative" });
+	});
+
 	it("returns an explicit empty result", () => {
 		expect(parseMoney("")).toEqual({ ok: false, error: "empty" });
 		expect(parseMoney("   ")).toEqual({ ok: false, error: "empty" });

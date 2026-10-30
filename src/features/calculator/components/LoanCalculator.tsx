@@ -4,6 +4,7 @@ import DownPaymentFields from "./DownPaymentFields";
 import LoanSummary from "./LoanSummary";
 import MonthlyCostsFields from "./MonthlyCostsFields";
 import MonthlyCostsSummary from "./MonthlyCostsSummary";
+import MonthlyEstimateCard from "./MonthlyEstimateCard";
 import PmiFields from "./PmiFields";
 import PmiSummary from "./PmiSummary";
 import PropertyTaxFields from "./PropertyTaxFields";
@@ -13,8 +14,16 @@ import TermSelector from "./TermSelector";
 import TextField from "./TextField";
 
 const LoanCalculator = () => {
-	const { state, dispatch, derived, propertyTax, monthlyCosts, pmi, schedule } =
-		useCalculatorInputs();
+	const {
+		state,
+		dispatch,
+		derived,
+		propertyTax,
+		monthlyCosts,
+		pmi,
+		estimate,
+		schedule,
+	} = useCalculatorInputs();
 	const { inputs, touched } = state;
 	// Show a message only after the user has left the field.
 	const shown = (field: keyof typeof touched) =>
@@ -109,6 +118,7 @@ const LoanCalculator = () => {
 					/>
 				</form>
 			</Card>
+			<MonthlyEstimateCard estimate={estimate} />
 			<LoanSummary loan={derived.loan} />
 			<PropertyTaxSummary tax={propertyTax.tax} />
 			<MonthlyCostsSummary costs={monthlyCosts.costs} />

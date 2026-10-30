@@ -20,6 +20,8 @@ const inputs = (
 	downPaymentMode: "percent",
 	termYears: 30,
 	interestRate: "6.5",
+	state: "NJ",
+	annualTaxOverride: "",
 	...overrides,
 });
 

@@ -149,4 +149,54 @@ describe("LoanCalculator", () => {
 			expect(screen.getByText(/no schedule/i)).toBeTruthy();
 		});
 	});
+	describe("property tax (S-3)", () => {
+		it("shows the NJ estimate with the illustrative label by default", () => {
+			render(<LoanCalculator />);
+			const section = screen.getByRole("region", {
+				name: "Estimated property tax",
+			});
+			expect(within(section).getByText("$10,000.00")).toBeTruthy();
+			expect(within(section).getByText("$833.33")).toBeTruthy();
+			expect(within(section).getByText("Illustrative estimate")).toBeTruthy();
+			expect(within(section).queryByText("Manual override")).toBeNull();
+		});
+
+		it("shows the TX estimate for $500,000", () => {
+			render(<LoanCalculator />);
+			fireEvent.change(screen.getByLabelText("State"), {
+				target: { value: "TX" },
+			});
+			const section = screen.getByRole("region", {
+				name: "Estimated property tax",
+			});
+			expect(within(section).getByText("$8,000.00")).toBeTruthy();
+			expect(within(section).getByText("$666.67")).toBeTruthy();
+			expect(within(section).getByText("Month 12")).toBeTruthy();
+			expect(within(section).getByText("$666.63")).toBeTruthy();
+		});
+
+		it("uses a manual override, labels it, and returns to the state rate when cleared", () => {
+			render(<LoanCalculator />);
+			const section = () =>
+				screen.getByRole("region", { name: "Estimated property tax" });
+			type("Annual property tax (optional)", "6000");
+			expect(within(section()).getByText("$6,000.00")).toBeTruthy();
+			expect(within(section()).getByText("$500.00")).toBeTruthy();
+			expect(within(section()).getByText("Manual override")).toBeTruthy();
+			expect(within(section()).queryByText("Illustrative estimate")).toBeNull();
+
+			type("Annual property tax (optional)", "");
+			expect(within(section()).getByText("$10,000.00")).toBeTruthy();
+			expect(within(section()).getByText("Illustrative estimate")).toBeTruthy();
+			expect(within(section()).queryByText("Manual override")).toBeNull();
+		});
+
+		it("shows an error for a bad override after leaving the field", () => {
+			render(<LoanCalculator />);
+			type("Annual property tax (optional)", "abc");
+			expect(
+				screen.getByText("Annual property tax must be a number"),
+			).toBeTruthy();
+		});
+	});
 });

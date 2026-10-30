@@ -11,7 +11,11 @@ export type ErrorField =
 	| "homePrice"
 	| "downPayment"
 	| "interestRate"
-	| "annualTaxOverride";
+	| "annualTaxOverride"
+	| "annualInsurance"
+	| "extraAnnualInsurance"
+	| "monthlyHoa"
+	| "monthlyOther";
 
 /** Raw text the user typed, plus which down payment form is the source. */
 export interface CalculatorInputs {
@@ -24,6 +28,13 @@ export interface CalculatorInputs {
 	state: StateCode;
 	/** Annual property tax typed by the user. Empty means use the state rate. */
 	annualTaxOverride: string;
+	/** Empty means use the national default. */
+	annualInsurance: string;
+	/** Optional extra annual premium (flood, wind). Empty means none. */
+	extraAnnualInsurance: string;
+	monthlyHoa: string;
+	/** One optional monthly amount, not a list. */
+	monthlyOther: string;
 }
 
 export interface CalculatorState {
@@ -36,7 +47,11 @@ export type EditableField =
 	| "downPaymentPercent"
 	| "downPaymentAmount"
 	| "interestRate"
-	| "annualTaxOverride";
+	| "annualTaxOverride"
+	| "annualInsurance"
+	| "extraAnnualInsurance"
+	| "monthlyHoa"
+	| "monthlyOther";
 
 export type CalculatorAction =
 	| { type: "edit"; field: EditableField; value: string }

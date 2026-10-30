@@ -74,7 +74,10 @@ describe("LoanCalculator", () => {
 		render(<LoanCalculator />);
 		type("Down payment (%)", "100");
 		// Loan amount and monthly principal and interest are both $0.00.
-		expect(screen.getAllByText("$0.00")).toHaveLength(2);
+		const summary = screen.getByRole("region", {
+			name: "Monthly principal and interest",
+		});
+		expect(within(summary).getAllByText("$0.00")).toHaveLength(2);
 		expect(screen.getByText("0.00%")).toBeTruthy();
 	});
 
@@ -197,6 +200,50 @@ describe("LoanCalculator", () => {
 			expect(
 				screen.getByText("Annual property tax must be a number"),
 			).toBeTruthy();
+		});
+	});
+
+	describe("insurance, HOA and other costs (S-4)", () => {
+		const section = () =>
+			screen.getByRole("region", {
+				name: "Insurance, HOA and other monthly costs",
+			});
+
+		it("uses the $2,400 default and labels it when insurance is empty", () => {
+			render(<LoanCalculator />);
+			expect(within(section()).getByText("$200.00")).toBeTruthy();
+			expect(
+				within(section()).getByText("Illustrative estimate, not a quote."),
+			).toBeTruthy();
+		});
+
+		it("shows $150.00 for $1,800 insurance and $100.00 HOA under non-escrow", () => {
+			render(<LoanCalculator />);
+			type("Annual homeowners insurance", "1800");
+			type("Monthly HOA", "100");
+			expect(within(section()).getByText("$150.00")).toBeTruthy();
+			expect(
+				within(section()).queryByText("Illustrative estimate, not a quote."),
+			).toBeNull();
+			const nonEscrow = within(section())
+				.getByRole("heading", { name: "Non-escrow" })
+				.closest("div") as HTMLElement;
+			expect(within(nonEscrow).getByText("$100.00")).toBeTruthy();
+		});
+
+		it("rejects a negative value with an error and does not use it", () => {
+			render(<LoanCalculator />);
+			type("Monthly HOA", "-100");
+			expect(screen.getByText("Monthly HOA cannot be negative")).toBeTruthy();
+			expect(field("Monthly HOA").getAttribute("aria-invalid")).toBe("true");
+			expect(within(section()).queryByText("-$100.00")).toBeNull();
+			expect(
+				within(section()).getByText(
+					"Fix the highlighted fields to see these costs.",
+				),
+			).toBeTruthy();
+			type("Monthly HOA", "100");
+			expect(within(section()).getByText("$100.00")).toBeTruthy();
 		});
 	});
 });

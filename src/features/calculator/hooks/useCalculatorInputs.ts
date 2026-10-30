@@ -1,16 +1,36 @@
-import { useDeferredValue, useMemo, useReducer } from "react";
-import { buildSchedule } from "@/lib/amortization";
-import { deriveArm } from "../armSchedule";
-import { buildAssumptions } from "../assumptions";
+import {
+	useDeferredValue,
+	useEffect,
+	useMemo,
+	useReducer,
+	useRef,
+} from "react";
+import { buildSchedule, type ScheduleRow } from "@/lib/amortization";
+import { type ArmResult, deriveArm } from "../armSchedule";
+import { type AssumptionItem, buildAssumptions } from "../assumptions";
 import {
 	calculatorReducer,
 	initialCalculatorState,
 } from "../calculatorReducer";
 import { deriveLoan } from "../loanMath";
-import { deriveMonthlyCosts } from "../monthlyCosts";
-import { buildMonthlyEstimate } from "../monthlyEstimate";
-import { derivePmi } from "../pmi";
-import { derivePropertyTax } from "../propertyTax";
+import { deriveMonthlyCosts, type MonthlyCosts } from "../monthlyCosts";
+import { buildMonthlyEstimate, type MonthlyEstimate } from "../monthlyEstimate";
+import { derivePmi, type PmiResult } from "../pmi";
+import { derivePropertyTax, type PropertyTax } from "../propertyTax";
+import type { LoanDerivation } from "../types";
+import { keepsLastResult } from "../validation";
+
+/** Everything the result views show. */
+export interface ResultSet {
+	loan: LoanDerivation | null;
+	arm: ArmResult | null;
+	tax: PropertyTax | null;
+	costs: MonthlyCosts | null;
+	pmi: PmiResult | null;
+	estimate: MonthlyEstimate | null;
+	schedule: ScheduleRow[] | null;
+	assumptions: AssumptionItem[];
+}
 
 /**
  * Owns the calculator input state. Typing updates `state` immediately; the
@@ -84,17 +104,58 @@ export const useCalculatorInputs = (today?: Date) => {
 			now,
 		],
 	);
+	const current = useMemo<ResultSet>(
+		() => ({
+			loan,
+			arm: arm.result,
+			tax: propertyTax.tax,
+			costs: monthlyCosts.costs,
+			pmi: pmi.result,
+			estimate,
+			schedule,
+			assumptions,
+		}),
+		[
+			loan,
+			arm.result,
+			propertyTax.tax,
+			monthlyCosts.costs,
+			pmi.result,
+			estimate,
+			schedule,
+			assumptions,
+		],
+	);
+
+	// Non-numeric text in a money field keeps the last valid result on screen;
+	// every other error clears it (PRD S-10).
+	const errors = {
+		...derived.errors,
+		...propertyTax.errors,
+		...monthlyCosts.errors,
+		...arm.errors,
+		...pmi.errors,
+	};
+	const isComplete =
+		estimate !== null &&
+		Object.values(errors).every((message) => message === undefined);
+	const lastValid = useRef<ResultSet | null>(null);
+	useEffect(() => {
+		if (isComplete) lastValid.current = current;
+	}, [isComplete, current]);
+	const held = keepsLastResult(errors, deferredInputs)
+		? lastValid.current
+		: null;
+
 	return {
 		state,
-		assumptions,
 		dispatch,
 		derived,
-		loan,
 		arm,
 		propertyTax,
 		monthlyCosts,
 		pmi,
-		estimate,
-		schedule,
+		results: held ?? current,
+		showingLastResult: held !== null,
 	};
 };

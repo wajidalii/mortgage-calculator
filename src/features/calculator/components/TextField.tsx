@@ -76,7 +76,11 @@ const TextField = ({
 				</p>
 			) : null}
 			{error ? (
-				<p id={errorId} className="mt-1 text-sm font-medium text-red-700">
+				<p
+					id={errorId}
+					role="alert"
+					className="mt-1 text-sm font-medium text-red-700"
+				>
 					<span aria-hidden="true">⚠ </span>
 					{error}
 				</p>

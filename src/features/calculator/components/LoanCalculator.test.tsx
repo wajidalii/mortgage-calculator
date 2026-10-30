@@ -12,6 +12,11 @@ import LoanCalculator from "./LoanCalculator";
 afterEach(cleanup);
 
 const field = (name: string) => screen.getByLabelText(name) as HTMLInputElement;
+/** The standalone P&I result, not the line in the itemized estimate. */
+const piSummary = () =>
+	within(
+		screen.getByRole("region", { name: "Monthly principal and interest" }),
+	);
 const type = (name: string, value: string) => {
 	const input = field(name);
 	fireEvent.change(input, { target: { value } });
@@ -27,17 +32,17 @@ describe("LoanCalculator", () => {
 
 	it("shows monthly principal and interest for each term", () => {
 		render(<LoanCalculator />);
-		expect(screen.getByText("$2,528.27")).toBeTruthy();
+		expect(piSummary().getByText("$2,528.27")).toBeTruthy();
 		fireEvent.click(screen.getByLabelText("20 years"));
-		expect(screen.getByText("$2,982.29")).toBeTruthy();
+		expect(piSummary().getByText("$2,982.29")).toBeTruthy();
 		fireEvent.click(screen.getByLabelText("15 years"));
-		expect(screen.getByText("$3,484.43")).toBeTruthy();
+		expect(piSummary().getByText("$3,484.43")).toBeTruthy();
 	});
 
 	it("divides the loan by the number of payments at a 0% rate", () => {
 		render(<LoanCalculator />);
 		type("Interest rate", "0");
-		expect(screen.getByText("$1,111.11")).toBeTruthy();
+		expect(piSummary().getByText("$1,111.11")).toBeTruthy();
 	});
 
 	it("offers only 15, 20 and 30 year terms", () => {
@@ -293,6 +298,50 @@ describe("LoanCalculator", () => {
 			type("Down payment (%)", "10");
 			type("PMI rate (per year)", "-1");
 			expect(screen.getByText("PMI rate cannot be negative")).toBeTruthy();
+		});
+	});
+
+	describe("itemized monthly estimate (S-6)", () => {
+		const card = () =>
+			screen.getByRole("region", { name: "Estimated monthly cost" });
+		const row = (label: string) =>
+			within(card()).getByText(label).closest("div") as HTMLElement;
+
+		it("itemizes the golden case and includes the disclaimer", () => {
+			render(<LoanCalculator />);
+			type("Annual homeowners insurance", "1800");
+			type("Monthly HOA", "100");
+			expect(
+				within(row("Principal and interest")).getByText("$2,528.27"),
+			).toBeTruthy();
+			expect(within(row("Property tax")).getByText("$833.33")).toBeTruthy();
+			expect(
+				within(row("Homeowners insurance")).getByText("$150.00"),
+			).toBeTruthy();
+			expect(within(row("Lender payment")).getByText("$3,511.60")).toBeTruthy();
+			expect(within(row("HOA")).getByText("$100.00")).toBeTruthy();
+			expect(within(card()).getByText("$3,611.60")).toBeTruthy();
+			expect(within(card()).getByLabelText("Disclaimer")).toBeTruthy();
+		});
+
+		it("lists PMI in the lender payment group when it is on", () => {
+			render(<LoanCalculator />);
+			type("Down payment (%)", "10");
+			expect(within(card()).getByText("PMI")).toBeTruthy();
+			const escrow = within(card())
+				.getByRole("heading", { name: "Lender payment (escrow)" })
+				.closest("div") as HTMLElement;
+			expect(within(escrow).getByText("PMI")).toBeTruthy();
+		});
+
+		it("asks to fix the fields while an input is invalid", () => {
+			render(<LoanCalculator />);
+			type("Monthly HOA", "-1");
+			expect(
+				within(card()).getByText(
+					"Fix the highlighted fields to see the itemized monthly estimate.",
+				),
+			).toBeTruthy();
 		});
 	});
 });

@@ -28,6 +28,10 @@ export const initialCalculatorState: CalculatorState = {
 		interestRate: "6.50",
 		state: "NJ",
 		annualTaxOverride: "",
+		annualInsurance: "",
+		extraAnnualInsurance: "",
+		monthlyHoa: "",
+		monthlyOther: "",
 	},
 	touched: {},
 };
@@ -53,6 +57,13 @@ export const syncDownPayment = (inputs: CalculatorInputs): CalculatorInputs => {
 	return { ...inputs, downPaymentPercent: microsToPercentText(percent) };
 };
 
+/** Edits to these fields can change the synced down payment counterpart. */
+const PRICE_LINKED_FIELDS: ReadonlySet<EditableField> = new Set([
+	"homePrice",
+	"downPaymentPercent",
+	"downPaymentAmount",
+]);
+
 const errorFieldFor = (field: EditableField): ErrorField =>
 	field === "downPaymentPercent" || field === "downPaymentAmount"
 		? "downPayment"
@@ -71,10 +82,9 @@ export const calculatorReducer = (
 		case "blur": {
 			const touched = { ...state.touched, [errorFieldFor(action.field)]: true };
 			// Price and down payment edits both change the synced counterpart.
-			const inputs =
-				action.field === "interestRate" || action.field === "annualTaxOverride"
-					? state.inputs
-					: syncDownPayment(state.inputs);
+			const inputs = PRICE_LINKED_FIELDS.has(action.field)
+				? syncDownPayment(state.inputs)
+				: state.inputs;
 			return { inputs, touched };
 		}
 		case "setDownPaymentMode":

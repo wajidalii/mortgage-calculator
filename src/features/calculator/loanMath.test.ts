@@ -22,6 +22,10 @@ const inputs = (
 	interestRate: "6.5",
 	state: "NJ",
 	annualTaxOverride: "",
+	annualInsurance: "",
+	extraAnnualInsurance: "",
+	monthlyHoa: "",
+	monthlyOther: "",
 	...overrides,
 });
 

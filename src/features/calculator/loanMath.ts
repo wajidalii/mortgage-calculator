@@ -1,5 +1,6 @@
 import type { ParseError } from "@/lib/decimal";
 import { parseMoney } from "@/lib/money";
+import { monthlyPayment } from "@/lib/payment";
 import { parseRate } from "@/lib/rate";
 import { roundHalfUp } from "@/lib/rounding";
 import type { Cents, Micros } from "@/types/units";
@@ -120,6 +121,11 @@ export const deriveLoan = (inputs: CalculatorInputs): DerivedLoan => {
 			downPayment,
 			downPaymentPercent: percentFromDownPayment(homePrice, downPayment),
 			loanAmount,
+			monthlyPrincipalAndInterest: monthlyPayment(
+				loanAmount,
+				rate.value,
+				inputs.termYears * 12,
+			),
 			ltv: ltvFor(homePrice, loanAmount),
 			interestRate: rate.value,
 			termYears: inputs.termYears,

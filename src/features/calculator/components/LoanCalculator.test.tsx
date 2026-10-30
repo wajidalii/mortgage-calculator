@@ -19,6 +19,21 @@ describe("LoanCalculator", () => {
 		expect(screen.getByText("80.00%")).toBeTruthy();
 	});
 
+	it("shows monthly principal and interest for each term", () => {
+		render(<LoanCalculator />);
+		expect(screen.getByText("$2,528.27")).toBeTruthy();
+		fireEvent.click(screen.getByLabelText("20 years"));
+		expect(screen.getByText("$2,982.29")).toBeTruthy();
+		fireEvent.click(screen.getByLabelText("15 years"));
+		expect(screen.getByText("$3,484.43")).toBeTruthy();
+	});
+
+	it("divides the loan by the number of payments at a 0% rate", () => {
+		render(<LoanCalculator />);
+		type("Interest rate", "0");
+		expect(screen.getByText("$1,111.11")).toBeTruthy();
+	});
+
 	it("offers only 15, 20 and 30 year terms", () => {
 		render(<LoanCalculator />);
 		const radios = screen.getAllByRole("radio") as HTMLInputElement[];
@@ -52,7 +67,8 @@ describe("LoanCalculator", () => {
 	it("shows $0 and 0.00% LTV at 100% down", () => {
 		render(<LoanCalculator />);
 		type("Down payment (%)", "100");
-		expect(screen.getByText("$0.00")).toBeTruthy();
+		// Loan amount and monthly principal and interest are both $0.00.
+		expect(screen.getAllByText("$0.00")).toHaveLength(2);
 		expect(screen.getByText("0.00%")).toBeTruthy();
 	});
 

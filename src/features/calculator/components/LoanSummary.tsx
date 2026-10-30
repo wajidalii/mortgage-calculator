@@ -15,16 +15,25 @@ const LoanSummary = ({ loan }: LoanSummaryProps) => (
 			id="loan-summary-heading"
 			className="text-sm font-medium text-slate-700"
 		>
-			Loan amount
+			Monthly principal and interest
 		</h2>
 		{/* Announce result changes without moving focus. */}
 		<div aria-live="polite">
 			{loan ? (
 				<>
 					<p className="mt-1 text-4xl font-bold tracking-tight text-slate-900">
-						{formatMoney(loan.loanAmount)}
+						{formatMoney(loan.monthlyPrincipalAndInterest)}
+						<span className="ml-1 text-base font-normal text-slate-600">
+							/ month
+						</span>
 					</p>
-					<dl className="mt-4 grid grid-cols-2 gap-4 border-t border-slate-300/60 pt-4 text-sm">
+					<dl className="mt-4 grid grid-cols-1 gap-4 border-t border-slate-300/60 pt-4 text-sm sm:grid-cols-3">
+						<div>
+							<dt className="text-slate-600">Loan amount</dt>
+							<dd className="mt-0.5 text-lg font-semibold text-slate-900">
+								{formatMoney(loan.loanAmount)}
+							</dd>
+						</div>
 						<div>
 							<dt className="text-slate-600">Loan-to-value (LTV)</dt>
 							<dd className="mt-0.5 text-lg font-semibold text-slate-900">
@@ -44,7 +53,7 @@ const LoanSummary = ({ loan }: LoanSummaryProps) => (
 				</>
 			) : (
 				<p className="mt-1 text-base text-slate-700">
-					Fix the highlighted fields to see the loan amount and LTV.
+					Fix the highlighted fields to see the payment, loan amount and LTV.
 				</p>
 			)}
 		</div>

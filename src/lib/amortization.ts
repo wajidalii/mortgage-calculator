@@ -39,13 +39,49 @@ export interface ScheduleInput {
 	extra?: (month: number) => number;
 }
 
+export interface LedgerMonth {
+	interest: Cents;
+	/** Regular payment before extra: min(PI, B + interest), or all of it in the last month. */
+	regular: Cents;
+	principal: Cents;
+	extraPaid: Cents;
+	/** Balance after this month's payment. */
+	balance: Cents;
+}
+
 /**
- * Month-by-month fixed-rate ledger (PRD 8.4), integer cents throughout:
+ * One month of the ledger (PRD 8.4), shared by the fixed-rate and ARM
+ * schedules so both follow the same rounding and final-payment policy:
  *   interest = round(B x r)                 (integer half-up)
- *   payment  = min(PI, B + interest)
+ *   payment  = min(PI, B + interest)        (all of B + interest in the last month)
  *   principal = max(0, min(B, payment - interest))
  *   extra    = min(max(0, requested), B - principal)
- *   B       -= principal + extra
+ */
+export const ledgerMonth = (
+	balance: Cents,
+	rate: Micros,
+	pi: Cents,
+	isLastMonth: boolean,
+	requestedExtra = 0,
+): LedgerMonth => {
+	const interest = monthlyInterest(balance, rate);
+	const due = (balance + interest) as Cents;
+	const regular = isLastMonth ? due : (Math.min(pi, due) as Cents);
+	const principal = Math.max(0, Math.min(balance, regular - interest)) as Cents;
+	const requested = Math.max(0, Math.floor(requestedExtra));
+	const extraPaid = Math.min(requested, balance - principal) as Cents;
+	return {
+		interest,
+		regular,
+		principal,
+		extraPaid,
+		balance: (balance - principal - extraPaid) as Cents,
+	};
+};
+
+/**
+ * Month-by-month fixed-rate ledger (PRD 8.4), integer cents throughout; see
+ * `ledgerMonth` for the monthly rules.
  * The last scheduled month pays off whatever is left, so the final payment can
  * differ from PI by a few dollars. Escrow items (tax, insurance, PMI, HOA) are
  * not inputs here and so can never reduce the balance.
@@ -62,22 +98,20 @@ export const buildSchedule = ({
 	let balance = loan;
 
 	for (let month = 1; month <= payments && balance > 0; month++) {
-		const interest = monthlyInterest(balance, rate);
-		const due = (balance + interest) as Cents;
-		const regular = month === payments ? due : (Math.min(pi, due) as Cents);
-		const principal = Math.max(
-			0,
-			Math.min(balance, regular - interest),
-		) as Cents;
-		const requested = Math.max(0, Math.floor(extra?.(month) ?? 0));
-		const extraPaid = Math.min(requested, balance - principal) as Cents;
-		balance = (balance - principal - extraPaid) as Cents;
+		const step = ledgerMonth(
+			balance,
+			rate,
+			pi,
+			month === payments,
+			extra?.(month) ?? 0,
+		);
+		balance = step.balance;
 		rows.push({
 			month,
-			payment: (regular + extraPaid) as Cents,
-			interest,
-			principal,
-			extra: extraPaid,
+			payment: (step.regular + step.extraPaid) as Cents,
+			interest: step.interest,
+			principal: step.principal,
+			extra: step.extraPaid,
 			balance,
 		});
 	}

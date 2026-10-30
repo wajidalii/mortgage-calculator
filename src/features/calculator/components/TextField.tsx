@@ -1,0 +1,88 @@
+import { useId } from "react";
+import { cn } from "@/lib/cn";
+
+interface TextFieldProps {
+	label: string;
+	value: string;
+	onChange: (value: string) => void;
+	onBlur: () => void;
+	error?: string | undefined;
+	hint?: string;
+	prefix?: string;
+	suffix?: string;
+	readOnly?: boolean;
+	className?: string;
+}
+
+const TextField = ({
+	label,
+	value,
+	onChange,
+	onBlur,
+	error,
+	hint,
+	prefix,
+	suffix,
+	readOnly = false,
+	className,
+}: TextFieldProps) => {
+	const id = useId();
+	const errorId = `${id}-error`;
+	const hintId = `${id}-hint`;
+	const describedBy =
+		[error ? errorId : null, hint ? hintId : null].filter(Boolean).join(" ") ||
+		undefined;
+
+	return (
+		<div className={className}>
+			<label htmlFor={id} className="block text-sm font-medium text-slate-800">
+				{label}
+			</label>
+			<div
+				className={cn(
+					"mt-1 flex items-center rounded-md bg-white ring-1 ring-slate-300 focus-within:ring-2 focus-within:ring-brand-500",
+					error && "ring-2 ring-red-600 focus-within:ring-red-600",
+					readOnly && "bg-slate-100 text-slate-600",
+				)}
+			>
+				{prefix ? (
+					<span aria-hidden="true" className="pl-3 text-slate-500">
+						{prefix}
+					</span>
+				) : null}
+				<input
+					id={id}
+					type="text"
+					inputMode="decimal"
+					autoComplete="off"
+					value={value}
+					readOnly={readOnly}
+					aria-readonly={readOnly || undefined}
+					aria-invalid={error ? true : undefined}
+					aria-describedby={describedBy}
+					onChange={(event) => onChange(event.target.value)}
+					onBlur={onBlur}
+					className="w-full min-w-0 bg-transparent px-3 py-2 text-base outline-none"
+				/>
+				{suffix ? (
+					<span aria-hidden="true" className="pr-3 text-slate-500">
+						{suffix}
+					</span>
+				) : null}
+			</div>
+			{hint ? (
+				<p id={hintId} className="mt-1 text-xs text-slate-500">
+					{hint}
+				</p>
+			) : null}
+			{error ? (
+				<p id={errorId} className="mt-1 text-sm font-medium text-red-700">
+					<span aria-hidden="true">⚠ </span>
+					{error}
+				</p>
+			) : null}
+		</div>
+	);
+};
+
+export default TextField;

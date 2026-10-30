@@ -1,10 +1,12 @@
-import Card from "@/components/ui/Card";
+import Disclaimer from "@/components/feedback/Disclaimer";
+import LoanCalculator from "@/features/calculator/components/LoanCalculator";
 
 const CalculatorPage = () => (
-	<Card>
+	<div className="grid gap-6">
 		<h1 className="text-2xl font-semibold">Calculator</h1>
-		<p className="mt-2 text-slate-600">Calculator coming soon.</p>
-	</Card>
+		<LoanCalculator />
+		<Disclaimer />
+	</div>
 );
 
 export default CalculatorPage;

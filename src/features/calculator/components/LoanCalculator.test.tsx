@@ -458,4 +458,95 @@ describe("LoanCalculator", () => {
 			expect(piSummary().getByText("$2,528.27")).toBeTruthy();
 		});
 	});
+
+	describe("input validation", () => {
+		const estimate = () =>
+			within(screen.getByRole("region", { name: "Estimated monthly cost" }));
+
+		it("shows an error and no result for a rate of 31%", () => {
+			render(<LoanCalculator />);
+			type("Interest rate", "31");
+			expect(
+				screen.getByText("Interest rate cannot be more than 30%"),
+			).toBeTruthy();
+			expect(estimate().queryByText(/month total/)).toBeNull();
+			expect(screen.queryByRole("table")).toBeNull();
+		});
+
+		it("shows an error and no result for a rate of -1%", () => {
+			render(<LoanCalculator />);
+			type("Interest rate", "-1");
+			expect(
+				screen.getByText("An interest rate cannot be negative"),
+			).toBeTruthy();
+			expect(estimate().queryByText(/month total/)).toBeNull();
+		});
+
+		it("shows the exact message when the down payment is above the price", () => {
+			render(<LoanCalculator />);
+			fireEvent.click(screen.getByRole("button", { name: "Dollar amount" }));
+			type("Down payment ($)", "600000");
+			expect(
+				screen.getByText("Down payment cannot be more than the price"),
+			).toBeTruthy();
+			expect(estimate().queryByText(/month total/)).toBeNull();
+		});
+
+		it("keeps the last valid result when a money field holds text", () => {
+			render(<LoanCalculator />);
+			expect(estimate().getByText(/month total/)).toBeTruthy();
+			const before =
+				estimate().getByText(/month total/).parentElement?.textContent;
+			type("Monthly HOA", "abc");
+			expect(screen.getByText("Monthly HOA must be a number")).toBeTruthy();
+			expect(
+				estimate().getByText(/month total/).parentElement?.textContent,
+			).toBe(before);
+			expect(screen.getByRole("status").textContent).toContain("last valid");
+			expect(screen.getByRole("table")).toBeTruthy();
+			// Fixing the field clears the notice and updates the result.
+			type("Monthly HOA", "100");
+			expect(screen.queryByRole("status")).toBeNull();
+			expect(estimate().getAllByText("$100.00").length).toBeGreaterThan(0);
+		});
+
+		it("clears the result when text is combined with an out-of-range rate", () => {
+			render(<LoanCalculator />);
+			type("Monthly HOA", "abc");
+			type("Interest rate", "31");
+			expect(estimate().queryByText(/month total/)).toBeNull();
+			expect(screen.queryByRole("status")).toBeNull();
+		});
+
+		it("links each error to its input with aria-invalid and aria-describedby", () => {
+			render(<LoanCalculator />);
+			const rate = field("Interest rate");
+			expect(rate.getAttribute("aria-invalid")).toBeNull();
+			expect(rate.getAttribute("aria-describedby")).toBeNull();
+			type("Interest rate", "31");
+			expect(rate.getAttribute("aria-invalid")).toBe("true");
+			const message = screen.getByText("Interest rate cannot be more than 30%");
+			expect(rate.getAttribute("aria-describedby")).toContain(message.id);
+		});
+
+		it("announces errors to screen readers and does not rely on color alone", () => {
+			render(<LoanCalculator />);
+			type("Interest rate", "31");
+			const alert = screen.getByRole("alert");
+			expect(alert.textContent).toContain(
+				"Interest rate cannot be more than 30%",
+			);
+			expect(alert.textContent).toContain("⚠");
+		});
+
+		it("labels every text input", () => {
+			render(<LoanCalculator />);
+			for (const input of screen.getAllByRole("textbox")) {
+				expect(
+					(input as HTMLInputElement).labels?.length,
+					input.outerHTML,
+				).toBeGreaterThan(0);
+			}
+		});
+	});
 });

@@ -25,16 +25,14 @@ interface LoanCalculatorProps {
 const LoanCalculator = ({ today }: LoanCalculatorProps) => {
 	const {
 		state,
-		assumptions,
 		dispatch,
 		derived,
-		loan,
 		arm,
 		propertyTax,
 		monthlyCosts,
 		pmi,
-		estimate,
-		schedule,
+		results,
+		showingLastResult,
 	} = useCalculatorInputs(today);
 	const { inputs, touched } = state;
 	const isArm = inputs.loanType === "arm";
@@ -157,17 +155,26 @@ const LoanCalculator = ({ today }: LoanCalculatorProps) => {
 					/>
 				</form>
 			</Card>
+			{showingLastResult ? (
+				<p
+					role="status"
+					className="rounded-md bg-amber-50 p-3 text-sm font-medium text-amber-950 ring-1 ring-amber-400"
+				>
+					<span aria-hidden="true">⚠ </span>A field has text that is not a
+					number. The results below are from your last valid entry.
+				</p>
+			) : null}
 			<MonthlyEstimateCard
-				estimate={estimate}
-				arm={arm.result?.summary ?? null}
-				outOfDate={hasStaleDefault(assumptions)}
+				estimate={results.estimate}
+				arm={results.arm?.summary ?? null}
+				outOfDate={hasStaleDefault(results.assumptions)}
 			/>
-			<LoanSummary loan={loan} />
-			<PropertyTaxSummary tax={propertyTax.tax} />
-			<MonthlyCostsSummary costs={monthlyCosts.costs} />
-			<PmiSummary result={pmi.result} />
-			<AssumptionsPanel items={assumptions} />
-			{schedule ? <ScheduleTable rows={schedule} /> : null}
+			<LoanSummary loan={results.loan} />
+			<PropertyTaxSummary tax={results.tax} />
+			<MonthlyCostsSummary costs={results.costs} />
+			<PmiSummary result={results.pmi} />
+			<AssumptionsPanel items={results.assumptions} />
+			{results.schedule ? <ScheduleTable rows={results.schedule} /> : null}
 		</div>
 	);
 };

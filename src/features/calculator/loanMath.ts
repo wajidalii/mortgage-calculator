@@ -1,18 +1,22 @@
-import type { ParseError } from "@/lib/decimal";
 import { parseMoney } from "@/lib/money";
 import { monthlyPayment } from "@/lib/payment";
 import { parseRate } from "@/lib/rate";
 import { roundHalfUp } from "@/lib/rounding";
 import type { Cents, Micros } from "@/types/units";
 import type { CalculatorInputs, DerivedLoan, InputErrors } from "./types";
+import {
+	DOWN_PAYMENT_TOO_HIGH,
+	MAX_INTEREST_RATE,
+	parseMessage,
+	RATE_TOO_HIGH,
+} from "./validation";
 
 const MICROS_PER_WHOLE = 1_000_000;
 
 /** $10,000,000. Keeps every intermediate product inside the safe integer range. */
 export const MAX_HOME_PRICE = 1_000_000_000 as Cents;
 
-export const DOWN_PAYMENT_TOO_HIGH =
-	"Down payment cannot be more than the price";
+export { DOWN_PAYMENT_TOO_HIGH };
 
 /** Down payment in cents from a fraction in millionths: round(price x pct). */
 export const downPaymentFromPercent = (price: Cents, percent: Micros): Cents =>
@@ -29,19 +33,6 @@ export const loanAmountFor = (price: Cents, down: Cents): Cents =>
 /** LTV = L / H in millionths. */
 export const ltvFor = (price: Cents, loan: Cents): Micros =>
 	roundHalfUp(loan * MICROS_PER_WHOLE, price) as Micros;
-
-const parseMessage = (label: string, error: ParseError): string => {
-	switch (error) {
-		case "empty":
-			return `Enter ${label}`;
-		case "negative":
-			return `${label[0]?.toUpperCase()}${label.slice(1)} cannot be negative`;
-		case "too-large":
-			return `${label[0]?.toUpperCase()}${label.slice(1)} is too large`;
-		default:
-			return `${label[0]?.toUpperCase()}${label.slice(1)} must be a number`;
-	}
-};
 
 /** Plain text for a synced field: "100,000.00" (no currency sign). */
 export const centsToFieldText = (cents: Cents): string => {
@@ -79,6 +70,8 @@ export const deriveLoan = (inputs: CalculatorInputs): DerivedLoan => {
 	const rate = parseRate(inputs.interestRate);
 	if (!rate.ok) {
 		errors.interestRate = parseMessage("an interest rate", rate.error);
+	} else if (rate.value > MAX_INTEREST_RATE) {
+		errors.interestRate = RATE_TOO_HIGH;
 	}
 
 	let downPayment: Cents | null = null;

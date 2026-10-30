@@ -26,6 +26,8 @@ const inputs = (
 	extraAnnualInsurance: "",
 	monthlyHoa: "",
 	monthlyOther: "",
+	pmiOn: true,
+	pmiRate: "",
 	...overrides,
 });
 

@@ -246,4 +246,53 @@ describe("LoanCalculator", () => {
 			expect(within(section()).getByText("$100.00")).toBeTruthy();
 		});
 	});
+
+	describe("PMI (S-5)", () => {
+		const section = () =>
+			screen.getByRole("region", { name: "Private mortgage insurance (PMI)" });
+
+		it("is off at 20% down and hides the PMI controls", () => {
+			render(<LoanCalculator />);
+			expect(
+				within(section()).getByText(
+					"PMI is off: the loan is 80% of the home price or less.",
+				),
+			).toBeTruthy();
+			expect(screen.queryByLabelText(/Include PMI/)).toBeNull();
+		});
+
+		it("is on at 10% down with LTV 90.00%, removal month 95 and end month 109", () => {
+			render(<LoanCalculator />);
+			type("Down payment (%)", "10");
+			expect(screen.getByText("90.00%")).toBeTruthy();
+			expect(within(section()).getByText("$281.25")).toBeTruthy();
+			expect(within(section()).getByText("Month 95")).toBeTruthy();
+			expect(within(section()).getByText("Month 109")).toBeTruthy();
+			expect(within(section()).getByText("Illustrative estimate")).toBeTruthy();
+		});
+
+		it("uses an entered PMI rate: $450,000 at 0.50% is $187.50", () => {
+			render(<LoanCalculator />);
+			type("Down payment (%)", "10");
+			type("PMI rate (per year)", "0.50");
+			expect(within(section()).getByText("$187.50")).toBeTruthy();
+			expect(within(section()).queryByText("Illustrative estimate")).toBeNull();
+		});
+
+		it("can be turned off and back on", () => {
+			render(<LoanCalculator />);
+			type("Down payment (%)", "10");
+			fireEvent.click(screen.getByLabelText(/Include PMI/));
+			expect(within(section()).getByText("PMI is turned off.")).toBeTruthy();
+			fireEvent.click(screen.getByLabelText(/Include PMI/));
+			expect(within(section()).getByText("$281.25")).toBeTruthy();
+		});
+
+		it("shows an error for a bad PMI rate", () => {
+			render(<LoanCalculator />);
+			type("Down payment (%)", "10");
+			type("PMI rate (per year)", "-1");
+			expect(screen.getByText("PMI rate cannot be negative")).toBeTruthy();
+		});
+	});
 });

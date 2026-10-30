@@ -15,7 +15,8 @@ export type ErrorField =
 	| "annualInsurance"
 	| "extraAnnualInsurance"
 	| "monthlyHoa"
-	| "monthlyOther";
+	| "monthlyOther"
+	| "pmiRate";
 
 /** Raw text the user typed, plus which down payment form is the source. */
 export interface CalculatorInputs {
@@ -35,6 +36,10 @@ export interface CalculatorInputs {
 	monthlyHoa: string;
 	/** One optional monthly amount, not a list. */
 	monthlyOther: string;
+	/** PMI toggle. Only matters when LTV is above 80%. */
+	pmiOn: boolean;
+	/** Annual PMI rate in percent. Empty means use the default. */
+	pmiRate: string;
 }
 
 export interface CalculatorState {
@@ -51,14 +56,16 @@ export type EditableField =
 	| "annualInsurance"
 	| "extraAnnualInsurance"
 	| "monthlyHoa"
-	| "monthlyOther";
+	| "monthlyOther"
+	| "pmiRate";
 
 export type CalculatorAction =
 	| { type: "edit"; field: EditableField; value: string }
 	| { type: "blur"; field: EditableField }
 	| { type: "setDownPaymentMode"; mode: DownPaymentMode }
 	| { type: "setTerm"; years: LoanTerm }
-	| { type: "setState"; state: StateCode };
+	| { type: "setState"; state: StateCode }
+	| { type: "setPmiOn"; on: boolean };
 
 export interface LoanDerivation {
 	homePrice: Cents;

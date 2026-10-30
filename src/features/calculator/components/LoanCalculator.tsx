@@ -4,6 +4,8 @@ import DownPaymentFields from "./DownPaymentFields";
 import LoanSummary from "./LoanSummary";
 import MonthlyCostsFields from "./MonthlyCostsFields";
 import MonthlyCostsSummary from "./MonthlyCostsSummary";
+import PmiFields from "./PmiFields";
+import PmiSummary from "./PmiSummary";
 import PropertyTaxFields from "./PropertyTaxFields";
 import PropertyTaxSummary from "./PropertyTaxSummary";
 import ScheduleTable from "./ScheduleTable";
@@ -11,7 +13,7 @@ import TermSelector from "./TermSelector";
 import TextField from "./TextField";
 
 const LoanCalculator = () => {
-	const { state, dispatch, derived, propertyTax, monthlyCosts, schedule } =
+	const { state, dispatch, derived, propertyTax, monthlyCosts, pmi, schedule } =
 		useCalculatorInputs();
 	const { inputs, touched } = state;
 	// Show a message only after the user has left the field.
@@ -19,7 +21,8 @@ const LoanCalculator = () => {
 		touched[field]
 			? (derived.errors[field] ??
 				propertyTax.errors[field] ??
-				monthlyCosts.errors[field])
+				monthlyCosts.errors[field] ??
+				pmi.errors[field])
 			: undefined;
 
 	return (
@@ -93,11 +96,23 @@ const LoanCalculator = () => {
 						}
 						onBlur={(field) => dispatch({ type: "blur", field })}
 					/>
+					<PmiFields
+						required={pmi.required}
+						on={inputs.pmiOn}
+						rate={inputs.pmiRate}
+						error={shown("pmiRate")}
+						onToggle={(on) => dispatch({ type: "setPmiOn", on })}
+						onRateChange={(value) =>
+							dispatch({ type: "edit", field: "pmiRate", value })
+						}
+						onBlur={() => dispatch({ type: "blur", field: "pmiRate" })}
+					/>
 				</form>
 			</Card>
 			<LoanSummary loan={derived.loan} />
 			<PropertyTaxSummary tax={propertyTax.tax} />
 			<MonthlyCostsSummary costs={monthlyCosts.costs} />
+			<PmiSummary result={pmi.result} />
 			{schedule ? <ScheduleTable rows={schedule} /> : null}
 		</div>
 	);

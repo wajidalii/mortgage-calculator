@@ -32,6 +32,8 @@ export const initialCalculatorState: CalculatorState = {
 		extraAnnualInsurance: "",
 		monthlyHoa: "",
 		monthlyOther: "",
+		pmiOn: true,
+		pmiRate: "",
 	},
 	touched: {},
 };
@@ -95,6 +97,8 @@ export const calculatorReducer = (
 			};
 		case "setTerm":
 			return { ...state, inputs: { ...state.inputs, termYears: action.years } };
+		case "setPmiOn":
+			return { ...state, inputs: { ...state.inputs, pmiOn: action.on } };
 		case "setState":
 			return { ...state, inputs: { ...state.inputs, state: action.state } };
 	}

@@ -1,6 +1,7 @@
 import { useDeferredValue, useMemo, useReducer } from "react";
 import { buildSchedule } from "@/lib/amortization";
 import { deriveArm } from "../armSchedule";
+import { buildAssumptions } from "../assumptions";
 import {
 	calculatorReducer,
 	initialCalculatorState,
@@ -14,9 +15,9 @@ import { derivePropertyTax } from "../propertyTax";
 /**
  * Owns the calculator input state. Typing updates `state` immediately; the
  * loan derivation reads a deferred copy so a slow recalculation never blocks
- * keystrokes (INP).
+ * keystrokes (INP). `today` is injectable so tests can fix the stale check.
  */
-export const useCalculatorInputs = () => {
+export const useCalculatorInputs = (today?: Date) => {
 	const [state, dispatch] = useReducer(
 		calculatorReducer,
 		initialCalculatorState,
@@ -63,8 +64,29 @@ export const useCalculatorInputs = () => {
 			),
 		[loan, propertyTax.tax, monthlyCosts.costs, pmi.result],
 	);
+	const now = useMemo(() => today ?? new Date(), [today]);
+	const assumptions = useMemo(
+		() =>
+			buildAssumptions({
+				inputs: deferredInputs,
+				loan,
+				tax: propertyTax.tax,
+				costs: monthlyCosts.costs,
+				pmi: pmi.result,
+				today: now,
+			}),
+		[
+			deferredInputs,
+			loan,
+			propertyTax.tax,
+			monthlyCosts.costs,
+			pmi.result,
+			now,
+		],
+	);
 	return {
 		state,
+		assumptions,
 		dispatch,
 		derived,
 		loan,

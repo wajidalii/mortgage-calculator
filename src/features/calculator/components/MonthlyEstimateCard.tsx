@@ -8,6 +8,8 @@ interface MonthlyEstimateCardProps {
 	estimate: MonthlyEstimate | null;
 	/** Set for a valid 5/6 ARM: the estimate shows the first-period payment. */
 	arm?: ArmSummary | null;
+	/** An illustrative default behind this estimate is past the stale limit. */
+	outOfDate?: boolean;
 }
 
 const Lines = ({
@@ -60,7 +62,11 @@ const ResetRisk = ({ arm }: { arm: ArmSummary }) => (
 	</div>
 );
 
-const MonthlyEstimateCard = ({ estimate, arm }: MonthlyEstimateCardProps) => (
+const MonthlyEstimateCard = ({
+	estimate,
+	arm,
+	outOfDate = false,
+}: MonthlyEstimateCardProps) => (
 	<section
 		aria-labelledby="monthly-estimate-heading"
 		className="rounded-lg bg-brand-50 p-6 ring-1 ring-brand-500/30"
@@ -118,6 +124,15 @@ const MonthlyEstimateCard = ({ estimate, arm }: MonthlyEstimateCardProps) => (
 						</div>
 					</div>
 					{arm ? <ResetRisk arm={arm} /> : null}
+					{outOfDate ? (
+						<p className="mt-4 text-sm text-amber-950">
+							<span className="rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium ring-1 ring-amber-400">
+								May be out of date
+							</span>{" "}
+							Some illustrative defaults behind this estimate are over a year
+							old. See the assumptions below.
+						</p>
+					) : null}
 				</>
 			) : (
 				<p className="mt-1 text-base text-slate-700">

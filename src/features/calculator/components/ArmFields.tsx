@@ -1,7 +1,6 @@
 import { useId } from "react";
 import { DEFAULTS } from "@/config/defaults/defaults";
-import { formatPercent } from "@/lib/rate";
-import { ARM_INDEX_SHOCK, ARM_INDEX_START } from "../armSchedule";
+import { INDEX_PRESET_HINTS } from "../armSchedule";
 import type { EditableField, ErrorField, IndexPresetId } from "../types";
 import TextField from "./TextField";
 
@@ -19,12 +18,6 @@ interface ArmFieldsProps {
 	onBlur: (field: ArmField) => void;
 	onPresetChange: (preset: IndexPresetId) => void;
 }
-
-const PRESET_HINTS: Record<IndexPresetId, string> = {
-	flat: `The index stays at ${formatPercent(ARM_INDEX_START, 2)}.`,
-	"plus-one-per-year": `The index starts at ${formatPercent(ARM_INDEX_START, 2)} and adds 1 point every year after month 60.`,
-	shock: `The index jumps to ${formatPercent(ARM_INDEX_SHOCK, 2)} at month 61.`,
-};
 
 const ArmFields = ({
 	margin,
@@ -103,7 +96,7 @@ const ArmFields = ({
 					))}
 				</div>
 				<p className="mt-1 text-xs text-slate-500">
-					{PRESET_HINTS[preset]} This is an assumption, not a forecast.
+					{INDEX_PRESET_HINTS[preset]} This is an assumption, not a forecast.
 				</p>
 			</fieldset>
 		</fieldset>

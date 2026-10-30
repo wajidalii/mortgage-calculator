@@ -6,6 +6,7 @@ import {
 } from "../calculatorReducer";
 import { deriveLoan } from "../loanMath";
 import { deriveMonthlyCosts } from "../monthlyCosts";
+import { derivePmi } from "../pmi";
 import { derivePropertyTax } from "../propertyTax";
 
 /**
@@ -38,5 +39,9 @@ export const useCalculatorInputs = () => {
 				})
 			: null;
 	}, [derived.loan]);
-	return { state, dispatch, derived, propertyTax, monthlyCosts, schedule };
+	const pmi = useMemo(
+		() => derivePmi(deferredInputs, derived.loan, schedule),
+		[deferredInputs, derived.loan, schedule],
+	);
+	return { state, dispatch, derived, propertyTax, monthlyCosts, pmi, schedule };
 };

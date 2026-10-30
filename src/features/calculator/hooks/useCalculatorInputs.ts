@@ -1,4 +1,5 @@
 import { useDeferredValue, useMemo, useReducer } from "react";
+import { buildSchedule } from "@/lib/amortization";
 import {
 	calculatorReducer,
 	initialCalculatorState,
@@ -17,5 +18,15 @@ export const useCalculatorInputs = () => {
 	);
 	const deferredInputs = useDeferredValue(state.inputs);
 	const derived = useMemo(() => deriveLoan(deferredInputs), [deferredInputs]);
-	return { state, dispatch, derived };
+	const schedule = useMemo(() => {
+		const loan = derived.loan;
+		return loan
+			? buildSchedule({
+					loan: loan.loanAmount,
+					rate: loan.interestRate,
+					payments: loan.termYears * 12,
+				})
+			: null;
+	}, [derived.loan]);
+	return { state, dispatch, derived, schedule };
 };

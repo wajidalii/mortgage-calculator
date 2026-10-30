@@ -1,0 +1,15 @@
+language js(typescript, jsx)
+
+// Components must be arrow functions: ban `function Foo() { ...<jsx/>... }`
+// and `export default function Foo() { ...<jsx/>... }` in src/**/*.tsx.
+or {
+	`function $name($params) { $body }`,
+	`export default function $name($params) { $body }`
+} where {
+	$body <: contains or {
+		`<$_ />`,
+		`<$_>$_</$_>`,
+		`<>$_</>`
+	},
+	register_diagnostic(span=$name, message="Components must be arrow functions: use `const Foo = () => ...; export default Foo;` instead of a function declaration.", severity="error")
+}

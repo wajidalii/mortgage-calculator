@@ -1,0 +1,26 @@
+language js(typescript, jsx)
+
+// Closest enforceable form of "component files must default-export the component".
+// Biome GritQL plugins cannot assert the ABSENCE of a node at file level (module-root
+// patterns never match), so instead we ban every way of exporting a component that is
+// NOT a default export in src/**/*.tsx:
+//   export const Foo = () => <jsx/>;   export function Foo() { <jsx/> }   export { Foo };
+or {
+	`export const $name = $value` where {
+		$value <: contains or {
+			`<$_ />`,
+			`<$_>$_</$_>`,
+			`<>$_</>`
+		}
+	},
+	`export function $name($params) { $value }` where {
+		$value <: contains or {
+			`<$_ />`,
+			`<$_>$_</$_>`,
+			`<>$_</>`
+		}
+	},
+	JsExportNamedClause() as $name
+} where {
+	register_diagnostic(span=$name, message="Components must be default-exported: write `const Foo = () => ...; export default Foo;` (no named component exports).", severity="error")
+}

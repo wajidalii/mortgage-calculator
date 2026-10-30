@@ -28,6 +28,13 @@ const inputs = (
 	monthlyOther: "",
 	pmiOn: true,
 	pmiRate: "",
+	loanType: "fixed",
+	armMargin: "2.75",
+	armFloor: "",
+	armInitialCap: "2",
+	armPeriodicCap: "1",
+	armLifetimeCap: "5",
+	armIndexPreset: "flat",
 	...overrides,
 });
 

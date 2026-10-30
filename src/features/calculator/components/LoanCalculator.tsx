@@ -1,7 +1,9 @@
 import Card from "@/components/ui/Card";
 import { useCalculatorInputs } from "../hooks/useCalculatorInputs";
+import ArmFields from "./ArmFields";
 import DownPaymentFields from "./DownPaymentFields";
 import LoanSummary from "./LoanSummary";
+import LoanTypeSelector from "./LoanTypeSelector";
 import MonthlyCostsFields from "./MonthlyCostsFields";
 import MonthlyCostsSummary from "./MonthlyCostsSummary";
 import MonthlyEstimateCard from "./MonthlyEstimateCard";
@@ -18,6 +20,8 @@ const LoanCalculator = () => {
 		state,
 		dispatch,
 		derived,
+		loan,
+		arm,
 		propertyTax,
 		monthlyCosts,
 		pmi,
@@ -25,12 +29,14 @@ const LoanCalculator = () => {
 		schedule,
 	} = useCalculatorInputs();
 	const { inputs, touched } = state;
+	const isArm = inputs.loanType === "arm";
 	// Show a message only after the user has left the field.
 	const shown = (field: keyof typeof touched) =>
 		touched[field]
 			? (derived.errors[field] ??
 				propertyTax.errors[field] ??
 				monthlyCosts.errors[field] ??
+				arm.errors[field as keyof typeof arm.errors] ??
 				pmi.errors[field])
 			: undefined;
 
@@ -69,12 +75,16 @@ const LoanCalculator = () => {
 						}
 						onBlur={(field) => dispatch({ type: "blur", field })}
 					/>
+					<LoanTypeSelector
+						value={inputs.loanType}
+						onChange={(loanType) => dispatch({ type: "setLoanType", loanType })}
+					/>
 					<TermSelector
 						value={inputs.termYears}
 						onChange={(years) => dispatch({ type: "setTerm", years })}
 					/>
 					<TextField
-						label="Interest rate"
+						label={isArm ? "Start rate" : "Interest rate"}
 						suffix="%"
 						value={inputs.interestRate}
 						error={shown("interestRate")}
@@ -82,7 +92,28 @@ const LoanCalculator = () => {
 							dispatch({ type: "edit", field: "interestRate", value })
 						}
 						onBlur={() => dispatch({ type: "blur", field: "interestRate" })}
+						{...(isArm
+							? { hint: "The rate for months 1 to 60 (the fixed period)." }
+							: {})}
 					/>
+					{isArm ? (
+						<ArmFields
+							margin={inputs.armMargin}
+							floor={inputs.armFloor}
+							initialCap={inputs.armInitialCap}
+							periodicCap={inputs.armPeriodicCap}
+							lifetimeCap={inputs.armLifetimeCap}
+							preset={inputs.armIndexPreset}
+							errorFor={shown}
+							onChange={(field, value) =>
+								dispatch({ type: "edit", field, value })
+							}
+							onBlur={(field) => dispatch({ type: "blur", field })}
+							onPresetChange={(preset) =>
+								dispatch({ type: "setArmIndexPreset", preset })
+							}
+						/>
+					) : null}
 					<PropertyTaxFields
 						state={inputs.state}
 						override={inputs.annualTaxOverride}
@@ -118,8 +149,11 @@ const LoanCalculator = () => {
 					/>
 				</form>
 			</Card>
-			<MonthlyEstimateCard estimate={estimate} />
-			<LoanSummary loan={derived.loan} />
+			<MonthlyEstimateCard
+				estimate={estimate}
+				arm={arm.result?.summary ?? null}
+			/>
+			<LoanSummary loan={loan} />
 			<PropertyTaxSummary tax={propertyTax.tax} />
 			<MonthlyCostsSummary costs={monthlyCosts.costs} />
 			<PmiSummary result={pmi.result} />

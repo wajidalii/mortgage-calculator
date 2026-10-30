@@ -24,7 +24,7 @@ const Row = ({
 const MonthlyCostsSummary = ({ costs }: MonthlyCostsSummaryProps) => (
 	<section
 		aria-labelledby="monthly-costs-heading"
-		className="rounded-lg bg-white p-6 ring-1 ring-slate-300"
+		className="rounded-lg bg-white p-4 sm:p-6 ring-1 ring-slate-300"
 	>
 		<h2
 			id="monthly-costs-heading"

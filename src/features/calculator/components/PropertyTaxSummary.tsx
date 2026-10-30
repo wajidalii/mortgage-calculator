@@ -9,7 +9,7 @@ interface PropertyTaxSummaryProps {
 const PropertyTaxSummary = ({ tax }: PropertyTaxSummaryProps) => (
 	<section
 		aria-labelledby="property-tax-heading"
-		className="rounded-lg bg-white p-6 ring-1 ring-slate-300"
+		className="rounded-lg bg-white p-4 sm:p-6 ring-1 ring-slate-300"
 	>
 		<h2
 			id="property-tax-heading"

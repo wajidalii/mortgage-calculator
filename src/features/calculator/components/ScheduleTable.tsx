@@ -112,7 +112,7 @@ const ScheduleTable = ({ rows }: ScheduleTableProps) => {
 							variant={view === item.view ? "primary" : "secondary"}
 							aria-pressed={view === item.view}
 							onClick={() => setView(item.view)}
-							className="px-3 py-1 first:rounded-r-none last:rounded-l-none"
+							className="min-h-11 px-3 py-1 first:rounded-r-none last:rounded-l-none"
 						>
 							{item.label}
 						</Button>

@@ -9,6 +9,7 @@ Web calculator for U.S. home buyers and owners (see `PRD.md`, `user-stories.md`,
 - Biome 2.6 for lint and format; Prettier only for `*.md`, `*.yml`, `*.yaml`
 - Yarn 4 (Berry) through Corepack, `nodeLinker: node-modules`. Node >= 22 (`.nvmrc`)
 - Husky + lint-staged
+- Vitest 5 for tests (co-located `*.test.ts` files in `src/`)
 - No state library (no Zustand/Redux). `useState` / `useReducer` in feature hooks; Context only for stable global data
 - Versions are pinned exactly in `package.json`
 
@@ -16,15 +17,16 @@ Web calculator for U.S. home buyers and owners (see `PRD.md`, `user-stories.md`,
 
 Use `yarn`, not `npm`. If `yarn` is not found, add `~/.local/bin` to PATH (the Corepack shim lives there; the Husky hook needs it too).
 
-| Command                         | What it does                                                                      |
-| ------------------------------- | --------------------------------------------------------------------------------- |
-| `yarn dev`                      | Local dev server (`vite --host`, port 5173). Needs a `.env` (copy `.env.example`) |
-| `yarn start`                    | Production: `yarn build && serve -s dist -l ${PORT:-3000}`                        |
-| `yarn build`                    | `tsc -b && vite build`                                                            |
-| `yarn typecheck`                | `tsc -b --noEmit`                                                                 |
-| `yarn lint` / `yarn lint:fix`   | `biome lint .` / `biome lint --write .`                                           |
-| `yarn check` / `yarn check:fix` | Biome lint + format + import sorting, check / write                               |
-| `yarn format`                   | Biome format, then Prettier on md/yml/yaml                                        |
+| Command                         | What it does                                                                          |
+| ------------------------------- | ------------------------------------------------------------------------------------- |
+| `yarn dev`                      | Local dev server (`vite --host`, port 5173). Needs a `.env` (copy `.env.example`)     |
+| `yarn start`                    | Production: `yarn build && serve -s dist -l ${PORT:-3000}`                            |
+| `yarn build`                    | `tsc -b && vite build`                                                                |
+| `yarn typecheck`                | `tsc -b --noEmit`                                                                     |
+| `yarn test` / `yarn test:watch` | Vitest: single run / watch mode. Tests are `src/**/*.test.{ts,tsx}`, node environment |
+| `yarn lint` / `yarn lint:fix`   | `biome lint .` / `biome lint --write .`                                               |
+| `yarn check` / `yarn check:fix` | Biome lint + format + import sorting, check / write                                   |
+| `yarn format`                   | Biome format, then Prettier on md/yml/yaml                                            |
 
 Yarn Berry does not run `pre*`/`post*` hooks on custom scripts (so `start` calls `yarn build` explicitly) and does not run `prepare` (so Husky installs via `postinstall`).
 
@@ -54,11 +56,14 @@ Root configs: `biome.json`, `biome-plugins/`, `vite.config.ts`, `tsconfig*.json`
 ## Code conventions (enforced by Biome)
 
 1. **Components are arrow functions** with a **default export**:
+
    ```tsx
    const Foo = () => { ... };
    export default Foo;
    ```
+
    No `function Foo()` components, no named component exports, no `export { ... }` in `.tsx` files. Enforced by GritQL plugins in `biome-plugins/`, scoped to `src/**/*.tsx`.
+
 2. **Known gap:** Biome cannot assert that a file _has_ a default export. The rules ban every other way to export a component, but cannot catch a `.tsx` file with no default export, or one that default-exports something other than the component. Check this in review.
 3. Every page and the layout are loaded with `lazy()` and must default-export. Do not lazy-load tiny leaf components; that causes request waterfalls and hurts LCP.
 4. No `any` (`noExplicitAny` is an error). Use explicit interfaces and `import type` for type-only imports.
@@ -138,5 +143,4 @@ No nginx: production serves the built `dist/` with `serve` (SPA fallback on).
 - Mortgage logic and features from `PRD.md` are not started.
 - Navbar is a placeholder slot in `MainLayout`.
 - `Providers` (`src/app/providers.tsx`) is a pass-through.
-- No tests yet; no test runner is configured.
 - Closing the default-export lint gap (see Code conventions, item 2) would need a small check script.

@@ -1,5 +1,6 @@
 import { useDeferredValue, useMemo, useReducer } from "react";
 import { buildSchedule } from "@/lib/amortization";
+import { deriveArm } from "../armSchedule";
 import {
 	calculatorReducer,
 	initialCalculatorState,
@@ -22,6 +23,15 @@ export const useCalculatorInputs = () => {
 	);
 	const deferredInputs = useDeferredValue(state.inputs);
 	const derived = useMemo(() => deriveLoan(deferredInputs), [deferredInputs]);
+	const arm = useMemo(
+		() => deriveArm(deferredInputs, derived.loan),
+		[deferredInputs, derived.loan],
+	);
+	// An invalid ARM input shows an error and no result at all.
+	const loan =
+		deferredInputs.loanType === "arm" && Object.keys(arm.errors).length > 0
+			? null
+			: derived.loan;
 	const propertyTax = useMemo(
 		() => derivePropertyTax(deferredInputs),
 		[deferredInputs],
@@ -31,33 +41,34 @@ export const useCalculatorInputs = () => {
 		[deferredInputs],
 	);
 	const schedule = useMemo(() => {
-		const loan = derived.loan;
-		return loan
-			? buildSchedule({
-					loan: loan.loanAmount,
-					rate: loan.interestRate,
-					payments: loan.termYears * 12,
-				})
-			: null;
-	}, [derived.loan]);
+		if (!loan) return null;
+		if (deferredInputs.loanType === "arm") return arm.result?.rows ?? null;
+		return buildSchedule({
+			loan: loan.loanAmount,
+			rate: loan.interestRate,
+			payments: loan.termYears * 12,
+		});
+	}, [loan, deferredInputs.loanType, arm.result]);
 	const pmi = useMemo(
-		() => derivePmi(deferredInputs, derived.loan, schedule),
-		[deferredInputs, derived.loan, schedule],
+		() => derivePmi(deferredInputs, loan, schedule),
+		[deferredInputs, loan, schedule],
 	);
 	const estimate = useMemo(
 		() =>
 			buildMonthlyEstimate(
-				derived.loan,
+				loan,
 				propertyTax.tax,
 				monthlyCosts.costs,
 				pmi.result,
 			),
-		[derived.loan, propertyTax.tax, monthlyCosts.costs, pmi.result],
+		[loan, propertyTax.tax, monthlyCosts.costs, pmi.result],
 	);
 	return {
 		state,
 		dispatch,
 		derived,
+		loan,
+		arm,
 		propertyTax,
 		monthlyCosts,
 		pmi,

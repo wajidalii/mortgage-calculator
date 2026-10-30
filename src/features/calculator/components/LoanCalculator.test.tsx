@@ -47,7 +47,9 @@ describe("LoanCalculator", () => {
 
 	it("offers only 15, 20 and 30 year terms", () => {
 		render(<LoanCalculator />);
-		const radios = screen.getAllByRole("radio") as HTMLInputElement[];
+		const radios = within(
+			screen.getByRole("group", { name: "Loan term" }),
+		).getAllByRole("radio") as HTMLInputElement[];
 		expect(radios.map((radio) => radio.value)).toEqual(["15", "20", "30"]);
 		expect(radios.find((radio) => radio.checked)?.value).toBe("30");
 		fireEvent.click(screen.getByLabelText("15 years"));
@@ -342,6 +344,118 @@ describe("LoanCalculator", () => {
 					"Fix the highlighted fields to see the itemized monthly estimate.",
 				),
 			).toBeTruthy();
+		});
+	});
+
+	describe("5/6 ARM", () => {
+		const chooseArm = () => fireEvent.click(screen.getByLabelText("5/6 ARM"));
+		const scheduleRows = () => {
+			fireEvent.click(screen.getByRole("button", { name: "Monthly" }));
+			const table = screen.getByRole("table");
+			// Drop the header row.
+			return within(table).getAllByRole("row").slice(1);
+		};
+
+		it("is a fixed-rate loan with no ARM controls until 5/6 ARM is chosen", () => {
+			render(<LoanCalculator />);
+			expect(
+				(screen.getByLabelText("Fixed rate") as HTMLInputElement).checked,
+			).toBe(true);
+			expect(screen.queryByText("5/6 ARM terms")).toBeNull();
+			expect(screen.queryByText("Hypothetical rate")).toBeNull();
+		});
+
+		it("shows the terms, the start rate and the index presets", () => {
+			render(<LoanCalculator />);
+			chooseArm();
+			expect(field("Start rate").value).toBe("6.50");
+			expect(field("Margin").value).toBe("2.75");
+			expect(field("Initial cap").value).toBe("2.00");
+			expect(field("Periodic cap").value).toBe("1.00");
+			expect(field("Lifetime cap").value).toBe("5.00");
+			const presets = within(
+				screen.getByRole("group", { name: "Index path after month 60" }),
+			).getAllByRole("radio") as HTMLInputElement[];
+			expect(presets.map((radio) => radio.value)).toEqual([
+				"flat",
+				"plus-one-per-year",
+				"shock",
+			]);
+		});
+
+		it("labels rows 61 and later 'Hypothetical rate' and rows 1 to 60 not", () => {
+			render(<LoanCalculator />);
+			chooseArm();
+			const rows = scheduleRows();
+			expect(rows).toHaveLength(360);
+			rows.forEach((row, index) => {
+				const labelled = within(row).queryByText("Hypothetical rate") !== null;
+				expect(labelled, `month ${index + 1}`).toBe(index >= 60);
+			});
+		});
+
+		it("labels the yearly rows from year 6 on", () => {
+			render(<LoanCalculator />);
+			chooseArm();
+			const table = screen.getByRole("table");
+			const rows = within(table).getAllByRole("row").slice(1);
+			expect(rows).toHaveLength(30);
+			rows.forEach((row, index) => {
+				const labelled = within(row).queryByText("Hypothetical rate") !== null;
+				expect(labelled, `year ${index + 1}`).toBe(index >= 5);
+			});
+		});
+
+		it("switches the schedule to the ARM engine for the shock preset", () => {
+			render(<LoanCalculator />);
+			chooseArm();
+			fireEvent.click(screen.getByLabelText("Shock"));
+			const rows = scheduleRows();
+			// Month 61 resets 6.50% to 8.50%; month 60 is still 6.50%.
+			expect(within(rows[59] as HTMLElement).getByText("6.50%")).toBeTruthy();
+			expect(within(rows[60] as HTMLElement).getByText("8.50%")).toBeTruthy();
+			expect(
+				within(rows[60] as HTMLElement).getByText("$3,015.13"),
+			).toBeTruthy();
+		});
+
+		it("shows the first-period payment and flags the reset risk", () => {
+			render(<LoanCalculator />);
+			chooseArm();
+			fireEvent.click(screen.getByLabelText("Shock"));
+			const estimate = within(
+				screen.getByRole("region", { name: "Estimated monthly cost" }),
+			);
+			expect(
+				estimate.getByText("Principal and interest (months 1–60)"),
+			).toBeTruthy();
+			expect(estimate.getByText(/Reset risk/)).toBeTruthy();
+			expect(estimate.getByText("Hypothetical rate")).toBeTruthy();
+		});
+
+		it("shows an error and no result when a cap is above 100%", () => {
+			render(<LoanCalculator />);
+			chooseArm();
+			type("Initial cap", "101");
+			expect(
+				screen.getByText("Initial cap cannot be more than 100%"),
+			).toBeTruthy();
+			expect(screen.queryByRole("table")).toBeNull();
+			expect(
+				screen.queryByText("Reset risk: this payment is for months 1 to 60"),
+			).toBeNull();
+			expect(
+				screen.queryByText("Principal and interest (months 1–60)"),
+			).toBeNull();
+		});
+
+		it("returns to the fixed-rate result when Fixed rate is chosen again", () => {
+			render(<LoanCalculator />);
+			chooseArm();
+			fireEvent.click(screen.getByLabelText("Fixed rate"));
+			expect(screen.queryByText("Hypothetical rate")).toBeNull();
+			expect(screen.queryByText("5/6 ARM terms")).toBeNull();
+			expect(piSummary().getByText("$2,528.27")).toBeTruthy();
 		});
 	});
 });

@@ -1,3 +1,4 @@
+import { DEFAULTS } from "@/config/defaults/defaults";
 import { parseMoney } from "@/lib/money";
 import { parseRate } from "@/lib/rate";
 import {
@@ -18,6 +19,8 @@ import type {
 
 export const DEFAULT_TERM: LoanTerm = 30;
 
+const armTerms = DEFAULTS.armTerms.value;
+
 export const initialCalculatorState: CalculatorState = {
 	inputs: {
 		homePrice: "500,000",
@@ -34,6 +37,13 @@ export const initialCalculatorState: CalculatorState = {
 		monthlyOther: "",
 		pmiOn: true,
 		pmiRate: "",
+		loanType: "fixed",
+		armMargin: microsToPercentText(armTerms.marginMicros),
+		armFloor: "",
+		armInitialCap: microsToPercentText(armTerms.initialCapMicros),
+		armPeriodicCap: microsToPercentText(armTerms.periodicCapMicros),
+		armLifetimeCap: microsToPercentText(armTerms.lifetimeCapMicros),
+		armIndexPreset: "flat",
 	},
 	touched: {},
 };
@@ -99,6 +109,16 @@ export const calculatorReducer = (
 			return { ...state, inputs: { ...state.inputs, termYears: action.years } };
 		case "setPmiOn":
 			return { ...state, inputs: { ...state.inputs, pmiOn: action.on } };
+		case "setLoanType":
+			return {
+				...state,
+				inputs: { ...state.inputs, loanType: action.loanType },
+			};
+		case "setArmIndexPreset":
+			return {
+				...state,
+				inputs: { ...state.inputs, armIndexPreset: action.preset },
+			};
 		case "setState":
 			return { ...state, inputs: { ...state.inputs, state: action.state } };
 	}

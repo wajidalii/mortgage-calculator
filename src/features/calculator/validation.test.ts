@@ -103,6 +103,23 @@ describe("nonNumericMoneyFields", () => {
 	});
 });
 
+describe("closing cost text", () => {
+	it("counts dollar lines and credits, not percent lines", () => {
+		const text = inputs({
+			closing: {
+				...initialCalculatorState.inputs.closing,
+				lender: { mode: "amount", value: "abc" },
+				title: { mode: "percent", value: "abc" },
+			},
+			closingCredits: "x",
+		});
+		expect([...nonNumericMoneyFields(text)].sort()).toEqual([
+			"closing:lender",
+			"closingCredits",
+		]);
+	});
+});
+
 describe("keepsLastResult", () => {
 	it("is true when every error is non-numeric money text", () => {
 		expect(

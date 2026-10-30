@@ -35,6 +35,13 @@ const inputs = (
 	armPeriodicCap: "1",
 	armLifetimeCap: "5",
 	armIndexPreset: "flat",
+	closing: {
+		lender: { mode: "amount", value: "" },
+		title: { mode: "amount", value: "" },
+		prepaids: { mode: "amount", value: "" },
+		other: { mode: "amount", value: "" },
+	},
+	closingCredits: "",
 	...overrides,
 });
 

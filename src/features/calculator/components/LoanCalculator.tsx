@@ -3,6 +3,8 @@ import { hasStaleDefault } from "../assumptions";
 import { useCalculatorInputs } from "../hooks/useCalculatorInputs";
 import ArmFields from "./ArmFields";
 import AssumptionsPanel from "./AssumptionsPanel";
+import CashToCloseCard from "./CashToCloseCard";
+import ClosingCostsFields from "./ClosingCostsFields";
 import DownPaymentFields from "./DownPaymentFields";
 import LoanSummary from "./LoanSummary";
 import LoanTypeSelector from "./LoanTypeSelector";
@@ -31,6 +33,7 @@ const LoanCalculator = ({ today }: LoanCalculatorProps) => {
 		propertyTax,
 		monthlyCosts,
 		pmi,
+		closing,
 		results,
 		showingLastResult,
 	} = useCalculatorInputs(today);
@@ -43,7 +46,8 @@ const LoanCalculator = ({ today }: LoanCalculatorProps) => {
 				propertyTax.errors[field] ??
 				monthlyCosts.errors[field] ??
 				arm.errors[field as keyof typeof arm.errors] ??
-				pmi.errors[field])
+				pmi.errors[field] ??
+				closing.errors[field])
 			: undefined;
 
 	return (
@@ -153,6 +157,25 @@ const LoanCalculator = ({ today }: LoanCalculatorProps) => {
 						}
 						onBlur={() => dispatch({ type: "blur", field: "pmiRate" })}
 					/>
+					<ClosingCostsFields
+						closing={inputs.closing}
+						credits={inputs.closingCredits}
+						dollars={closing.dollars}
+						errorFor={shown}
+						onValueChange={(line, value) =>
+							dispatch({ type: "editClosingLine", line, value })
+						}
+						onModeChange={(line, mode) =>
+							dispatch({ type: "setClosingMode", line, mode })
+						}
+						onBlur={(line) => dispatch({ type: "blurClosingLine", line })}
+						onCreditsChange={(value) =>
+							dispatch({ type: "edit", field: "closingCredits", value })
+						}
+						onCreditsBlur={() =>
+							dispatch({ type: "blur", field: "closingCredits" })
+						}
+					/>
 				</form>
 			</Card>
 			{showingLastResult ? (
@@ -169,6 +192,7 @@ const LoanCalculator = ({ today }: LoanCalculatorProps) => {
 				arm={results.arm?.summary ?? null}
 				outOfDate={hasStaleDefault(results.assumptions)}
 			/>
+			<CashToCloseCard closing={results.closing} />
 			<LoanSummary loan={results.loan} />
 			<PropertyTaxSummary tax={results.tax} />
 			<MonthlyCostsSummary costs={results.costs} />

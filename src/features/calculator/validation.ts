@@ -1,7 +1,7 @@
 import type { ParseError } from "@/lib/decimal";
 import { parseMoney } from "@/lib/money";
 import type { Micros } from "@/types/units";
-import type { CalculatorInputs, ErrorField } from "./types";
+import { type CalculatorInputs, CLOSING_LINES, type ErrorField } from "./types";
 
 /** Interest and start rates above 30% are rejected (PRD S-10). */
 export const MAX_INTEREST_RATE = 300_000 as Micros;
@@ -40,6 +40,7 @@ const MONEY_FIELDS: readonly {
 	{ input: "extraAnnualInsurance", error: "extraAnnualInsurance" },
 	{ input: "monthlyHoa", error: "monthlyHoa" },
 	{ input: "monthlyOther", error: "monthlyOther" },
+	{ input: "closingCredits", error: "closingCredits" },
 ];
 
 /**
@@ -60,6 +61,13 @@ export const nonNumericMoneyFields = (
 		if (typeof text !== "string" || text.trim() === "") continue;
 		const parsed = parseMoney(text);
 		if (!parsed.ok && parsed.error === "invalid") bad.add(error);
+	}
+	// A percent line is a rate, not money, so only dollar lines count here.
+	for (const { id } of CLOSING_LINES) {
+		const line = inputs.closing[id];
+		if (line.mode !== "amount" || line.value.trim() === "") continue;
+		const parsed = parseMoney(line.value);
+		if (!parsed.ok && parsed.error === "invalid") bad.add(`closing:${id}`);
 	}
 	return bad;
 };

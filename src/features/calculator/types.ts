@@ -40,6 +40,8 @@ export interface LoanDerivation {
 	downPayment: Cents;
 	downPaymentPercent: Micros;
 	loanAmount: Cents;
+	/** Monthly principal and interest for the fixed-rate loan. */
+	monthlyPrincipalAndInterest: Cents;
 	/** loan / price, in millionths. 80.00% is 800000. */
 	ltv: Micros;
 	interestRate: Micros;

@@ -29,6 +29,7 @@ describe("deriveLoan", () => {
 		expect(errors).toEqual({});
 		expect(loan?.loanAmount).toBe(40_000_000);
 		expect(loan?.ltv).toBe(800_000);
+		expect(loan?.monthlyPrincipalAndInterest).toBe(252_827);
 		expect(loan?.downPayment).toBe(10_000_000);
 		expect(loan?.interestRate).toBe(65_000);
 		expect(loan?.termYears).toBe(30);
@@ -52,6 +53,7 @@ describe("deriveLoan", () => {
 		const { loan } = deriveLoan(inputs({ downPaymentPercent: "100" }));
 		expect(loan?.loanAmount).toBe(0);
 		expect(loan?.ltv).toBe(0);
+		expect(loan?.monthlyPrincipalAndInterest).toBe(0);
 		const dollars = deriveLoan(
 			inputs({ downPaymentMode: "amount", downPaymentAmount: "500000" }),
 		);

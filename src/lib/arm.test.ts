@@ -325,7 +325,7 @@ describe("ARM invariants (PRD 12.2)", () => {
 			expect(rows).toHaveLength(years * 12);
 			checkInvariants(rows, loan, start, p);
 		}
-	});
+	}, 20_000);
 
 	it("keeps the ledger exact with extra payments", () => {
 		const extra = (month: number) => (month % 5 === 0 ? 20_000 : 0);

@@ -1,6 +1,8 @@
 import Card from "@/components/ui/Card";
+import { hasStaleDefault } from "../assumptions";
 import { useCalculatorInputs } from "../hooks/useCalculatorInputs";
 import ArmFields from "./ArmFields";
+import AssumptionsPanel from "./AssumptionsPanel";
 import DownPaymentFields from "./DownPaymentFields";
 import LoanSummary from "./LoanSummary";
 import LoanTypeSelector from "./LoanTypeSelector";
@@ -15,9 +17,15 @@ import ScheduleTable from "./ScheduleTable";
 import TermSelector from "./TermSelector";
 import TextField from "./TextField";
 
-const LoanCalculator = () => {
+interface LoanCalculatorProps {
+	/** Fixes "today" for the stale-default check. Defaults to the current date. */
+	today?: Date;
+}
+
+const LoanCalculator = ({ today }: LoanCalculatorProps) => {
 	const {
 		state,
+		assumptions,
 		dispatch,
 		derived,
 		loan,
@@ -27,7 +35,7 @@ const LoanCalculator = () => {
 		pmi,
 		estimate,
 		schedule,
-	} = useCalculatorInputs();
+	} = useCalculatorInputs(today);
 	const { inputs, touched } = state;
 	const isArm = inputs.loanType === "arm";
 	// Show a message only after the user has left the field.
@@ -152,11 +160,13 @@ const LoanCalculator = () => {
 			<MonthlyEstimateCard
 				estimate={estimate}
 				arm={arm.result?.summary ?? null}
+				outOfDate={hasStaleDefault(assumptions)}
 			/>
 			<LoanSummary loan={loan} />
 			<PropertyTaxSummary tax={propertyTax.tax} />
 			<MonthlyCostsSummary costs={monthlyCosts.costs} />
 			<PmiSummary result={pmi.result} />
+			<AssumptionsPanel items={assumptions} />
 			{schedule ? <ScheduleTable rows={schedule} /> : null}
 		</div>
 	);

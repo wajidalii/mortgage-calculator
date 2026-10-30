@@ -12,7 +12,7 @@ import {
 	stepIndex,
 } from "@/lib/arm";
 import type { ParseError } from "@/lib/decimal";
-import { parseRate } from "@/lib/rate";
+import { formatPercent, parseRate } from "@/lib/rate";
 import type { Cents, Micros } from "@/types/units";
 import type {
 	CalculatorInputs,
@@ -44,6 +44,13 @@ export const indexPathFor = (preset: IndexPresetId): IndexPath => {
 		case "shock":
 			return stepIndex(ARM_INDEX_START, ARM_INDEX_SHOCK, FIRST_RESET_MONTH);
 	}
+};
+
+/** One sentence per preset, shown with the selector and in the assumptions. */
+export const INDEX_PRESET_HINTS: Record<IndexPresetId, string> = {
+	flat: `The index stays at ${formatPercent(ARM_INDEX_START, 2)}.`,
+	"plus-one-per-year": `The index starts at ${formatPercent(ARM_INDEX_START, 2)} and adds 1 point every year after month 60.`,
+	shock: `The index jumps to ${formatPercent(ARM_INDEX_SHOCK, 2)} at month 61.`,
 };
 
 export type ArmErrorField = Extract<ErrorField, `arm${string}`>;

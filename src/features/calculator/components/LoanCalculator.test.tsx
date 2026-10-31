@@ -621,3 +621,41 @@ describe("LoanCalculator", () => {
 		});
 	});
 });
+
+describe("LoanCalculator affordability", () => {
+	const affordability = () =>
+		within(screen.getByRole("region", { name: "Simplified affordability" }));
+
+	it("always shows the not-a-loan-approval statement", () => {
+		render(<LoanCalculator />);
+		expect(affordability().getByText(/not a loan approval/i)).toBeTruthy();
+		type("Gross monthly income", "10000");
+		expect(affordability().getByText(/not a loan approval/i)).toBeTruthy();
+	});
+
+	it("asks for income and shows an error for zero income", () => {
+		render(<LoanCalculator />);
+		expect(
+			affordability().getByText(/Enter your gross monthly income/),
+		).toBeTruthy();
+		type("Gross monthly income", "0");
+		expect(screen.getByText("Income must be more than $0")).toBeTruthy();
+	});
+
+	it("marks an above-guideline ratio with text", () => {
+		render(<LoanCalculator />);
+		type("Gross monthly income", "3000");
+		expect(affordability().getAllByText(/Above guideline/).length).toBe(2);
+		type("Gross monthly income", "100000");
+		expect(affordability().queryByText(/Above guideline/)).toBeNull();
+	});
+
+	it("lists the thresholds in the assumptions panel and applies edits", () => {
+		render(<LoanCalculator />);
+		type("Gross monthly income", "10000");
+		expect(screen.getByText("Front-end limit (housing / income)")).toBeTruthy();
+		type("Front-end limit", "40");
+		expect(screen.getAllByText("40.0%").length).toBeGreaterThan(0);
+		expect(screen.getAllByText("Overridden").length).toBeGreaterThan(0);
+	});
+});

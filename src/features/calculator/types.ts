@@ -47,7 +47,11 @@ export type ErrorField =
 	| "armPeriodicCap"
 	| "armLifetimeCap"
 	| `closing:${ClosingLineId}`
-	| "closingCredits";
+	| "closingCredits"
+	| "grossMonthlyIncome"
+	| "otherMonthlyDebt"
+	| "dtiFrontEnd"
+	| "dtiBackEnd";
 
 /** Raw text the user typed, plus which down payment form is the source. */
 export interface CalculatorInputs {
@@ -83,6 +87,14 @@ export interface CalculatorInputs {
 	closing: Record<ClosingLineId, ClosingLineInput>;
 	/** Optional seller or lender credits in dollars. Empty means none. */
 	closingCredits: string;
+	/** Gross monthly income for the affordability check. Empty shows a prompt. */
+	grossMonthlyIncome: string;
+	/** Optional monthly debt payments (car, student loans). Empty means none. */
+	otherMonthlyDebt: string;
+	/** Front-end limit in percent. Empty means use the default. */
+	dtiFrontEnd: string;
+	/** Back-end limit in percent. Empty means use the default. */
+	dtiBackEnd: string;
 }
 
 export interface CalculatorState {
@@ -106,7 +118,11 @@ export type EditableField =
 	| "armInitialCap"
 	| "armPeriodicCap"
 	| "armLifetimeCap"
-	| "closingCredits";
+	| "closingCredits"
+	| "grossMonthlyIncome"
+	| "otherMonthlyDebt"
+	| "dtiFrontEnd"
+	| "dtiBackEnd";
 
 export type CalculatorAction =
 	| { type: "edit"; field: EditableField; value: string }

@@ -6,6 +6,7 @@ import {
 	useRef,
 } from "react";
 import { buildSchedule, type ScheduleRow } from "@/lib/amortization";
+import { type Affordability, deriveAffordability } from "../affordability";
 import { type ArmResult, deriveArm } from "../armSchedule";
 import { type AssumptionItem, buildAssumptions } from "../assumptions";
 import {
@@ -30,6 +31,7 @@ export interface ResultSet {
 	pmi: PmiResult | null;
 	estimate: MonthlyEstimate | null;
 	closing: ClosingCosts | null;
+	affordability: Affordability | null;
 	schedule: ScheduleRow[] | null;
 	assumptions: AssumptionItem[];
 }
@@ -90,6 +92,12 @@ export const useCalculatorInputs = (today?: Date) => {
 			),
 		[loan, propertyTax.tax, monthlyCosts.costs, pmi.result],
 	);
+	// Its errors stay out of the shared error set: a blank income must not
+	// hide the payment estimate.
+	const affordability = useMemo(
+		() => deriveAffordability(deferredInputs, estimate),
+		[deferredInputs, estimate],
+	);
 	const now = useMemo(() => today ?? new Date(), [today]);
 	const assumptions = useMemo(
 		() =>
@@ -99,6 +107,7 @@ export const useCalculatorInputs = (today?: Date) => {
 				tax: propertyTax.tax,
 				costs: monthlyCosts.costs,
 				pmi: pmi.result,
+				affordability: affordability.result,
 				today: now,
 			}),
 		[
@@ -107,6 +116,7 @@ export const useCalculatorInputs = (today?: Date) => {
 			propertyTax.tax,
 			monthlyCosts.costs,
 			pmi.result,
+			affordability.result,
 			now,
 		],
 	);
@@ -119,6 +129,7 @@ export const useCalculatorInputs = (today?: Date) => {
 			pmi: pmi.result,
 			estimate,
 			closing: closing.costs,
+			affordability: affordability.result,
 			schedule,
 			assumptions,
 		}),
@@ -130,6 +141,7 @@ export const useCalculatorInputs = (today?: Date) => {
 			pmi.result,
 			estimate,
 			closing.costs,
+			affordability.result,
 			schedule,
 			assumptions,
 		],
@@ -165,6 +177,7 @@ export const useCalculatorInputs = (today?: Date) => {
 		monthlyCosts,
 		pmi,
 		closing,
+		affordability,
 		results: held ?? current,
 		showingLastResult: held !== null,
 	};

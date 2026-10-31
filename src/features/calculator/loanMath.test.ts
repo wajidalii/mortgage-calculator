@@ -42,6 +42,10 @@ const inputs = (
 		other: { mode: "amount", value: "" },
 	},
 	closingCredits: "",
+	grossMonthlyIncome: "",
+	otherMonthlyDebt: "",
+	dtiFrontEnd: "",
+	dtiBackEnd: "",
 	...overrides,
 });
 

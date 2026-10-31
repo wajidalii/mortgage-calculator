@@ -51,6 +51,10 @@ export const initialCalculatorState: CalculatorState = {
 			other: { mode: "amount", value: "" },
 		},
 		closingCredits: "",
+		grossMonthlyIncome: "",
+		otherMonthlyDebt: "",
+		dtiFrontEnd: "",
+		dtiBackEnd: "",
 	},
 	touched: {},
 };

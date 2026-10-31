@@ -16,6 +16,7 @@ services:
     volumes:
       - ./src:/app/src
       - ./index.html:/app/index.html
+      - ./public:/app/public
       - ./vite.config.ts:/app/vite.config.ts
       - ./tsconfig.json:/app/tsconfig.json
       - ./tsconfig.app.json:/app/tsconfig.app.json

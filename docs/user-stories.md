@@ -1,10 +1,12 @@
 # User Stories: Mortgage Ownership Calculator
 
-Source: PRD.md, section 7. Version 0.1 (draft). Date: 2026-10-30.
+Source: PRD.md, section 7. Version 0.2. Date: 2026-10-31.
 
-All story statuses are "Planned". Money in examples is shown in dollars. The product stores cents (decision D-4). Rates are stored as integer millionths (decision D-5).
+Each story has a status of **Implemented** or **Not implemented**. A story is marked Implemented only after its acceptance criteria were checked against the running app (see "Verification" at the end). Money in examples is shown in dollars. The product stores cents (decision D-4). Rates are stored as integer millionths (decision D-5).
 
 ## How to read this file
+
+- Each story sentence names one role. The **Roles** field lists every role the story serves.
 
 - "Serves" links the story to a job in jobs-to-be-done.md.
 - "Roles" links the story to a role in app-roles.md.
@@ -26,9 +28,9 @@ Each release ships only after the release before it passes all tests. If the sch
 
 ### S-1 Enter purchase and loan inputs
 
-**Serves:** J-1, J-2, J-3. **Roles:** AR-1, AR-2, AR-3. **Status:** Planned.
+**Serves:** J-1, J-2, J-3. **Roles:** AR-1, AR-2, AR-3. **Status:** Implemented.
 
-"As a user, I want to enter the home price, down payment, loan term, and interest rate, so that I can see the loan amount and the loan-to-value (LTV) ratio."
+"As a First-Time Buyer, I want to enter the home price, down payment, loan term, and interest rate, so that I can see the loan amount and the loan-to-value (LTV) ratio."
 
 - Given price $500,000 and down payment 20%, when I view the result, then the loan amount is $400,000 and the LTV is 80.00%.
 - Given I change the down payment from a percent to a dollar amount, when I leave the field, then the other form of the value updates to match.
@@ -36,9 +38,9 @@ Each release ships only after the release before it passes all tests. If the sch
 
 ### S-2 See the fixed monthly principal and interest
 
-**Serves:** J-1, J-2, J-3. **Roles:** AR-1, AR-2, AR-3. **Status:** Planned.
+**Serves:** J-1, J-2, J-3. **Roles:** AR-1, AR-2, AR-3. **Status:** Implemented.
 
-"As a user, I want to see the monthly principal and interest for a fixed loan, so that I know the core payment."
+"As a First-Time Buyer, I want to see the monthly principal and interest for a fixed loan, so that I know the core payment."
 
 - Given loan $400,000, rate 6.50%, and term 30 years, when I calculate, then principal and interest is $2,528.27.
 - Given the same loan with a 20 year term, when I calculate, then principal and interest is $2,982.29.
@@ -47,9 +49,9 @@ Each release ships only after the release before it passes all tests. If the sch
 
 ### S-3 Estimate property tax by state
 
-**Serves:** J-1, J-4. **Roles:** AR-1, AR-2, AR-3. **Status:** Planned.
+**Serves:** J-1, J-4. **Roles:** AR-1, AR-2, AR-3. **Status:** Implemented.
 
-"As a user, I want to pick a state and see an estimated property tax, so that I do not need to look it up first."
+"As a First-Time Buyer, I want to pick a state and see an estimated property tax, so that I do not need to look it up first."
 
 - Given price $500,000 and state NJ, when I view the result, then the annual tax is $10,000.00 and the monthly tax is $833.33.
 - Given price $500,000 and state TX, when I view the result, then the annual tax is $8,000.00 and the monthly tax is $666.67.
@@ -59,9 +61,9 @@ Each release ships only after the release before it passes all tests. If the sch
 
 ### S-4 Enter insurance, HOA, and other monthly costs
 
-**Serves:** J-1, J-4. **Roles:** AR-1, AR-2, AR-3. **Status:** Planned.
+**Serves:** J-1, J-4. **Roles:** AR-1, AR-2, AR-3. **Status:** Implemented.
 
-"As a user, I want to enter insurance, HOA, and other monthly costs, so that the total includes them."
+"As a First-Time Buyer, I want to enter insurance, HOA, and other monthly costs, so that the total includes them."
 
 - Given annual insurance $1,800, when I view the result, then monthly insurance is $150.00.
 - Given monthly HOA $100, when I view the result, then HOA is $100.00 and it appears in the non-escrow group.
@@ -70,9 +72,9 @@ Each release ships only after the release before it passes all tests. If the sch
 
 ### S-5 See PMI and when it ends
 
-**Serves:** J-1, J-4. **Roles:** AR-1, AR-2, AR-3. **Status:** Planned.
+**Serves:** J-1, J-4. **Roles:** AR-1, AR-2, AR-3. **Status:** Implemented.
 
-"As a user, I want to see an estimate of PMI and when it ends, so that I know how long I pay it."
+"As a First-Time Buyer, I want to see an estimate of PMI and when it ends, so that I know how long I pay it."
 
 - Given price $500,000 and down payment 10%, when I view the result, then the LTV is 90.00% and PMI is on.
 - Given the PMI rate 0.50% and loan $450,000, when I view the result, then monthly PMI is $187.50.
@@ -82,9 +84,9 @@ Each release ships only after the release before it passes all tests. If the sch
 
 ### S-6 See one itemized monthly estimate
 
-**Serves:** J-1, J-4. **Roles:** AR-1, AR-2, AR-3. **Status:** Planned.
+**Serves:** J-1, J-4. **Roles:** AR-1, AR-2, AR-3. **Status:** Implemented.
 
-"As a user, I want one itemized monthly estimate, so that I can see what I pay the lender and what I pay elsewhere."
+"As a First-Time Buyer, I want one itemized monthly estimate, so that I can see what I pay the lender and what I pay elsewhere."
 
 - Given price $500,000, down payment 20%, rate 6.50%, term 30 years, state NJ, annual insurance $1,800, and HOA $100, when I view the result, then I see principal and interest $2,528.27, tax $833.33, insurance $150.00, a lender payment of $3,511.60, HOA $100.00 (non-escrow), and a total of $3,611.60.
 - Given any inputs, when the result shows, then the line items add up to the total shown.
@@ -92,9 +94,9 @@ Each release ships only after the release before it passes all tests. If the sch
 
 ### S-7 See the amortization schedule
 
-**Serves:** J-1, J-2, J-3. **Roles:** AR-1, AR-2, AR-3. **Status:** Planned.
+**Serves:** J-1, J-2, J-3. **Roles:** AR-1, AR-2, AR-3. **Status:** Implemented.
 
-"As a user, I want a month-by-month amortization schedule, so that I can see interest, principal, and balance over time."
+"As a Homeowner, I want a month-by-month amortization schedule, so that I can see interest, principal, and balance over time."
 
 - Given loan $400,000, rate 6.50%, and term 30 years, when I view the schedule, then the lifetime interest is $510,179.81 and the final balance is $0.00.
 - Given any fixed loan, when the schedule shows, then the principal paid over the term equals the original loan amount.
@@ -103,9 +105,9 @@ Each release ships only after the release before it passes all tests. If the sch
 
 ### S-8 See a 5/6 ARM with true payment recalculation
 
-**Serves:** J-1, J-2, J-3. **Roles:** AR-1, AR-2, AR-3. **Status:** Planned.
+**Serves:** J-1, J-2, J-3. **Roles:** AR-1, AR-2, AR-3. **Status:** Implemented.
 
-"As a user, I want to see a 5/6 ARM with a true payment recalculation, so that I understand the risk after the fixed period."
+"As a First-Time Buyer, I want to see a 5/6 ARM with a true payment recalculation, so that I understand the risk after the fixed period."
 
 - Given loan $400,000, start rate 6.50%, margin 2.75%, caps 2/1/5, and a flat index of 3.75%, when I view the schedule, then the rate stays 6.50% and the payment stays $2,528.27.
 - Given the same loan and an index of 9.00% from month 61, when I view the schedule, then the rates after each reset are 8.50%, 9.50%, 10.50%, then 11.50%, and the first reset payment is $3,015.13.
@@ -115,9 +117,9 @@ Each release ships only after the release before it passes all tests. If the sch
 
 ### S-9 See all assumptions in one place
 
-**Serves:** J-4. **Roles:** AR-1, AR-2, AR-3. **Status:** Planned.
+**Serves:** J-4. **Roles:** AR-1, AR-2, AR-3. **Status:** Implemented.
 
-"As a user, I want to see all assumptions in one place, so that I know what is real input and what is illustrative."
+"As a First-Time Buyer, I want to see all assumptions in one place, so that I know what is real input and what is illustrative."
 
 - Given I open the assumptions panel, when it shows, then it lists every default, its value, and whether it is "Entered", "Illustrative", or "Overridden".
 - Given any result screen, when it shows, then the disclaimer text is visible without a click.
@@ -128,9 +130,9 @@ Each release ships only after the release before it passes all tests. If the sch
 
 ### S-10 Get clear input checks
 
-**Serves:** J-1, J-2, J-3. **Roles:** AR-1, AR-2, AR-3. **Status:** Planned.
+**Serves:** J-1, J-2, J-3. **Roles:** AR-1, AR-2, AR-3. **Status:** Implemented.
 
-"As a user, I want clear input checks, so that I do not get a wrong result without a warning."
+"As a Homeowner, I want clear input checks, so that I do not get a wrong result without a warning."
 
 - Given I enter an interest rate above 30% or below 0%, when I leave the field, then I see an error and no result shows.
 - Given I enter a down payment greater than the price, when I leave the field, then I see the message "Down payment cannot be more than the price".
@@ -141,7 +143,7 @@ Each release ships only after the release before it passes all tests. If the sch
 
 ### S-11 See closing costs and cash to close
 
-**Serves:** J-1. **Roles:** AR-1. **Status:** Planned.
+**Serves:** J-1. **Roles:** AR-1. **Status:** Implemented.
 
 "As a First-Time Buyer, I want to enter closing costs and see the cash to close, so that I know how much money I need on closing day."
 
@@ -151,20 +153,20 @@ Each release ships only after the release before it passes all tests. If the sch
 
 ### S-12 Check simplified affordability
 
-**Serves:** J-1. **Roles:** AR-1. **Status:** Planned.
+**Serves:** J-1. **Roles:** AR-1. **Status:** Implemented.
 
 "As a First-Time Buyer, I want a simple affordability check, so that I know if the payment is in a normal range."
 
 - Given gross monthly income $10,000, housing payment $3,000, and other monthly debt $500, when I view the result, then the front-end ratio is 30.0% and the back-end ratio is 35.0%.
 - Given a ratio is above its threshold, when the result shows, then the product marks it as "Above guideline".
-- Given the thresholds, when I open the assumptions panel, then the defaults are 28% (front-end) and 36% (back-end), and I can edit them.
+- Given the affordability section, when I open it, then the default limits are 28% (front-end) and 36% (back-end), and I can edit them.
 - Given any affordability result, when it shows, then the product states that it is not a loan approval.
 
 ## R3 Owner
 
 ### S-13 Add extra payments
 
-**Serves:** J-2. **Roles:** AR-2. **Status:** Planned.
+**Serves:** J-2. **Roles:** AR-2. **Status:** Implemented.
 
 "As a Homeowner, I want to add extra payments, so that I can see the payoff date and interest saved."
 
@@ -174,7 +176,7 @@ Each release ships only after the release before it passes all tests. If the sch
 
 ### S-14 See the refinance break-even
 
-**Serves:** J-2. **Roles:** AR-2. **Status:** Planned.
+**Serves:** J-2. **Roles:** AR-2. **Status:** Implemented.
 
 "As a Homeowner, I want a refinance break-even, so that I know how many months it takes to recover the cost."
 
@@ -184,18 +186,18 @@ Each release ships only after the release before it passes all tests. If the sch
 
 ### S-15 See rate sensitivity
 
-**Serves:** J-1, J-2, J-3. **Roles:** AR-1, AR-2, AR-3. **Status:** Planned.
+**Serves:** J-1, J-2, J-3. **Roles:** AR-1, AR-2, AR-3. **Status:** Implemented.
 
-"As a user, I want to see how the payment changes with the rate, so that I can judge rate risk."
+"As a Homeowner, I want to see how the payment changes with the rate, so that I can judge rate risk."
 
 - Given loan $400,000 and term 30 years, when I view rate sensitivity for 6.50%, then I see payments for 5.50%, 6.00%, 6.50%, 7.00%, and 7.50%.
 - Given the step size is 0.50 points, when I change the base rate, then the five rows move with it.
 
 ### S-16 Set yearly growth for tax and insurance
 
-**Serves:** J-1, J-2. **Roles:** AR-1, AR-2. **Status:** Planned.
+**Serves:** J-1, J-2. **Roles:** AR-1, AR-2. **Status:** Implemented.
 
-"As a user, I want to set yearly growth for tax and insurance, so that I see how the cost can rise."
+"As a First-Time Buyer, I want to set yearly growth for tax and insurance, so that I see how the cost can rise."
 
 - Given tax growth 3% and year 1 monthly tax $833.33, when I view the yearly summary, then year 2 tax is based on $858.33 per month.
 - Given growth is 0%, when I view the yearly summary, then tax and insurance stay the same each year.
@@ -205,19 +207,19 @@ Each release ships only after the release before it passes all tests. If the sch
 
 ### S-17 Compare two loans side by side
 
-**Serves:** J-3. **Roles:** AR-3. **Status:** Planned.
+**Serves:** J-3. **Roles:** AR-3. **Status:** Implemented.
 
 "As a Professional, I want to compare two loans side by side, so that I can show the tradeoff."
 
 - Given a 15 year fixed loan and a 30 year fixed loan on $400,000 at 6.50%, when I view the comparison, then I see monthly payments of $3,484.43 and $2,528.27, and lifetime interest of $227,197.24 and $510,179.81.
 - Given a fixed loan and a 5/6 ARM, when I view the comparison, then the ARM column carries the "Hypothetical rate" label.
-- Given I change one input, when the page updates, then both columns recalculate.
+- Given I change one input in Loan A, when the page updates, then only that loan's column and the differences summary recalculate, and the other loan's inputs and results do not change.
 
 ### S-18 Save and reopen scenarios
 
-**Serves:** J-1, J-2, J-3. **Roles:** AR-1, AR-2, AR-3. **Status:** Planned.
+**Serves:** J-1, J-2, J-3. **Roles:** AR-1, AR-2, AR-3. **Status:** Implemented.
 
-"As a user, I want to save and reopen scenarios in my browser, so that I do not enter data again."
+"As a Homeowner, I want to save and reopen scenarios in my browser, so that I do not enter data again."
 
 - Given I save a scenario with a name, when I reload the page, then the scenario is in my list and opens with the same inputs.
 - Given browser storage is blocked, when I save, then I see a message that saving is not available and the calculator still works.
@@ -226,7 +228,7 @@ Each release ships only after the release before it passes all tests. If the sch
 
 ### S-19 Print a report
 
-**Serves:** J-3, J-4. **Roles:** AR-3. **Status:** Planned.
+**Serves:** J-3, J-4. **Roles:** AR-3. **Status:** Implemented.
 
 "As a Professional, I want a print-friendly report, so that I can give it to a client."
 
@@ -260,6 +262,21 @@ Each release ships only after the release before it passes all tests. If the sch
 
 ## Open items
 
+- Known gap: S-5 and S-12 examples are checked by unit tests with the exact values; in the browser the same logic was checked with the app's own derived housing payment.
 - Q-1 (business model) is not decided. R4 stays as written. See PRD.md, section 13.
 - Q-4 (ARM caps and margin) and Q-5 (demo tax rates) are not verified. They affect S-8 and S-3.
 - T-1: replace the PMI default before launch. It affects S-5.
+
+## Verification
+
+Checked on 2026-10-31 in Chromium (Playwright) against the running dev server, with a fresh browser profile, and against the automated tests (`yarn test`, 460 passing).
+
+- S-1 to S-4, S-6, S-7, S-11, S-13 to S-16: every example value was entered in the browser and matched.
+- S-5: month 95 (removal request) and month 109 (PMI ends) match for a 10% down payment. The $187.50 figure at a 0.50% PMI rate is covered by `pmi.test.ts` and `LoanCalculator.test.tsx`.
+- S-8: with the shock index path, month 61 shows 8.50%, $3,015.13 and the "Hypothetical rate" label.
+- S-9: assumptions panel, defaults labels and the printed assumptions list were seen. The 365-day "May be out of date" rule is covered by `AssumptionsPanel.test.tsx` (the dates in the app are all newer than 365 days today).
+- S-10: errors for a rate above 30% or below 0%, a down payment above the price and text in a money field were seen; no horizontal scroll at 360 px.
+- S-12: front-end and back-end ratios, "Above guideline" and the "not a loan approval" statement were seen.
+- S-17: Loan B kept its inputs when Loan A changed. This replaces the earlier "both columns update" wording, which no longer matches the side-by-side workspace.
+- S-18: save, reload, open, delete with confirmation, and the "Saving is not available in this browser" message with storage blocked.
+- S-19: with print media emulated, the report shows the disclaimer and the assumptions with "as of" dates.

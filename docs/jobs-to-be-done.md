@@ -1,8 +1,8 @@
 # Jobs to Be Done: Mortgage Ownership Calculator
 
-Source: PRD.md, section 5. Version 0.1 (draft). Date: 2026-10-30.
+Source: PRD.md, section 5. Version 0.2. Date: 2026-10-31.
 
-A job states the situation, the motivation, and the result the user wants. Each job below serves one or more roles. Each job links to the stories that serve it.
+A job states the situation, the motivation, and the result the user wants. Each job below names the role it belongs to and links to the stories that serve it. Story statuses are in user-stories.md.
 
 ## Job format
 
@@ -64,7 +64,7 @@ A job states the situation, the motivation, and the result the user wants. Each 
 **Success looks like**
 
 - The user sees two loans in two columns.
-- The user changes one input and both columns update.
+- The user changes one input in a loan and sees that loan and the differences summary update, with the other loan unchanged.
 - The user prints a report that the client can keep.
 
 **Stories:** S-1 to S-10, S-15, S-17 to S-19

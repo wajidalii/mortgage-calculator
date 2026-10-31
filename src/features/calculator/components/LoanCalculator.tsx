@@ -1,5 +1,8 @@
 import { useMemo } from "react";
 import Card from "@/components/ui/Card";
+import SavedScenarios from "@/features/scenarios/components/SavedScenarios";
+import type { StorageLike } from "@/features/scenarios/storage";
+import { parseCalculatorInputs } from "@/features/scenarios/validate";
 import { hasStaleDefault } from "../assumptions";
 import { deriveCostGrowth } from "../costGrowth";
 import { useCalculatorInputs } from "../hooks/useCalculatorInputs";
@@ -32,9 +35,11 @@ import TextField from "./TextField";
 interface LoanCalculatorProps {
 	/** Fixes "today" for the stale-default check. Defaults to the current date. */
 	today?: Date;
+	/** Where saved scenarios go. Defaults to the browser's local storage. */
+	storage?: StorageLike | null;
 }
 
-const LoanCalculator = ({ today }: LoanCalculatorProps) => {
+const LoanCalculator = ({ today, storage }: LoanCalculatorProps) => {
 	const {
 		state,
 		dispatch,
@@ -79,6 +84,13 @@ const LoanCalculator = ({ today }: LoanCalculatorProps) => {
 
 	return (
 		<div className="grid gap-6">
+			<SavedScenarios
+				kind="calculator"
+				current={inputs}
+				parse={parseCalculatorInputs}
+				onOpen={(saved) => dispatch({ type: "load", inputs: saved })}
+				{...(storage !== undefined ? { storage } : {})}
+			/>
 			<Card>
 				<form
 					noValidate

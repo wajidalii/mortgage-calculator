@@ -58,6 +58,8 @@ export const initialCalculatorState: CalculatorState = {
 		extraMonthly: "",
 		lumpSum: "",
 		lumpMonth: "",
+		taxGrowth: "",
+		insuranceGrowth: "",
 	},
 	touched: {},
 };

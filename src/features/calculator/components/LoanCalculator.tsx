@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import Card from "@/components/ui/Card";
 import { hasStaleDefault } from "../assumptions";
+import { deriveCostGrowth } from "../costGrowth";
 import { useCalculatorInputs } from "../hooks/useCalculatorInputs";
 import { buildRateSensitivity } from "../rateSensitivity";
 import AffordabilityCard from "./AffordabilityCard";
@@ -9,6 +10,8 @@ import ArmFields from "./ArmFields";
 import AssumptionsPanel from "./AssumptionsPanel";
 import CashToCloseCard from "./CashToCloseCard";
 import ClosingCostsFields from "./ClosingCostsFields";
+import CostGrowthFields from "./CostGrowthFields";
+import CostGrowthTable from "./CostGrowthTable";
 import DownPaymentFields from "./DownPaymentFields";
 import ExtraPaymentFields from "./ExtraPaymentFields";
 import ExtraPaymentsSummary from "./ExtraPaymentsSummary";
@@ -47,6 +50,10 @@ const LoanCalculator = ({ today }: LoanCalculatorProps) => {
 		showingLastResult,
 	} = useCalculatorInputs(today);
 	const { inputs, touched } = state;
+	const growth = useMemo(
+		() => deriveCostGrowth(inputs, results.tax, results.costs),
+		[inputs, results.tax, results.costs],
+	);
 	// Fixed-rate only: an ARM has no single rate to vary.
 	const sensitivity = useMemo(
 		() =>
@@ -66,7 +73,8 @@ const LoanCalculator = ({ today }: LoanCalculatorProps) => {
 				pmi.errors[field] ??
 				closing.errors[field] ??
 				affordability.errors[field] ??
-				extra.errors[field])
+				extra.errors[field] ??
+				growth.errors[field as keyof typeof growth.errors])
 			: undefined;
 
 	return (
@@ -165,6 +173,14 @@ const LoanCalculator = ({ today }: LoanCalculatorProps) => {
 						}
 						onBlur={(field) => dispatch({ type: "blur", field })}
 					/>
+					<CostGrowthFields
+						values={inputs}
+						errorFor={shown}
+						onChange={(field, value) =>
+							dispatch({ type: "edit", field, value })
+						}
+						onBlur={(field) => dispatch({ type: "blur", field })}
+					/>
 					<PmiFields
 						required={pmi.required}
 						on={inputs.pmiOn}
@@ -233,6 +249,7 @@ const LoanCalculator = ({ today }: LoanCalculatorProps) => {
 			<RateSensitivityTable rows={sensitivity} />
 			<PropertyTaxSummary tax={results.tax} />
 			<MonthlyCostsSummary costs={results.costs} />
+			<CostGrowthTable growth={growth.result} />
 			<ExtraPaymentsSummary extra={results.extra} />
 			<PmiSummary result={results.pmi} />
 			<AssumptionsPanel items={results.assumptions} />

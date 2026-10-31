@@ -49,6 +49,8 @@ const inputs = (
 	extraMonthly: "",
 	lumpSum: "",
 	lumpMonth: "",
+	taxGrowth: "",
+	insuranceGrowth: "",
 	...overrides,
 });
 

@@ -1,6 +1,8 @@
+import { useMemo } from "react";
 import Card from "@/components/ui/Card";
 import { hasStaleDefault } from "../assumptions";
 import { useCalculatorInputs } from "../hooks/useCalculatorInputs";
+import { buildRateSensitivity } from "../rateSensitivity";
 import AffordabilityCard from "./AffordabilityCard";
 import AffordabilityFields from "./AffordabilityFields";
 import ArmFields from "./ArmFields";
@@ -19,6 +21,7 @@ import PmiFields from "./PmiFields";
 import PmiSummary from "./PmiSummary";
 import PropertyTaxFields from "./PropertyTaxFields";
 import PropertyTaxSummary from "./PropertyTaxSummary";
+import RateSensitivityTable from "./RateSensitivityTable";
 import ScheduleTable from "./ScheduleTable";
 import TermSelector from "./TermSelector";
 import TextField from "./TextField";
@@ -44,6 +47,14 @@ const LoanCalculator = ({ today }: LoanCalculatorProps) => {
 		showingLastResult,
 	} = useCalculatorInputs(today);
 	const { inputs, touched } = state;
+	// Fixed-rate only: an ARM has no single rate to vary.
+	const sensitivity = useMemo(
+		() =>
+			results.loan && inputs.loanType === "fixed"
+				? buildRateSensitivity(results.loan)
+				: null,
+		[results.loan, inputs.loanType],
+	);
 	const isArm = inputs.loanType === "arm";
 	// Show a message only after the user has left the field.
 	const shown = (field: keyof typeof touched) =>
@@ -219,6 +230,7 @@ const LoanCalculator = ({ today }: LoanCalculatorProps) => {
 			<CashToCloseCard closing={results.closing} />
 			<AffordabilityCard affordability={results.affordability} />
 			<LoanSummary loan={results.loan} />
+			<RateSensitivityTable rows={sensitivity} />
 			<PropertyTaxSummary tax={results.tax} />
 			<MonthlyCostsSummary costs={results.costs} />
 			<ExtraPaymentsSummary extra={results.extra} />

@@ -1,6 +1,6 @@
 import ButtonLink from "@/components/ui/ButtonLink";
+import Icon from "@/components/ui/Icon";
 import Reveal from "@/components/ui/Reveal";
-import Icon from "./Icon";
 
 const FinalCta = () => (
 	<section

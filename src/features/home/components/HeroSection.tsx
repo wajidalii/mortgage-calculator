@@ -1,5 +1,5 @@
 import ButtonLink from "@/components/ui/ButtonLink";
-import Icon from "./Icon";
+import Icon from "@/components/ui/Icon";
 import PaymentPreview from "./PaymentPreview";
 
 const HeroSection = () => (

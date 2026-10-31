@@ -10,6 +10,8 @@ const PATHS = {
 	bookmark: "M7 4h10v16l-5-3.5L7 20z",
 	user: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 8a7 7 0 0 1 14 0",
 	key: "M14.5 9.5a4 4 0 1 1-1.2 2.8L4 21v-3h3v-3h3l2.3-2.3",
+	swap: "M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4m4 4H7",
+	copy: "M9 9h10v11H9zM5 15V4h10",
 	briefcase: "M4 8h16v11H4zM9 8V5h6v3M4 13h16",
 } as const;
 

@@ -10,9 +10,7 @@ describe("Disclaimer", () => {
 	it("renders the full PRD disclaimer text without any interaction", () => {
 		render(<Disclaimer />);
 		expect(screen.getByText(DISCLAIMER_TEXT)).toBeTruthy();
-		expect(
-			screen.getByRole("complementary", { name: "Disclaimer" }),
-		).toBeTruthy();
+		expect(screen.getByRole("note", { name: "Disclaimer" })).toBeTruthy();
 	});
 
 	it("keeps the exact PRD wording in the shared constant", () => {

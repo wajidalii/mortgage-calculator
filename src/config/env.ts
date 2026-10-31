@@ -3,15 +3,12 @@ export interface Env {
 	appName: string;
 }
 
-const required = (key: keyof ImportMetaEnv): string => {
+const withDefault = (key: keyof ImportMetaEnv, fallback: string): string => {
 	const value = import.meta.env[key];
-	if (typeof value !== "string" || value.trim() === "") {
-		throw new Error(`Missing required environment variable: ${key}`);
-	}
-	return value;
+	return typeof value === "string" && value.trim() !== "" ? value : fallback;
 };
 
 export const env: Env = Object.freeze({
-	apiBaseUrl: required("VITE_API_BASE_URL").replace(/\/+$/, ""),
-	appName: required("VITE_APP_NAME"),
+	apiBaseUrl: withDefault("VITE_API_BASE_URL", "/api").replace(/\/+$/, ""),
+	appName: withDefault("VITE_APP_NAME", "Mortgage Calculator"),
 });

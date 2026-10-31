@@ -38,7 +38,7 @@ const LoanColumn = ({ index, active, cells }: LoanColumnProps) => (
 						CELL,
 						first &&
 							cn(
-								"rounded-t-2xl border-t-4 pt-5 shadow-panel lg:sticky lg:top-0 lg:z-20",
+								"rounded-t-2xl border-t-4 pt-5 shadow-panel lg:sticky lg:top-(--header-h,4.5rem) lg:z-20",
 								LOAN_STYLE[index].accent,
 							),
 						!first && "border-t border-t-slate-100",

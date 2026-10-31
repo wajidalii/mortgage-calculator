@@ -55,7 +55,7 @@ const CAPABILITIES: readonly Capability[] = [
 const CapabilitiesSection = () => (
 	<section aria-labelledby="capabilities-title" className="bg-white">
 		<Reveal className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16 lg:px-8">
-			<div className="lg:sticky lg:top-8 lg:self-start">
+			<div className="lg:sticky lg:top-[calc(var(--header-h,4.5rem)+2rem)] lg:self-start">
 				<SectionHeading
 					id="capabilities-title"
 					eyebrow="Inside the calculator"

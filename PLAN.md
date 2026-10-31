@@ -159,7 +159,7 @@ Each scout queries a real vulnerability database for its package at the exact pi
 
 ## 9. Feature roadmap (GitHub)
 
-Feature work follows `PRD.md` and `user-stories.md` and is tracked as GitHub milestones and issues at https://github.com/wajidalii/mortgage-calculator/milestones. Each release starts only after the previous one passes all tests.
+Feature work follows `PRD.md` and `docs/user-stories.md` and is tracked as GitHub milestones and issues at https://github.com/wajidalii/mortgage-calculator/milestones. Each release starts only after the previous one passes all tests.
 
 | Milestone        | Issues  | Content                                                                                                    |
 | ---------------- | ------- | ---------------------------------------------------------------------------------------------------------- |

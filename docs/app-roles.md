@@ -1,17 +1,20 @@
 # App Roles: Mortgage Ownership Calculator
 
-Source: PRD.md, section 4. Version 0.1 (draft). Date: 2026-10-30.
+Source: PRD.md, section 4. Version 0.2. Date: 2026-10-31.
 
 One product serves all three roles (decision D-1). A role is a type of user. It is not a login type. The product has no accounts in this version. The user picks the tools they need.
 
 ## How to read this file
 
+- Each role starts with one sentence: "A [role] is [who they are]. They can [what they do]. They must never [what the app prevents]." The lists below it give the detail.
 - "Can" lists what the role does in the product.
 - "Must never" lists a rule the product enforces for this role.
 - "Jobs" links to jobs-to-be-done.md.
 - "Stories" links to user-stories.md.
 
 ## AR-1 First-Time Buyer
+
+**In one sentence:** A First-Time Buyer is a person planning to buy a first home who does not yet know the full cost of owning it. They can enter a price, loan terms and costs and see one itemized monthly total and the cash needed at closing. They must never see a result presented as a loan offer, quote or approval, or an estimate without a label saying where it came from.
 
 A First-Time Buyer is a person who plans to buy a home for the first time. They do not know all the costs of ownership. They need one clear number for the monthly cost and one clear number for the cash needed at closing.
 
@@ -38,6 +41,8 @@ A First-Time Buyer is a person who plans to buy a home for the first time. They 
 
 ## AR-2 Homeowner
 
+**In one sentence:** A Homeowner is a person who already has a mortgage and is thinking about paying extra or refinancing. They can enter their current loan, try extra payments or a lower rate and see the savings and the break-even time. They must never see a refinance result without its cost and term assumptions, or a break-even when there is no monthly saving.
+
 A Homeowner is a person who owns a home and has a mortgage. They think about refinancing or paying extra. They know their current loan. They need to see the savings and the time it takes to recover the cost.
 
 **Can**
@@ -60,12 +65,14 @@ A Homeowner is a person who owns a home and has a mortgage. They think about ref
 
 ## AR-3 Professional
 
+**In one sentence:** A Professional is a real-estate or mortgage professional who shows loan tradeoffs to clients. They can compare two loans side by side, save scenarios in the browser and print a report. They must never produce a report that hides the disclaimer or the illustrative assumptions, or show an ARM result without the "Hypothetical rate" label after the fixed period.
+
 A Professional is a real-estate or mortgage professional. They show tradeoffs to a client. They need results that are easy to compare and easy to print.
 
 **Can**
 
 - Compare two loans side by side. The loans can be fixed and fixed, or fixed and ARM.
-- Change one input and see both loans update.
+- Change an input of either loan and see that loan and the differences summary update. The two loans keep separate inputs.
 - Save and reopen scenarios in the browser.
 - Print a report for a client.
 

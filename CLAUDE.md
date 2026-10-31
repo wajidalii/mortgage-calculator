@@ -1,6 +1,6 @@
 # Mortgage Calculator
 
-Web calculator for U.S. home buyers and owners (see `PRD.md`, `user-stories.md`, `app-roles.md`, `jobs-to-be-done.md` for product scope). This repo holds the boilerplate (routing, layout, tooling, Docker) plus the first foundations: integer money/rate primitives, the defaults registry and the shared Disclaimer. Calculator features are tracked as GitHub issues and milestones (see `PLAN.md` section 9).
+Web calculator for U.S. home buyers and owners (see `PRD.md`, `docs/user-stories.md`, `docs/app-roles.md`, `docs/jobs-to-be-done.md` for product scope). This repo holds the boilerplate (routing, layout, tooling, Docker) plus the first foundations: integer money/rate primitives, the defaults registry and the shared Disclaimer. Calculator features are tracked as GitHub issues and milestones (see `PLAN.md` section 9).
 
 ## Stack
 
@@ -19,7 +19,7 @@ Use `yarn`, not `npm`. If `yarn` is not found, add `~/.local/bin` to PATH (the C
 
 | Command                         | What it does                                                                                         |
 | ------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `yarn dev`                      | Local dev server (`vite --host`, port 5173). Needs a `.env` (copy `.env.example`)                    |
+| `yarn dev`                      | Local dev server (`vite --host`, port 5173). No `.env` needed                                        |
 | `yarn start`                    | Production: `yarn build && serve -s dist -l ${PORT:-3000}`                                           |
 | `yarn build`                    | `tsc -b && vite build`                                                                               |
 | `yarn typecheck`                | `tsc -b --noEmit`                                                                                    |
@@ -47,7 +47,7 @@ src/
   components/feedback/   PageLoader, ErrorBoundary, Disclaimer
   hooks/                 shared hooks (useDebouncedValue, usePrinting, useInView, useFitsViewport)
   services/api/client.ts typed fetch wrapper; only code that touches the network
-  config/env.ts          validates VITE_* once at import, throws if missing
+  config/env.ts          reads VITE_* once at import, with built-in defaults
   config/defaults/       defaults registry (values with source, as-of date, confidence) and state tax table
   config/disclaimer.ts   PRD section 11 disclaimer text
   lib/                   pure helpers: cn, money (cents), rate (micros), decimal parsing, rounding
@@ -80,7 +80,7 @@ Root configs: `biome.json`, `biome-plugins/`, `vite.config.ts`, `tsconfig*.json`
 
 ## Environment variables
 
-- Copy `.env.example` to `.env` for local work. `.env` is gitignored.
+- A `.env` is optional: `VITE_API_BASE_URL` (default `/api`) and `VITE_APP_NAME` (default `Mortgage Calculator`) have built-in defaults in `src/config/env.ts`. `.env` is gitignored; `.env.example` documents the keys.
 - Only `VITE_*` variables are readable by the client, and **every one is inlined into the public bundle**. Never put secrets, tokens or private keys in them.
 - Read env only through `src/config/env.ts`, never `import.meta.env` directly elsewhere.
 - Current keys: `VITE_API_BASE_URL`, `VITE_APP_NAME`.

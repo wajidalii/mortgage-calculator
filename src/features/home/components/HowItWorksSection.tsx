@@ -1,3 +1,4 @@
+import Reveal from "@/components/ui/Reveal";
 import SectionHeading from "./SectionHeading";
 
 const STEPS = [
@@ -25,28 +26,30 @@ const HowItWorksSection = () => (
 			eyebrow="How it works"
 			title="From a number to a decision in three steps"
 		/>
-		<ol className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-6">
-			{STEPS.map((step, index) => (
-				<li key={step.title} className="relative md:pr-6">
-					<span
-						aria-hidden="true"
-						className="grid size-10 place-items-center rounded-full bg-brand-600 text-base font-bold text-white"
-					>
-						{index + 1}
-					</span>
-					{index < STEPS.length - 1 ? (
+		<Reveal className="mt-10">
+			<ol className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-6">
+				{STEPS.map((step, index) => (
+					<li key={step.title} className="relative md:pr-6">
 						<span
 							aria-hidden="true"
-							className="absolute top-5 left-14 hidden h-px w-[calc(100%-4.5rem)] bg-brand-200 md:block"
-						/>
-					) : null}
-					<h3 className="mt-4 text-xl font-semibold tracking-tight text-slate-900">
-						{step.title}
-					</h3>
-					<p className="mt-2 text-slate-600">{step.body}</p>
-				</li>
-			))}
-		</ol>
+							className="grid size-10 place-items-center rounded-full bg-brand-600 text-base font-bold text-white"
+						>
+							{index + 1}
+						</span>
+						{index < STEPS.length - 1 ? (
+							<span
+								aria-hidden="true"
+								className="absolute top-5 left-14 hidden h-px w-[calc(100%-4.5rem)] bg-brand-200 md:block"
+							/>
+						) : null}
+						<h3 className="mt-4 text-xl font-semibold tracking-tight text-slate-900">
+							{step.title}
+						</h3>
+						<p className="mt-2 text-slate-600">{step.body}</p>
+					</li>
+				))}
+			</ol>
+		</Reveal>
 	</section>
 );
 

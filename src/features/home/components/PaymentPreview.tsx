@@ -26,7 +26,7 @@ const BalanceSparkline = () => {
 			viewBox={`0 0 ${W} ${H}`}
 			role="img"
 			aria-label="Loan balance falling from the full loan amount to zero over 30 years"
-			className="h-16 w-full"
+			className="h-16 w-full motion-safe:animate-wipe [animation-delay:400ms]"
 			preserveAspectRatio="none"
 		>
 			<path d={`${line} L${W},${H} L0,${H}Z`} fill="var(--color-brand-100)" />

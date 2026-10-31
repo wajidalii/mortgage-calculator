@@ -1,11 +1,7 @@
 import { useDeferredValue, useMemo, useState } from "react";
-import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
-import {
-	lifetimeInterest,
-	type ScheduleRow,
-	summarizeByYear,
-} from "@/lib/amortization";
+import { TOGGLE_GROUP, toggleOption } from "@/components/ui/segmented";
+import { type ScheduleRow, summarizeByYear } from "@/lib/amortization";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/money";
 import { formatRate } from "@/lib/rate";
@@ -44,7 +40,6 @@ const ScheduleTable = ({ rows }: ScheduleTableProps) => {
 	// switching to the 360 monthly rows does not block the click (INP).
 	const shownView = useDeferredValue(view);
 	const years = useMemo(() => summarizeByYear(rows), [rows]);
-	const totalInterest = useMemo(() => lifetimeInterest(rows), [rows]);
 	const hasExtra = rows.some((row) => row.extra > 0);
 	const isArm = rows.some((row) => row.rate !== undefined);
 	// Loan years holding any month after the fixed period, and each year's last rate.
@@ -96,30 +91,29 @@ const ScheduleTable = ({ rows }: ScheduleTableProps) => {
 				}));
 
 	return (
-		<Card className="grid gap-4">
+		<Card className="grid min-w-0 grid-cols-1 gap-4">
 			<div className="flex flex-wrap items-center justify-between gap-3">
 				<div>
-					<h2 className="text-lg font-semibold">Amortization schedule</h2>
+					<p className="text-xs font-bold tracking-widest text-brand-700 uppercase">
+						Payment detail
+					</p>
+					<h2 className="mt-1 text-lg font-semibold">Amortization schedule</h2>
 					<p className="text-sm text-slate-600">
-						Lifetime interest{" "}
-						<strong className="font-semibold text-slate-900">
-							{formatMoney(totalInterest)}
-						</strong>{" "}
-						over {rows.length} payments
+						{rows.length} payments{hasExtra ? ", with your extra payments" : ""}
 					</p>
 				</div>
-				<fieldset>
+				<fieldset className={TOGGLE_GROUP}>
 					<legend className="sr-only">Schedule view</legend>
 					{VIEWS.map((item) => (
-						<Button
+						<button
 							key={item.view}
-							variant={view === item.view ? "primary" : "secondary"}
+							type="button"
 							aria-pressed={view === item.view}
 							onClick={() => setView(item.view)}
-							className="min-h-11 px-3 py-1 first:rounded-r-none last:rounded-l-none"
+							className={toggleOption(view === item.view)}
 						>
 							{item.label}
-						</Button>
+						</button>
 					))}
 				</fieldset>
 			</div>
@@ -133,7 +127,7 @@ const ScheduleTable = ({ rows }: ScheduleTableProps) => {
 				// biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be keyboard reachable
 				tabIndex={0}
 				aria-label={`${shownView === "monthly" ? "Monthly" : "Yearly"} amortization schedule`}
-				className="max-h-96 overflow-auto rounded-md ring-1 ring-slate-200 focus-visible:outline-2 focus-visible:outline-brand-500"
+				className="max-h-96 overflow-auto rounded-xl ring-1 ring-slate-200 focus-visible:outline-3 focus-visible:outline-brand-500"
 			>
 				<table
 					className={cn(
@@ -146,7 +140,7 @@ const ScheduleTable = ({ rows }: ScheduleTableProps) => {
 						{periodLabel.toLowerCase()}: payment, principal, interest and
 						remaining balance
 					</caption>
-					<thead className="sticky top-0 bg-slate-100 text-slate-700">
+					<thead className="sticky top-0 bg-slate-50 text-slate-600">
 						<tr>
 							<th scope="col" className="px-3 py-2 text-left font-medium">
 								{periodLabel}

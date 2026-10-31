@@ -30,3 +30,16 @@ export const formatMoney = (cents: Cents): string => {
 	const sign = cents < 0 ? "-" : "";
 	return `${sign}$${grouped}.${String(rest).padStart(2, "0")}`;
 };
+
+/**
+ * Short label for chart axes and captions, such as "$400k" or "$1.2M". Rounds
+ * for display only; never use it for a figure the user reads as exact.
+ */
+export const formatCompactMoney = (cents: number): string => {
+	const dollars = Math.round(cents / 100);
+	if (dollars >= 1_000_000) {
+		return `$${Math.round(dollars / 100_000) / 10}M`;
+	}
+	if (dollars >= 1_000) return `$${Math.round(dollars / 1_000)}k`;
+	return `$${dollars}`;
+};

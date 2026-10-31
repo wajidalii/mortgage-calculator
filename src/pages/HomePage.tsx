@@ -3,7 +3,7 @@ import Card from "@/components/ui/Card";
 import { env } from "@/config/env";
 
 const HomePage = () => (
-	<Card>
+	<Card className="mx-auto w-full max-w-3xl">
 		<h1 className="text-3xl font-bold">{env.appName}</h1>
 		<p className="mt-2 text-slate-600">
 			Estimate your monthly mortgage payment.

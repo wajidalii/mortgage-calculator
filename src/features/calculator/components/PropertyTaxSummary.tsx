@@ -9,18 +9,18 @@ interface PropertyTaxSummaryProps {
 const PropertyTaxSummary = ({ tax }: PropertyTaxSummaryProps) => (
 	<section
 		aria-labelledby="property-tax-heading"
-		className="rounded-lg bg-white p-4 sm:p-6 ring-1 ring-slate-300"
+		className="py-5 first:pt-0 last:pb-0"
 	>
-		<h2
+		<h3
 			id="property-tax-heading"
-			className="text-sm font-medium text-slate-700"
+			className="text-sm font-semibold text-slate-900"
 		>
 			Estimated property tax
-		</h2>
+		</h3>
 		<div aria-live="polite">
 			{tax ? (
 				<>
-					<p className="mt-1 text-2xl font-bold tracking-tight text-slate-900">
+					<p className="mt-1 text-xl font-bold tracking-tight text-slate-900 tabular-nums">
 						{formatMoney(tax.monthly)}
 						<span className="ml-1 text-base font-normal text-slate-600">
 							/ month

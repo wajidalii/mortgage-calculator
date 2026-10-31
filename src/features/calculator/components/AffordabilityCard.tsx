@@ -42,11 +42,11 @@ const RatioRow = ({
 const AffordabilityCard = ({ affordability }: AffordabilityCardProps) => (
 	<section
 		aria-labelledby="affordability-heading"
-		className="rounded-lg bg-white p-4 ring-1 ring-slate-300 sm:p-6"
+		className="rounded-2xl bg-white p-4 shadow-panel ring-1 ring-slate-200 sm:p-6"
 	>
 		<h2
 			id="affordability-heading"
-			className="text-sm font-medium text-slate-700"
+			className="text-lg font-semibold text-slate-900"
 		>
 			Simplified affordability
 		</h2>

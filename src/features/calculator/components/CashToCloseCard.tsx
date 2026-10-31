@@ -18,28 +18,25 @@ const Row = ({
 		className={`flex justify-between gap-4 py-1 ${strong ? "mt-1 border-t border-slate-300 pt-2 font-semibold" : ""}`}
 	>
 		<dt className={strong ? "text-slate-800" : "text-slate-700"}>{label}</dt>
-		<dd className="font-medium text-slate-900">{amount}</dd>
+		<dd className="font-medium text-slate-900 tabular-nums">{amount}</dd>
 	</div>
 );
 
 const CashToCloseCard = ({ closing }: CashToCloseCardProps) => (
 	<section
 		aria-labelledby="cash-to-close-heading"
-		className="rounded-lg bg-white p-4 ring-1 ring-slate-300 sm:p-6"
+		className="rounded-2xl bg-white p-4 shadow-panel ring-1 ring-slate-200 sm:p-6"
 	>
 		<h2
 			id="cash-to-close-heading"
-			className="text-sm font-medium text-slate-700"
+			className="text-lg font-semibold text-slate-900"
 		>
 			Cash to close
 		</h2>
 		<div aria-live="polite">
 			{closing ? (
 				<>
-					<p className="mt-1 text-4xl font-bold tracking-tight text-slate-900">
-						{formatMoney(closing.cashToClose)}
-					</p>
-					<dl className="mt-4 border-t border-slate-300/60 pt-4 text-sm">
+					<dl className="mt-3 text-sm">
 						<Row
 							label="Down payment"
 							amount={formatMoney(closing.downPayment)}

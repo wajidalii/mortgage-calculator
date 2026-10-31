@@ -13,12 +13,12 @@ const CostGrowthTable = ({ growth }: CostGrowthTableProps) =>
 	growth ? (
 		<section
 			aria-labelledby="cost-growth-heading"
-			className="rounded-lg bg-white p-4 ring-1 ring-slate-300 sm:p-6"
+			className="rounded-2xl bg-white p-4 shadow-panel ring-1 ring-slate-200 sm:p-6"
 		>
 			<div className="flex flex-wrap items-center gap-2">
 				<h2
 					id="cost-growth-heading"
-					className="text-sm font-medium text-slate-700"
+					className="text-lg font-semibold text-slate-900"
 				>
 					Tax and insurance by year
 				</h2>
@@ -37,13 +37,13 @@ const CostGrowthTable = ({ growth }: CostGrowthTableProps) =>
 				// biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be keyboard reachable
 				tabIndex={0}
 				aria-label="Tax and insurance by year table"
-				className="mt-3 max-h-96 overflow-auto rounded-md ring-1 ring-slate-200 focus-visible:outline-2 focus-visible:outline-brand-500"
+				className="mt-3 max-h-96 overflow-auto rounded-md ring-1 ring-slate-200 focus-visible:outline-3 focus-visible:outline-brand-500"
 			>
 				<table className="w-full min-w-[32rem] text-sm">
 					<caption className="sr-only">
 						Monthly property tax and insurance for each loan year
 					</caption>
-					<thead className="sticky top-0 bg-slate-100 text-slate-700">
+					<thead className="sticky top-0 bg-slate-50 text-slate-600">
 						<tr>
 							<th scope="col" className="px-3 py-2 text-left font-medium">
 								Year

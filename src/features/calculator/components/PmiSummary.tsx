@@ -7,17 +7,14 @@ interface PmiSummaryProps {
 }
 
 const PmiSummary = ({ result }: PmiSummaryProps) => (
-	<section
-		aria-labelledby="pmi-heading"
-		className="rounded-lg bg-white p-4 sm:p-6 ring-1 ring-slate-300"
-	>
-		<h2 id="pmi-heading" className="text-sm font-medium text-slate-700">
+	<section aria-labelledby="pmi-heading" className="py-5 first:pt-0 last:pb-0">
+		<h3 id="pmi-heading" className="text-sm font-semibold text-slate-900">
 			Private mortgage insurance (PMI)
-		</h2>
+		</h3>
 		<div aria-live="polite">
 			{result?.status === "on" ? (
 				<>
-					<p className="mt-1 text-2xl font-bold tracking-tight text-slate-900">
+					<p className="mt-1 text-xl font-bold tracking-tight text-slate-900 tabular-nums">
 						{formatMoney(result.pmi.monthly)}
 						<span className="ml-1 text-base font-normal text-slate-600">
 							/ month

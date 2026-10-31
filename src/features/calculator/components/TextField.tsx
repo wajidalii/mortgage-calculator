@@ -35,18 +35,25 @@ const TextField = ({
 
 	return (
 		<div className={className}>
-			<label htmlFor={id} className="block text-sm font-medium text-slate-800">
+			<label
+				htmlFor={id}
+				className="block text-sm font-semibold text-slate-800"
+			>
 				{label}
 			</label>
 			<div
 				className={cn(
-					"mt-1 flex min-h-11 items-center rounded-md bg-white ring-1 ring-slate-300 focus-within:ring-2 focus-within:ring-brand-500",
-					error && "ring-2 ring-red-600 focus-within:ring-red-600",
-					readOnly && "bg-slate-100 text-slate-600",
+					"mt-1.5 flex min-h-12 items-center rounded-xl bg-white ring-1 ring-slate-300 motion-safe:transition-shadow hover:ring-slate-400 focus-within:ring-3 focus-within:ring-brand-500",
+					error &&
+						"ring-2 ring-red-600 hover:ring-red-600 focus-within:ring-red-600",
+					readOnly && "bg-slate-50 text-slate-600 hover:ring-slate-300",
 				)}
 			>
 				{prefix ? (
-					<span aria-hidden="true" className="pl-3 text-slate-500">
+					<span
+						aria-hidden="true"
+						className="pl-3.5 font-semibold text-slate-500"
+					>
 						{prefix}
 					</span>
 				) : null}
@@ -62,16 +69,22 @@ const TextField = ({
 					aria-describedby={describedBy}
 					onChange={(event) => onChange(event.target.value)}
 					onBlur={onBlur}
-					className="w-full min-w-0 bg-transparent px-3 py-2 text-base outline-none"
+					className="w-full min-w-0 bg-transparent px-3 py-2 text-base font-semibold text-slate-900 tabular-nums outline-none"
 				/>
 				{suffix ? (
-					<span aria-hidden="true" className="pr-3 text-slate-500">
+					<span
+						aria-hidden="true"
+						className="pr-3.5 font-semibold text-slate-500"
+					>
 						{suffix}
 					</span>
 				) : null}
 			</div>
 			{hint ? (
-				<p id={hintId} className="mt-1 text-xs text-slate-500">
+				<p
+					id={hintId}
+					className="mt-1.5 text-xs leading-relaxed text-slate-600"
+				>
 					{hint}
 				</p>
 			) : null}

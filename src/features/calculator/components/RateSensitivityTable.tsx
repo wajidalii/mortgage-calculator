@@ -18,11 +18,11 @@ const RateSensitivityTable = ({ rows }: RateSensitivityTableProps) =>
 	rows ? (
 		<section
 			aria-labelledby="sensitivity-heading"
-			className="rounded-lg bg-white p-4 ring-1 ring-slate-300 sm:p-6"
+			className="rounded-2xl bg-white p-4 shadow-panel ring-1 ring-slate-200 sm:p-6"
 		>
 			<h2
 				id="sensitivity-heading"
-				className="text-sm font-medium text-slate-700"
+				className="text-lg font-semibold text-slate-900"
 			>
 				Rate sensitivity
 			</h2>
@@ -34,7 +34,7 @@ const RateSensitivityTable = ({ rows }: RateSensitivityTableProps) =>
 				<caption className="sr-only">
 					Monthly principal and interest by interest rate
 				</caption>
-				<thead className="bg-slate-100 text-slate-700">
+				<thead className="bg-slate-50 text-slate-600">
 					<tr>
 						<th scope="col" className="px-3 py-2 text-left font-medium">
 							Rate

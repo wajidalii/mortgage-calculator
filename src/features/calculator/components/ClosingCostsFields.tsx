@@ -1,4 +1,4 @@
-import Button from "@/components/ui/Button";
+import { TOGGLE_GROUP, toggleOption } from "@/components/ui/segmented";
 import { formatMoney } from "@/lib/money";
 import type { Cents } from "@/types/units";
 import {
@@ -40,9 +40,7 @@ const ClosingCostsFields = ({
 	onCreditsBlur,
 }: ClosingCostsFieldsProps) => (
 	<fieldset className="grid gap-5 sm:col-span-2 sm:grid-cols-2">
-		<legend className="text-sm font-semibold text-slate-900">
-			Closing costs (optional)
-		</legend>
+		<legend className="sr-only">Closing costs (optional)</legend>
 		{CLOSING_LINES.map((item) => {
 			const line = closing[item.id];
 			const dollar = dollars[item.id];
@@ -64,19 +62,19 @@ const ClosingCostsFields = ({
 						onChange={(value) => onValueChange(item.id, value)}
 						onBlur={() => onBlur(item.id)}
 					/>
-					<fieldset>
+					<fieldset className={`${TOGGLE_GROUP} justify-self-start`}>
 						<legend className="sr-only">{item.label} entered as</legend>
 						{MODES.map((option) => (
-							<Button
+							<button
 								key={option.mode}
-								variant={line.mode === option.mode ? "primary" : "secondary"}
+								type="button"
 								aria-pressed={line.mode === option.mode}
 								aria-label={`${item.label} as ${option.mode === "amount" ? "dollars" : "percent of price"}`}
 								onClick={() => onModeChange(item.id, option.mode)}
-								className="min-h-11 px-3 py-1 first:rounded-r-none last:rounded-l-none"
+								className={toggleOption(line.mode === option.mode)}
 							>
 								{option.label}
-							</Button>
+							</button>
 						))}
 					</fieldset>
 				</div>

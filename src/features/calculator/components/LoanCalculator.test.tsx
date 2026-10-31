@@ -13,10 +13,12 @@ import LoanCalculator from "./LoanCalculator";
 afterEach(cleanup);
 
 const field = (name: string) => screen.getByLabelText(name) as HTMLInputElement;
-/** The standalone P&I result, not the line in the itemized estimate. */
+/** The P&I line of the itemized estimate; P&I is shown once on the page. */
 const piSummary = () =>
 	within(
-		screen.getByRole("region", { name: "Monthly principal and interest" }),
+		within(screen.getByRole("region", { name: "Estimated monthly cost" }))
+			.getByText("Principal and interest")
+			.closest("div") as HTMLElement,
 	);
 const type = (name: string, value: string) => {
 	const input = field(name);
@@ -81,11 +83,10 @@ describe("LoanCalculator", () => {
 	it("shows $0 and 0.00% LTV at 100% down", () => {
 		render(<LoanCalculator />);
 		type("Down payment (%)", "100");
-		// Loan amount and monthly principal and interest are both $0.00.
-		const summary = screen.getByRole("region", {
-			name: "Monthly principal and interest",
-		});
+		// Loan amount and lifetime interest are both $0.00, and so is P&I.
+		const summary = screen.getByRole("region", { name: "Loan summary" });
 		expect(within(summary).getAllByText("$0.00")).toHaveLength(2);
+		expect(piSummary().getByText("$0.00")).toBeTruthy();
 		expect(screen.getByText("0.00%")).toBeTruthy();
 	});
 
@@ -828,5 +829,96 @@ describe("LoanCalculator print report", () => {
 		expect(
 			screen.queryByRole("table", { name: "Printable report" }),
 		).toBeNull();
+	});
+});
+
+describe("LoanCalculator dashboard layout", () => {
+	const hero = () =>
+		within(screen.getByRole("region", { name: "Estimated monthly cost" }));
+	const metrics = () =>
+		within(screen.getByRole("region", { name: "Loan summary" }));
+	const caption = () =>
+		screen.getByText(/^The balance starts at/).textContent ?? "";
+	const sectionFor = (title: string) =>
+		screen.getByText(title).closest("details") as HTMLDetailsElement;
+
+	it("shows loan amount, LTV, cash to close and lifetime interest once each", () => {
+		render(<LoanCalculator />);
+		expect(metrics().getByText("$400,000.00")).toBeTruthy();
+		expect(metrics().getByText("80.00%")).toBeTruthy();
+		expect(metrics().getByText("$100,000.00")).toBeTruthy();
+		expect(metrics().getByText("$510,179.81")).toBeTruthy();
+		expect(metrics().getByText("Over 360 payments")).toBeTruthy();
+		expect(screen.getAllByText("$510,179.81")).toHaveLength(1);
+	});
+
+	it("describes the payment split for screen readers", () => {
+		render(<LoanCalculator />);
+		const donut = hero().getByRole("img");
+		expect(donut.getAttribute("aria-label")).toBe(
+			"Share of the monthly total: Principal and interest 71 percent, Property tax 23 percent, Homeowners insurance 6 percent.",
+		);
+	});
+
+	it("states the balance chart's key facts in a text caption", () => {
+		render(<LoanCalculator />);
+		expect(caption()).toBe(
+			"The balance starts at $400k, falls to half by year 22 and is paid off in year 30.",
+		);
+	});
+
+	it("compares the chart with the original schedule when extra payments shorten it", () => {
+		render(<LoanCalculator />);
+		type("Extra payment each month (optional)", "200");
+		expect(caption()).toContain("paid off in year 25 instead of year 30");
+		expect(screen.getByText("Original schedule")).toBeTruthy();
+		expect(metrics().getByText("With your extra payments")).toBeTruthy();
+	});
+
+	it("shades and explains the hypothetical ARM period in the chart", () => {
+		render(<LoanCalculator />);
+		fireEvent.click(screen.getByLabelText("5/6 ARM"));
+		expect(
+			screen.getByText("Shaded: hypothetical rates after month 60"),
+		).toBeTruthy();
+		expect(caption()).toContain("assumed index values, not a forecast");
+		expect(
+			metrics().getByText("Uses hypothetical rates after month 60"),
+		).toBeTruthy();
+		expect(hero().getByText("Months 1 to 60")).toBeTruthy();
+	});
+
+	it("labels held results as the last valid entry, not a live estimate", () => {
+		render(<LoanCalculator />);
+		expect(hero().getByText("Live estimate")).toBeTruthy();
+		type("Monthly HOA", "abc");
+		expect(hero().queryByText("Live estimate")).toBeNull();
+		expect(hero().getByText("Last valid entry")).toBeTruthy();
+		expect(
+			within(screen.getByTestId("mobile-summary")).getByText(
+				"Last valid entry",
+			),
+		).toBeTruthy();
+	});
+
+	it("keeps taxes open, other sections closed, and opens one that gets an error", () => {
+		render(<LoanCalculator />);
+		expect(sectionFor("Taxes, insurance and HOA").open).toBe(true);
+		expect(sectionFor("Closing costs and credits").open).toBe(false);
+		expect(sectionFor("Affordability check").open).toBe(false);
+		type("Credits (seller or lender)", "200000");
+		expect(sectionFor("Closing costs and credits").open).toBe(true);
+		expect(
+			within(sectionFor("Closing costs and credits")).getByText("1 issue"),
+		).toBeTruthy();
+	});
+
+	it("shows the monthly total in the mobile summary bar", () => {
+		render(<LoanCalculator />);
+		const bar = within(screen.getByTestId("mobile-summary"));
+		expect(bar.getByText("$3,561.60")).toBeTruthy();
+		expect(
+			bar.getByRole("link", { name: "See breakdown" }).getAttribute("href"),
+		).toBe("#calculator-results");
 	});
 });

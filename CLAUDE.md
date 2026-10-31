@@ -39,12 +39,13 @@ src/
   main.tsx
   vite-env.d.ts          typed ImportMetaEnv
   app/                   App.tsx, router.tsx, providers.tsx
-  layouts/               MainLayout.tsx (Outlet + commented slot for a future Navbar)
+  layouts/               MainLayout.tsx (AppHeader + Outlet)
   pages/                 HomePage, CalculatorPage, NotFoundPage (one lazy chunk each)
   features/              feature folders: components/ hooks/ types.ts
-  components/ui/         Tailwind primitives (Button, Card)
+  components/ui/         Tailwind primitives (Button, Card, segmented-control classes)
+  components/layout/     AppHeader (brand + main nav)
   components/feedback/   PageLoader, ErrorBoundary, Disclaimer
-  hooks/                 shared hooks (useDebouncedValue)
+  hooks/                 shared hooks (useDebouncedValue, usePrinting, useInView, useFitsViewport)
   services/api/client.ts typed fetch wrapper; only code that touches the network
   config/env.ts          validates VITE_* once at import, throws if missing
   config/defaults/       defaults registry (values with source, as-of date, confidence) and state tax table
@@ -53,6 +54,8 @@ src/
   types/units.ts         branded Cents and Micros types
   types/  assets/  styles/index.css
 ```
+
+`design/` holds the static HTML design reference for the calculator dashboard. It is not app code and is excluded from Biome.
 
 Root configs: `biome.json`, `biome-plugins/`, `vite.config.ts`, `tsconfig*.json`, `.prettierrc`, `.lintstagedrc.json`, `.husky/`, `.yarnrc.yml`, `.env.example`, `Dockerfile`, `docker-compose.yml`, `.dockerignore`, `.claude/agents/`.
 
@@ -144,6 +147,5 @@ No nginx: production serves the built `dist/` with `serve` (SPA fallback on).
 ## Open items
 
 - Calculator features from `PRD.md` are not started; only primitives, defaults and the Disclaimer exist. Progress is tracked in GitHub milestones.
-- Navbar is a placeholder slot in `MainLayout`.
 - `Providers` (`src/app/providers.tsx`) is a pass-through.
 - Closing the default-export lint gap (see Code conventions, item 2) would need a small check script.

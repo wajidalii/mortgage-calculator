@@ -46,7 +46,7 @@ const CompareView = ({ storage }: CompareViewProps) => {
 		});
 
 	return (
-		<div className="grid gap-6">
+		<div className="grid grid-cols-1 gap-6">
 			<SavedScenarios
 				kind="compare"
 				current={state}
@@ -57,7 +57,7 @@ const CompareView = ({ storage }: CompareViewProps) => {
 				}}
 				{...(storage !== undefined ? { storage } : {})}
 			/>
-			<Card className="grid gap-5">
+			<Card className="grid grid-cols-1 gap-5">
 				<div className="grid gap-5 sm:grid-cols-2">
 					<TextField
 						label="Home price"

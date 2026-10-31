@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Cents } from "../types/units";
-import { formatMoney, parseMoney } from "./money";
+import { formatCompactMoney, formatMoney, parseMoney } from "./money";
 import { roundHalfUp } from "./rounding";
 
 describe("parseMoney (PRD 12.2)", () => {
@@ -107,4 +107,15 @@ describe("formatMoney", () => {
 			expect(() => formatMoney(cents as Cents)).toThrow(RangeError);
 		},
 	);
+});
+
+describe("formatCompactMoney", () => {
+	it("shortens thousands and millions for chart labels", () => {
+		expect(formatCompactMoney(40_000_000)).toBe("$400k");
+		expect(formatCompactMoney(20_000_000)).toBe("$200k");
+		expect(formatCompactMoney(125_000_000)).toBe("$1.3M");
+		expect(formatCompactMoney(100_000_000)).toBe("$1M");
+		expect(formatCompactMoney(99_900)).toBe("$999");
+		expect(formatCompactMoney(0)).toBe("$0");
+	});
 });

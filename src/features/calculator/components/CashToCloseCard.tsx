@@ -44,7 +44,7 @@ const CashToCloseCard = ({ closing }: CashToCloseCardProps) => {
 			>
 				Cash to close
 			</h2>
-			<div aria-live="polite">
+			<div>
 				{closing ? (
 					<>
 						<dl className="mt-3 text-sm">

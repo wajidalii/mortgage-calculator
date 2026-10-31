@@ -66,7 +66,7 @@ const SavedScenarios = <T,>({
 					{scenarios.map((item) => (
 						<li
 							key={item.id}
-							className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm"
+							className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm motion-safe:animate-fade"
 						>
 							<span>
 								<span className="font-medium text-slate-900">{item.name}</span>{" "}

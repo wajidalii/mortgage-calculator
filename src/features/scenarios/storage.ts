@@ -1,3 +1,5 @@
+import { upgradeLegacyCompare } from "@/features/compare/compare";
+
 /**
  * Saved scenarios live in browser storage only. Nothing here touches the
  * network (S-18). Every storage call is wrapped in try/catch because storage
@@ -6,7 +8,7 @@
 
 export const STORAGE_KEY = "mortgage-calculator:scenarios";
 /** Bump when the saved shape changes and add a step to `migrate`. */
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 export const MAX_NAME_LENGTH = 60;
 
 export type ScenarioKind = "calculator" | "compare";
@@ -57,10 +59,21 @@ const isScenario = (value: unknown): value is SavedScenario =>
 	"data" in value;
 
 /**
- * Brings an older saved envelope up to SCHEMA_VERSION. Version 1 is the first
- * version, so there is nothing to convert yet.
+ * Brings an older saved envelope up to SCHEMA_VERSION.
+ * 1 to 2: a saved comparison gave each loan its own price and down payment
+ * instead of sharing one pair.
  */
-const migrate = (envelope: Envelope): Envelope => envelope;
+const migrate = (envelope: Envelope): Envelope => {
+	if (envelope.version >= 2) return envelope;
+	return {
+		version: 2,
+		scenarios: envelope.scenarios.map((scenario) =>
+			scenario.kind === "compare"
+				? { ...scenario, data: upgradeLegacyCompare(scenario.data) }
+				: scenario,
+		),
+	};
+};
 
 export const loadScenarios = (storage: StorageLike | null): LoadResult => {
 	if (!storage) return { ok: false, reason: "unavailable" };

@@ -133,6 +133,38 @@ describe("parsing saved inputs", () => {
 			}),
 		).toBeNull();
 		expect(parseCalculatorInputs(null)).toBeNull();
-		expect(parseCompareState({ shared: {}, scenarios: [] })).toBeNull();
+		expect(parseCompareState({ scenarios: [] })).toBeNull();
+	});
+});
+
+describe("migrating version 1 comparisons", () => {
+	it("gives each loan the old shared price and down payment", () => {
+		const legacy = {
+			shared: { homePrice: "650,000", downPaymentPercent: "10" },
+			scenarios: [
+				{
+					loanType: "fixed",
+					termYears: 15,
+					interestRate: "6.00",
+					armIndexPreset: "flat",
+				},
+				{
+					loanType: "fixed",
+					termYears: 30,
+					interestRate: "6.50",
+					armIndexPreset: "flat",
+				},
+			],
+		};
+		const raw = JSON.stringify({
+			version: 1,
+			scenarios: [scenario(legacy, "compare")],
+		});
+		const result = loadScenarios(memory(raw));
+		expect(result.ok).toBe(true);
+		const data = result.ok ? result.scenarios[0]?.data : null;
+		const parsed = parseCompareState(data);
+		expect(parsed?.scenarios[0].homePrice).toBe("650,000");
+		expect(parsed?.scenarios[1].downPaymentPercent).toBe("10");
 	});
 });

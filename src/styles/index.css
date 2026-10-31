@@ -18,6 +18,61 @@
 	--color-brand-900: #0b363d;
 	--color-canvas: #f4f7f8;
 	--shadow-panel: 0 14px 42px rgb(18 50 58 / 0.06);
+	/*
+	 * Motion tokens (see MOTION.md). Entrances ease out, state changes use the
+	 * standard curve. Only transform, opacity and paint properties animate.
+	 */
+	--ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+	--ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+	--duration-micro: 150ms;
+	--duration-hover: 200ms;
+	--duration-expand: 250ms;
+	--duration-enter: 400ms;
+	--animate-rise: rise var(--duration-enter) var(--ease-out-soft) both;
+	--animate-rise-quick: rise var(--duration-expand) var(--ease-out-soft) both;
+	--animate-fade: fade var(--duration-micro) var(--ease-standard) both;
+	--animate-wipe: wipe 700ms var(--ease-out-soft) both;
+	--animate-flash: flash 800ms var(--ease-standard) both;
+
+	@keyframes rise {
+		from {
+			opacity: 0;
+			transform: translateY(0.5rem);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+
+	@keyframes fade {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
+	/* Reveals a chart left to right; clip-path is paint only. */
+	@keyframes wipe {
+		from {
+			clip-path: inset(0 100% 0 0);
+		}
+		to {
+			clip-path: inset(0);
+		}
+	}
+
+	/* A short highlight behind a figure that just changed. */
+	@keyframes flash {
+		from {
+			background-color: var(--flash-color, rgb(19 123 121 / 0.18));
+		}
+		to {
+			background-color: transparent;
+		}
+	}
 }
 
 :root {
@@ -71,9 +126,47 @@ body {
 	outline-offset: 2px;
 }
 
+/*
+ * Tailwind 4 resets buttons to the default cursor. Every enabled control gets
+ * the pointer, so toggles, Save, Print and checkbox labels all read as clickable.
+ */
+:where(
+	button:not(:disabled),
+	summary,
+	select,
+	input[type="range"],
+	input[type="checkbox"]:not(:disabled),
+	label:has(> input[type="checkbox"]),
+	label:has(> input[type="radio"])
+) {
+	cursor: pointer;
+}
+
 /* `<details>` markers are drawn by the AdvancedSection component. */
 summary::-webkit-details-marker {
 	display: none;
+}
+
+/*
+ * Scroll reveal (see Reveal). Content is visible by default; a section only
+ * becomes "pending" once script has checked that it starts below the fold.
+ */
+.reveal-pending {
+	opacity: 0;
+	transform: translateY(0.75rem);
+}
+
+.reveal-shown {
+	transition:
+		opacity var(--duration-enter) var(--ease-out-soft),
+		transform var(--duration-enter) var(--ease-out-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.reveal-pending {
+		opacity: 1;
+		transform: none;
+	}
 }
 
 @media print {
@@ -87,6 +180,19 @@ summary::-webkit-details-marker {
 
 	body {
 		background-color: white;
+	}
+
+	/* Nothing may stay hidden or mid-animation on paper. */
+	*,
+	::before,
+	::after {
+		animation: none;
+		transition: none;
+	}
+
+	.reveal-pending {
+		opacity: 1;
+		transform: none;
 	}
 
 	/* Browsers repeat these groups on every printed page. */

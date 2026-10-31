@@ -36,7 +36,7 @@ const AdvancedSection = ({
 			onToggle={(event) => setOpen(event.currentTarget.open)}
 			className="group border-t border-slate-200"
 		>
-			<summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 rounded-lg py-3 hover:text-brand-700">
+			<summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 rounded-lg py-3 motion-safe:transition-colors motion-safe:duration-micro hover:text-brand-700">
 				<span className="min-w-0">
 					<span className="block text-sm font-bold text-slate-900">
 						{title}
@@ -53,7 +53,7 @@ const AdvancedSection = ({
 					<svg
 						aria-hidden="true"
 						viewBox="0 0 20 20"
-						className="size-5 text-brand-600 motion-safe:transition-transform group-open:rotate-180"
+						className="size-5 text-brand-600 motion-safe:transition-transform motion-safe:duration-expand motion-safe:ease-out-soft group-open:rotate-180"
 					>
 						<path
 							d="M5 7.5l5 5 5-5"
@@ -66,7 +66,9 @@ const AdvancedSection = ({
 					</svg>
 				</span>
 			</summary>
-			<div className="grid gap-5 pt-2 pb-6 sm:grid-cols-2">{children}</div>
+			<div className="grid gap-5 pt-2 pb-6 sm:grid-cols-2 motion-safe:group-open:animate-rise-quick">
+				{children}
+			</div>
 		</details>
 	);
 };

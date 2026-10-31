@@ -1,7 +1,7 @@
-import { useId, useMemo } from "react";
+import { type PointerEvent, useId, useMemo, useState } from "react";
 import Card from "@/components/ui/Card";
 import type { ScheduleRow } from "@/lib/amortization";
-import { formatCompactMoney as compactMoney } from "@/lib/money";
+import { formatCompactMoney as compactMoney, formatMoney } from "@/lib/money";
 import type { Cents } from "@/types/units";
 
 interface BalanceChartProps {
@@ -45,6 +45,19 @@ const toPath = (
 		})
 		.join(" ");
 
+/** Balance at the end of each loan year, 0 to `years`; 0 once paid off. */
+const balancesByYear = (
+	rows: readonly ScheduleRow[],
+	loan: number,
+	years: number,
+): number[] => {
+	const points = yearPoints(rows, loan);
+	return Array.from({ length: years + 1 }, (_, year) => {
+		if (year * 12 >= rows.length && year > 0) return 0;
+		return points.find(([month]) => month === year * 12)?.[1] ?? 0;
+	});
+};
+
 /** First loan year whose closing balance is at or below half the loan. */
 const halfwayYear = (rows: readonly ScheduleRow[], loan: number) => {
 	const row = rows.find((item) => item.balance * 2 <= loan);
@@ -63,6 +76,8 @@ const BalanceChart = ({
 	hypotheticalAfter,
 }: BalanceChartProps) => {
 	const captionId = useId();
+	const sliderId = useId();
+	const [picked, setPicked] = useState<number | null>(null);
 	const months = (baseRows ?? rows).length;
 	const line = useMemo(
 		() => toPath(yearPoints(rows, loanAmount), months, loanAmount),
@@ -78,6 +93,31 @@ const BalanceChart = ({
 	const years = Math.ceil(months / 12);
 	const payoffYear = Math.ceil(rows.length / 12);
 	const half = halfwayYear(rows, loanAmount);
+	const balances = useMemo(
+		() => balancesByYear(rows, loanAmount, years),
+		[rows, loanAmount, years],
+	);
+	const baseBalances = useMemo(
+		() => (baseRows ? balancesByYear(baseRows, loanAmount, years) : null),
+		[baseRows, loanAmount, years],
+	);
+	const year = picked === null ? null : Math.min(picked, years);
+	const markerLeft =
+		year === null ? 0 : (Math.min(year * 12, months) / months) * 100;
+	const pickFromPointer = (event: PointerEvent<HTMLDivElement>) => {
+		const box = event.currentTarget.getBoundingClientRect();
+		if (box.width === 0) return;
+		const fraction = (event.clientX - box.left) / box.width;
+		setPicked(Math.max(0, Math.min(years, Math.round(fraction * years))));
+	};
+	const readout =
+		year === null
+			? null
+			: `Year ${year}: balance ${formatMoney(balances[year] as Cents)}${
+					baseBalances
+						? `, original schedule ${formatMoney(baseBalances[year] as Cents)}`
+						: ""
+				}`;
 	const hypotheticalX =
 		hypotheticalAfter && hypotheticalAfter < months
 			? (hypotheticalAfter / months) * W
@@ -101,56 +141,71 @@ const BalanceChart = ({
 						<span>{compactMoney(loanAmount / 2)}</span>
 						<span>$0</span>
 					</div>
-					<svg
-						aria-hidden="true"
-						viewBox={`0 0 ${W} ${H}`}
-						preserveAspectRatio="none"
-						className="h-44 w-full min-w-0 sm:h-52"
+					<div
+						className="relative min-w-0 flex-1 touch-pan-y"
+						onPointerMove={pickFromPointer}
+						onPointerDown={pickFromPointer}
 					>
-						{hypotheticalX !== null ? (
-							<rect
-								x={hypotheticalX}
-								y={0}
-								width={W - hypotheticalX}
-								height={H}
-								fill="var(--chart-hypothetical)"
-							/>
-						) : null}
-						{[TOP, (H + TOP) / 2, H - 0.5].map((y) => (
-							<line
-								key={y}
-								x1={0}
-								x2={W}
-								y1={y}
-								y2={y}
-								stroke="var(--chart-grid)"
-								vectorEffect="non-scaling-stroke"
-							/>
-						))}
-						<path
-							d={`${line} L${((rows.length / months) * W).toFixed(1)} ${H} L0 ${H} Z`}
-							fill="var(--color-brand-100)"
-							opacity={0.7}
-						/>
-						{base ? (
+						<svg
+							aria-hidden="true"
+							viewBox={`0 0 ${W} ${H}`}
+							preserveAspectRatio="none"
+							className="h-44 w-full min-w-0 motion-safe:animate-wipe sm:h-52"
+						>
+							{hypotheticalX !== null ? (
+								<rect
+									x={hypotheticalX}
+									y={0}
+									width={W - hypotheticalX}
+									height={H}
+									fill="var(--chart-hypothetical)"
+								/>
+							) : null}
+							{[TOP, (H + TOP) / 2, H - 0.5].map((y) => (
+								<line
+									key={y}
+									x1={0}
+									x2={W}
+									y1={y}
+									y2={y}
+									stroke="var(--chart-grid)"
+									vectorEffect="non-scaling-stroke"
+								/>
+							))}
 							<path
-								d={base}
+								d={`${line} L${((rows.length / months) * W).toFixed(1)} ${H} L0 ${H} Z`}
+								fill="var(--color-brand-100)"
+								opacity={0.7}
+							/>
+							{base ? (
+								<path
+									d={base}
+									fill="none"
+									stroke="var(--chart-base-line)"
+									strokeWidth={2}
+									strokeDasharray="6 5"
+									vectorEffect="non-scaling-stroke"
+								/>
+							) : null}
+							<path
+								d={line}
 								fill="none"
-								stroke="var(--chart-base-line)"
-								strokeWidth={2}
-								strokeDasharray="6 5"
+								stroke="var(--color-brand-600)"
+								strokeWidth={3}
+								strokeLinejoin="round"
 								vectorEffect="non-scaling-stroke"
 							/>
+						</svg>
+						{year !== null ? (
+							<span
+								aria-hidden="true"
+								className="pointer-events-none absolute inset-y-0 w-px bg-slate-700"
+								style={{ left: `${markerLeft}%` }}
+							>
+								<span className="absolute top-0 -left-1 size-2 rounded-full bg-slate-700" />
+							</span>
 						) : null}
-						<path
-							d={line}
-							fill="none"
-							stroke="var(--color-brand-600)"
-							strokeWidth={3}
-							strokeLinejoin="round"
-							vectorEffect="non-scaling-stroke"
-						/>
-					</svg>
+					</div>
 				</div>
 				<div
 					aria-hidden="true"
@@ -159,6 +214,30 @@ const BalanceChart = ({
 					<span>Year 0</span>
 					<span>Year {Math.round(years / 2)}</span>
 					<span>Year {years}</span>
+				</div>
+				<div className="grid gap-1">
+					<label
+						htmlFor={sliderId}
+						className="text-xs font-semibold text-slate-700"
+					>
+						Explore the balance by year
+					</label>
+					<input
+						id={sliderId}
+						type="range"
+						min={0}
+						max={years}
+						step={1}
+						value={year ?? 0}
+						onChange={(event) => setPicked(Number(event.target.value))}
+						aria-valuetext={
+							readout ?? `Year 0: balance ${formatMoney(loanAmount)}`
+						}
+						className="h-6 w-full accent-brand-600"
+					/>
+					<p className="min-h-5 text-sm font-medium text-slate-900 tabular-nums">
+						{readout ?? "Drag, tap the chart or use the arrow keys."}
+					</p>
 				</div>
 				<ul className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-slate-700">
 					<li className="flex items-center gap-2">

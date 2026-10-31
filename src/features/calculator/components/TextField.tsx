@@ -43,7 +43,7 @@ const TextField = ({
 			</label>
 			<div
 				className={cn(
-					"mt-1.5 flex min-h-12 items-center rounded-xl bg-white ring-1 ring-slate-300 motion-safe:transition-shadow hover:ring-slate-400 focus-within:ring-3 focus-within:ring-brand-500",
+					"mt-1.5 flex min-h-12 items-center rounded-xl bg-white ring-1 ring-slate-300 motion-safe:transition-shadow motion-safe:duration-micro hover:ring-slate-400 focus-within:ring-3 focus-within:ring-brand-500",
 					error &&
 						"ring-2 ring-red-600 hover:ring-red-600 focus-within:ring-red-600",
 					readOnly && "bg-slate-50 text-slate-600 hover:ring-slate-300",
@@ -92,7 +92,7 @@ const TextField = ({
 				<p
 					id={errorId}
 					role="alert"
-					className="mt-1 text-sm font-medium text-red-700"
+					className="mt-1 text-sm font-medium text-red-700 motion-safe:animate-fade"
 				>
 					<span aria-hidden="true">⚠ </span>
 					{error}

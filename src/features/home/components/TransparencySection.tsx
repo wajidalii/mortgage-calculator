@@ -1,4 +1,5 @@
 import Disclaimer from "@/components/feedback/Disclaimer";
+import Reveal from "@/components/ui/Reveal";
 import Icon from "./Icon";
 import SectionHeading from "./SectionHeading";
 
@@ -26,7 +27,7 @@ const TransparencySection = () => (
 		aria-labelledby="trust-title"
 		className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8"
 	>
-		<div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
+		<Reveal className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
 			<div>
 				<SectionHeading
 					id="trust-title"
@@ -62,7 +63,7 @@ const TransparencySection = () => (
 				</div>
 				<Disclaimer />
 			</div>
-		</div>
+		</Reveal>
 	</section>
 );
 

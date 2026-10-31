@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import Reveal from "@/components/ui/Reveal";
 import Icon, { type IconName } from "./Icon";
 import SectionHeading from "./SectionHeading";
 
@@ -52,34 +53,36 @@ const ToolsSection = () => (
 			intro="Start with the calculator. Reach for the other two when you are weighing offers or wondering about your current loan."
 		/>
 		<ul className="mt-10 grid grid-cols-1 gap-5 lg:grid-cols-2">
-			{TOOLS.map((tool) => (
+			{TOOLS.map((tool, index) => (
 				<li key={tool.to} className={tool.wide ? "lg:col-span-2" : undefined}>
-					<Link
-						to={tool.to}
-						className="group flex h-full flex-col rounded-2xl bg-white p-6 shadow-panel ring-1 ring-slate-200 motion-safe:transition-shadow hover:ring-brand-500 sm:p-8"
-					>
-						<span className="grid size-11 place-items-center rounded-xl bg-brand-50 text-brand-700">
-							<Icon name={tool.icon} className="size-6" />
-						</span>
-						<span className="mt-5 text-xs font-bold tracking-widest text-slate-600 uppercase">
-							{tool.name}
-						</span>
-						<h3 className="mt-1 font-display text-2xl font-semibold tracking-tight text-slate-900">
-							{tool.question}
-						</h3>
-						<p
-							className={`mt-3 text-slate-600 ${tool.wide ? "max-w-3xl" : ""}`}
+					<Reveal delay={index * 80} className="h-full">
+						<Link
+							to={tool.to}
+							className="group flex h-full flex-col rounded-2xl bg-white p-6 shadow-panel ring-1 ring-slate-200 motion-safe:transition-[translate,scale,box-shadow] motion-safe:duration-hover motion-safe:ease-out-soft hover:-translate-y-0.5 hover:shadow-lg hover:ring-brand-500 focus-visible:-translate-y-0.5 focus-visible:shadow-lg focus-visible:ring-brand-500 motion-safe:active:translate-y-0 sm:p-8"
 						>
-							{tool.body}
-						</p>
-						<span className="mt-6 inline-flex min-h-11 items-center gap-2 pt-2 text-sm font-semibold text-brand-700 group-hover:underline">
-							{tool.cta}
-							<Icon
-								name="arrow"
-								className="size-4 motion-safe:transition-transform motion-safe:group-hover:translate-x-1"
-							/>
-						</span>
-					</Link>
+							<span className="grid size-11 place-items-center rounded-xl bg-brand-50 text-brand-700 motion-safe:transition-colors motion-safe:duration-hover group-hover:bg-brand-600 group-hover:text-white group-focus-visible:bg-brand-600 group-focus-visible:text-white">
+								<Icon name={tool.icon} className="size-6" />
+							</span>
+							<span className="mt-5 text-xs font-bold tracking-widest text-slate-600 uppercase">
+								{tool.name}
+							</span>
+							<h3 className="mt-1 font-display text-2xl font-semibold tracking-tight text-slate-900">
+								{tool.question}
+							</h3>
+							<p
+								className={`mt-3 text-slate-600 ${tool.wide ? "max-w-3xl" : ""}`}
+							>
+								{tool.body}
+							</p>
+							<span className="mt-6 inline-flex min-h-11 items-center gap-2 pt-2 text-sm font-semibold text-brand-700 group-hover:underline">
+								{tool.cta}
+								<Icon
+									name="arrow"
+									className="size-4 motion-safe:transition-transform motion-safe:duration-hover motion-safe:group-hover:translate-x-1 motion-safe:group-focus-visible:translate-x-1"
+								/>
+							</span>
+						</Link>
+					</Reveal>
 				</li>
 			))}
 		</ul>

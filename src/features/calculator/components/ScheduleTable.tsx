@@ -171,7 +171,10 @@ const ScheduleTable = ({ rows }: ScheduleTableProps) => {
 					</thead>
 					<tbody className="divide-y divide-slate-100">
 						{body.map((row) => (
-							<tr key={row.key}>
+							<tr
+								key={row.key}
+								className="motion-safe:transition-colors motion-safe:duration-micro hover:bg-brand-50"
+							>
 								<th scope="row" className="px-3 py-2 text-left font-normal">
 									{row.label}
 									{row.hypothetical ? <HypotheticalBadge /> : null}

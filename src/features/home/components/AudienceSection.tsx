@@ -1,3 +1,4 @@
+import Reveal from "@/components/ui/Reveal";
 import Icon, { type IconName } from "./Icon";
 import SectionHeading from "./SectionHeading";
 
@@ -50,35 +51,37 @@ const AudienceSection = () => (
 				title="Whether you are buying, owning or advising"
 				intro="Everyone starts in the same place, and every tool is open to all. There is nothing to pick first."
 			/>
-			<ul className="mt-10 grid grid-cols-1 gap-5 lg:grid-cols-3">
-				{AUDIENCES.map((audience) => (
-					<li
-						key={audience.who}
-						className="flex flex-col rounded-2xl bg-white p-6 ring-1 ring-brand-100 sm:p-7"
-					>
-						<span className="grid size-10 place-items-center rounded-full bg-brand-600 text-white">
-							<Icon name={audience.icon} />
-						</span>
-						<h3 className="mt-4 text-xl font-semibold tracking-tight text-slate-900">
-							{audience.who}
-						</h3>
-						<p className="mt-2 font-display text-lg text-slate-700 italic">
-							{audience.question}
-						</p>
-						<ul className="mt-5 grid gap-3 border-t border-slate-200 pt-5 text-slate-700">
-							{audience.points.map((point) => (
-								<li key={point} className="flex gap-3">
-									<Icon
-										name="check"
-										className="mt-0.5 size-5 shrink-0 text-brand-600"
-									/>
-									<span>{point}</span>
-								</li>
-							))}
-						</ul>
-					</li>
-				))}
-			</ul>
+			<Reveal className="mt-10">
+				<ul className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+					{AUDIENCES.map((audience) => (
+						<li
+							key={audience.who}
+							className="flex flex-col rounded-2xl bg-white p-6 ring-1 ring-brand-100 sm:p-7"
+						>
+							<span className="grid size-10 place-items-center rounded-full bg-brand-600 text-white">
+								<Icon name={audience.icon} />
+							</span>
+							<h3 className="mt-4 text-xl font-semibold tracking-tight text-slate-900">
+								{audience.who}
+							</h3>
+							<p className="mt-2 font-display text-lg text-slate-700 italic">
+								{audience.question}
+							</p>
+							<ul className="mt-5 grid gap-3 border-t border-slate-200 pt-5 text-slate-700">
+								{audience.points.map((point) => (
+									<li key={point} className="flex gap-3">
+										<Icon
+											name="check"
+											className="mt-0.5 size-5 shrink-0 text-brand-600"
+										/>
+										<span>{point}</span>
+									</li>
+								))}
+							</ul>
+						</li>
+					))}
+				</ul>
+			</Reveal>
 		</div>
 	</section>
 );

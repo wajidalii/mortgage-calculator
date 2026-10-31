@@ -1,3 +1,4 @@
+import Reveal from "@/components/ui/Reveal";
 import SectionHeading from "./SectionHeading";
 
 interface Capability {
@@ -53,7 +54,7 @@ const CAPABILITIES: readonly Capability[] = [
 
 const CapabilitiesSection = () => (
 	<section aria-labelledby="capabilities-title" className="bg-white">
-		<div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16 lg:px-8">
+		<Reveal className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16 lg:px-8">
 			<div className="lg:sticky lg:top-8 lg:self-start">
 				<SectionHeading
 					id="capabilities-title"
@@ -93,7 +94,7 @@ const CapabilitiesSection = () => (
 					</li>
 				))}
 			</ol>
-		</div>
+		</Reveal>
 	</section>
 );
 

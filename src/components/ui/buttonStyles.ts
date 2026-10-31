@@ -6,18 +6,18 @@ export type ButtonVariant =
 export type ButtonSize = "md" | "lg";
 
 const BASE =
-	"inline-flex items-center justify-center gap-2 rounded-lg font-semibold motion-safe:transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 disabled:opacity-50";
+	"group inline-flex items-center justify-center gap-2 rounded-lg font-semibold motion-safe:transition-[background-color,box-shadow,translate,scale] motion-safe:duration-hover motion-safe:ease-standard motion-safe:not-disabled:hover:-translate-y-0.5 motion-safe:not-disabled:active:translate-y-0 motion-safe:not-disabled:active:scale-[0.97] focus-visible:outline-3 focus-visible:outline-offset-2 disabled:opacity-50";
 
 const VARIANTS: Record<ButtonVariant, string> = {
 	primary:
-		"bg-brand-600 text-white hover:bg-brand-700 focus-visible:outline-brand-500",
+		"bg-brand-600 text-white hover:bg-brand-700 hover:shadow-md active:bg-brand-800 focus-visible:outline-brand-500",
 	secondary:
-		"bg-white text-slate-900 ring-1 ring-slate-300 hover:bg-slate-50 hover:ring-slate-400 focus-visible:outline-brand-500",
+		"bg-white text-slate-900 ring-1 ring-slate-300 hover:bg-slate-50 hover:ring-slate-400 active:bg-slate-100 focus-visible:outline-brand-500",
 	// For dark brand surfaces: white fill, and a white outline ring.
 	onDark:
-		"bg-white text-brand-900 hover:bg-brand-50 focus-visible:outline-white",
+		"bg-white text-brand-900 hover:bg-brand-50 hover:shadow-lg active:bg-brand-100 focus-visible:outline-white",
 	outlineOnDark:
-		"text-white ring-1 ring-white/50 hover:bg-white/10 hover:ring-white focus-visible:outline-white",
+		"text-white ring-1 ring-white/50 hover:bg-white/10 hover:ring-white active:bg-white/20 focus-visible:outline-white",
 };
 
 const SIZES: Record<ButtonSize, string> = {

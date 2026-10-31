@@ -1,4 +1,5 @@
 import Disclaimer from "@/components/feedback/Disclaimer";
+import { useValueFlash } from "@/hooks/useValueFlash";
 import { formatMoney } from "@/lib/money";
 import { formatRate } from "@/lib/rate";
 import type { ArmSummary } from "../armSchedule";
@@ -62,65 +63,78 @@ const MonthlyPaymentHero = ({
 	arm,
 	outOfDate = false,
 	stale = false,
-}: MonthlyPaymentHeroProps) => (
-	<section
-		aria-labelledby="monthly-estimate-heading"
-		className="overflow-hidden rounded-2xl bg-linear-135 from-brand-900 to-brand-800 p-1.5 text-white shadow-panel sm:p-2"
-	>
-		<div className="px-4 pt-4 pb-5 sm:px-5 sm:pt-5">
-			<div className="flex flex-wrap items-start justify-between gap-2">
-				<h2
-					id="monthly-estimate-heading"
-					className="text-xs font-bold tracking-widest text-brand-100 uppercase"
-				>
-					Estimated monthly cost
-				</h2>
-				{estimate ? <StatusPill stale={stale} arm={Boolean(arm)} /> : null}
+}: MonthlyPaymentHeroProps) => {
+	// Highlight a newly calculated total, never a stale one.
+	const flash = useValueFlash(estimate?.total ?? null, !stale);
+	return (
+		<section
+			aria-labelledby="monthly-estimate-heading"
+			className="overflow-hidden rounded-2xl bg-linear-135 from-brand-900 to-brand-800 p-1.5 text-white shadow-panel sm:p-2"
+		>
+			<div className="px-4 pt-4 pb-5 sm:px-5 sm:pt-5">
+				<div className="flex flex-wrap items-start justify-between gap-2">
+					<h2
+						id="monthly-estimate-heading"
+						className="text-xs font-bold tracking-widest text-brand-100 uppercase"
+					>
+						Estimated monthly cost
+					</h2>
+					{estimate ? <StatusPill stale={stale} arm={Boolean(arm)} /> : null}
+				</div>
+				<div aria-live="polite">
+					{estimate ? (
+						<>
+							<p className="mt-2 text-4xl font-extrabold tracking-tight tabular-nums sm:text-5xl">
+								<span
+									key={flash}
+									className={
+										flash > 0
+											? "-mx-1.5 rounded-lg px-1.5 [--flash-color:rgb(255_255_255/0.22)] motion-safe:animate-flash"
+											: undefined
+									}
+								>
+									{formatMoney(estimate.total)}
+								</span>
+								<span className="ml-2 text-base font-medium tracking-normal text-brand-100">
+									/ month total
+								</span>
+							</p>
+							<p className="mt-1 text-sm text-brand-100">
+								Principal, interest, taxes, insurance and other ownership costs
+							</p>
+						</>
+					) : (
+						<p className="mt-2 text-base text-white">
+							Fix the highlighted fields to see the itemized monthly estimate.
+						</p>
+					)}
+				</div>
 			</div>
-			<div aria-live="polite">
+			<div className="rounded-xl bg-white p-4 text-slate-900 sm:p-5">
 				{estimate ? (
 					<>
-						<p className="mt-2 text-4xl font-extrabold tracking-tight tabular-nums sm:text-5xl">
-							{formatMoney(estimate.total)}
-							<span className="ml-2 text-base font-medium tracking-normal text-brand-100">
-								/ month total
-							</span>
-						</p>
-						<p className="mt-1 text-sm text-brand-100">
-							Principal, interest, taxes, insurance and other ownership costs
-						</p>
+						<PaymentBreakdown
+							estimate={estimate}
+							piLabel={arm ? "Principal and interest (months 1–60)" : undefined}
+						/>
+						{arm ? <ResetRisk arm={arm} /> : null}
+						{outOfDate ? (
+							<p className="mt-4 text-sm text-amber-950">
+								<span className="rounded bg-amber-100 px-1.5 py-0.5 text-xs font-semibold ring-1 ring-amber-400">
+									May be out of date
+								</span>{" "}
+								Some illustrative defaults behind this estimate are over a year
+								old. See the assumptions below.
+							</p>
+						) : null}
 					</>
-				) : (
-					<p className="mt-2 text-base text-white">
-						Fix the highlighted fields to see the itemized monthly estimate.
-					</p>
-				)}
+				) : null}
+				<div className={estimate ? "mt-5" : undefined}>
+					<Disclaimer />
+				</div>
 			</div>
-		</div>
-		<div className="rounded-xl bg-white p-4 text-slate-900 sm:p-5">
-			{estimate ? (
-				<>
-					<PaymentBreakdown
-						estimate={estimate}
-						piLabel={arm ? "Principal and interest (months 1–60)" : undefined}
-					/>
-					{arm ? <ResetRisk arm={arm} /> : null}
-					{outOfDate ? (
-						<p className="mt-4 text-sm text-amber-950">
-							<span className="rounded bg-amber-100 px-1.5 py-0.5 text-xs font-semibold ring-1 ring-amber-400">
-								May be out of date
-							</span>{" "}
-							Some illustrative defaults behind this estimate are over a year
-							old. See the assumptions below.
-						</p>
-					) : null}
-				</>
-			) : null}
-			<div className={estimate ? "mt-5" : undefined}>
-				<Disclaimer />
-			</div>
-		</div>
-	</section>
-);
+		</section>
+	);
+};
 
 export default MonthlyPaymentHero;

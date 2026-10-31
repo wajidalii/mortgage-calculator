@@ -2,6 +2,9 @@ import { useDeferredValue, useMemo, useState } from "react";
 import Disclaimer from "@/components/feedback/Disclaimer";
 import Card from "@/components/ui/Card";
 import TextField from "@/features/calculator/components/TextField";
+import SavedScenarios from "@/features/scenarios/components/SavedScenarios";
+import type { StorageLike } from "@/features/scenarios/storage";
+import { parseCompareState } from "@/features/scenarios/validate";
 import {
 	type CompareShared,
 	type CompareState,
@@ -18,7 +21,12 @@ type Touched = Partial<
 
 const TITLES: [string, string] = ["Loan A", "Loan B"];
 
-const CompareView = () => {
+interface CompareViewProps {
+	/** Where saved scenarios go. Defaults to the browser's local storage. */
+	storage?: StorageLike | null;
+}
+
+const CompareView = ({ storage }: CompareViewProps) => {
 	const [state, setState] = useState<CompareState>(initialCompareState);
 	const [touched, setTouched] = useState<Touched>({});
 	const deferred = useDeferredValue(state);
@@ -39,6 +47,16 @@ const CompareView = () => {
 
 	return (
 		<div className="grid gap-6">
+			<SavedScenarios
+				kind="compare"
+				current={state}
+				parse={parseCompareState}
+				onOpen={(saved) => {
+					setState(saved);
+					setTouched({});
+				}}
+				{...(storage !== undefined ? { storage } : {})}
+			/>
 			<Card className="grid gap-5">
 				<div className="grid gap-5 sm:grid-cols-2">
 					<TextField

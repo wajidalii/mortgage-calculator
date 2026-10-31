@@ -145,6 +145,7 @@ export type EditableField =
 	| "insuranceGrowth";
 
 export type CalculatorAction =
+	| { type: "load"; inputs: CalculatorInputs }
 	| { type: "edit"; field: EditableField; value: string }
 	| { type: "blur"; field: EditableField }
 	| { type: "setDownPaymentMode"; mode: DownPaymentMode }

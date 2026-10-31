@@ -102,6 +102,9 @@ export const calculatorReducer = (
 	action: CalculatorAction,
 ): CalculatorState => {
 	switch (action.type) {
+		case "load":
+			// A saved scenario replaces every input; old error flags no longer apply.
+			return { inputs: action.inputs, touched: {} };
 		case "edit":
 			return {
 				...state,

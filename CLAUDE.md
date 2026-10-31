@@ -140,6 +140,7 @@ No nginx: production serves the built `dist/` with `serve` (SPA fallback on).
 
 - A CVE baseline was taken on 2026-10-30 by querying OSV.dev, GitHub advisories and NVD for every direct dependency at its pinned version. No known vulnerabilities affected any of them. This is a weak signal: the versions are brand new, so advisories may not exist yet, and NVD was searched by keyword only. Re-run a dependency check before releases and when bumping versions.
 - Do not use `npm audit`/`yarn audit` as the only check.
+- **Privacy:** user inputs never leave the browser. `src/services/api/client.ts` is the only file that may use `fetch` or other network APIs, and nothing outside `src/services/` may import it. `src/services/networkGuard.test.ts` enforces this (and that `index.html` loads nothing from another origin). Saved scenarios use `localStorage` only. If a real API is ever added on purpose, change that test and the privacy statement in the same PR.
 
 ## Open items
 

@@ -20,7 +20,7 @@ Use `yarn`, not `npm`. If `yarn` is not found, add `~/.local/bin` to PATH (the C
 | Command                         | What it does                                                                                         |
 | ------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | `yarn dev`                      | Local dev server (`vite --host`, port 5173). No `.env` needed                                        |
-| `yarn start`                    | Production: `yarn build && serve -s dist -l ${PORT:-3000}`                                           |
+| `yarn start`                    | Production: `yarn build && serve -c serve.json -l ${PORT:-3000}`                                     |
 | `yarn build`                    | `tsc -b && vite build`                                                                               |
 | `yarn typecheck`                | `tsc -b --noEmit`                                                                                    |
 | `yarn test` / `yarn test:watch` | Vitest: single run / watch mode. Tests are `src/**/*.test.{ts,tsx}`; the default environment is node |
@@ -57,7 +57,7 @@ src/
 
 `design/` holds the static HTML design reference for the calculator dashboard. It is not app code and is excluded from Biome.
 
-Root configs: `biome.json`, `biome-plugins/`, `vite.config.ts`, `tsconfig*.json`, `.prettierrc`, `.lintstagedrc.json`, `.husky/`, `.yarnrc.yml`, `.env.example`, `Dockerfile`, `docker-compose.yml`, `.dockerignore`, `.claude/agents/`.
+Root configs: `biome.json`, `biome-plugins/`, `vite.config.ts`, `tsconfig*.json`, `.prettierrc`, `.lintstagedrc.json`, `.husky/`, `.yarnrc.yml`, `.env.example`, `serve.json`, `vercel.json`, `Dockerfile`, `docker-compose.yml`, `.dockerignore`, `.claude/agents/`.
 
 ## Code conventions (enforced by Biome)
 
@@ -129,7 +129,7 @@ Rules:
 
 ## Docker
 
-No nginx: production serves the built `dist/` with `serve` (SPA fallback on).
+No nginx: production serves the built `dist/` with `serve`, configured by the root `serve.json` (the same security headers as `vercel.json`, immutable caching for `/assets`, rewrites for the known routes, and a real 404 status for anything else via `dist/404.html`, which a small plugin in `vite.config.ts` copies from `index.html`). When adding a route, add it to the rewrites in both `serve.json` and `vercel.json`.
 
 - Stages: `deps` -> `dev` | `build` -> `prod-deps` -> `prod`.
 - `docker compose --profile dev up --build`: dev server on 5173 with bind mounts (polling enabled for file watching).

@@ -50,9 +50,11 @@ WORKDIR /app
 ENV NODE_ENV=production PORT=3000
 COPY --from=prod-deps --chown=node:node /app/node_modules ./node_modules
 COPY --from=build --chown=node:node /app/dist ./dist
+# serve.json: security headers, asset caching, SPA routes and a real 404.
+COPY --chown=node:node serve.json ./
 USER node
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD wget -qO- "http://127.0.0.1:${PORT}/" >/dev/null || exit 1
 # Shell form so ${PORT} expands; exec keeps serve as PID 1 for signals.
-CMD ["sh", "-c", "exec node_modules/.bin/serve -s dist -l ${PORT}"]
+CMD ["sh", "-c", "exec node_modules/.bin/serve -c serve.json -l ${PORT}"]

@@ -124,7 +124,9 @@ describe("LoanCalculator", () => {
 			// Default inputs are $400,000 at 6.50% over 30 years.
 			expect(screen.getByText("$510,179.81")).toBeTruthy();
 			fireEvent.click(screen.getByRole("button", { name: "Monthly" }));
-			const table = screen.getByRole("table");
+			const table = screen.getByRole("table", {
+				name: /^(Payment|Yearly totals) by/,
+			});
 			const rows = within(table).getAllByRole("row");
 			expect(rows).toHaveLength(361); // header + 360 months
 			const last = within(rows[360] as HTMLElement).getAllByRole("cell");
@@ -134,7 +136,9 @@ describe("LoanCalculator", () => {
 		it("switches to yearly rows that sum their months", () => {
 			render(<LoanCalculator />);
 			fireEvent.click(screen.getByRole("button", { name: "Monthly" }));
-			const monthly = within(screen.getByRole("table")).getAllByRole("row");
+			const monthly = within(
+				screen.getByRole("table", { name: /^(Payment|Yearly totals) by/ }),
+			).getAllByRole("row");
 			const cents = (row: HTMLElement, column: number) =>
 				Number(
 					(within(row).getAllByRole("cell")[column]?.textContent ?? "").replace(
@@ -147,7 +151,9 @@ describe("LoanCalculator", () => {
 				.reduce((sum, row) => sum + cents(row, 2), 0);
 
 			fireEvent.click(screen.getByRole("button", { name: "Yearly" }));
-			const yearly = within(screen.getByRole("table")).getAllByRole("row");
+			const yearly = within(
+				screen.getByRole("table", { name: /^(Payment|Yearly totals) by/ }),
+			).getAllByRole("row");
 			expect(yearly).toHaveLength(31); // header + 30 years
 			expect(cents(yearly[1] as HTMLElement, 2)).toBe(firstYearInterest);
 		});
@@ -155,7 +161,9 @@ describe("LoanCalculator", () => {
 		it("explains there is no schedule for a $0 loan", () => {
 			render(<LoanCalculator />);
 			type("Down payment (%)", "100");
-			expect(screen.queryByRole("table")).toBeNull();
+			expect(
+				screen.queryByRole("table", { name: /^(Payment|Yearly totals) by/ }),
+			).toBeNull();
 			expect(screen.getByText(/no schedule/i)).toBeTruthy();
 		});
 	});
@@ -351,7 +359,9 @@ describe("LoanCalculator", () => {
 		const chooseArm = () => fireEvent.click(screen.getByLabelText("5/6 ARM"));
 		const scheduleRows = () => {
 			fireEvent.click(screen.getByRole("button", { name: "Monthly" }));
-			const table = screen.getByRole("table");
+			const table = screen.getByRole("table", {
+				name: /^(Payment|Yearly totals) by/,
+			});
 			// Drop the header row.
 			return within(table).getAllByRole("row").slice(1);
 		};
@@ -397,7 +407,9 @@ describe("LoanCalculator", () => {
 		it("labels the yearly rows from year 6 on", () => {
 			render(<LoanCalculator />);
 			chooseArm();
-			const table = screen.getByRole("table");
+			const table = screen.getByRole("table", {
+				name: /^(Payment|Yearly totals) by/,
+			});
 			const rows = within(table).getAllByRole("row").slice(1);
 			expect(rows).toHaveLength(30);
 			rows.forEach((row, index) => {
@@ -440,7 +452,9 @@ describe("LoanCalculator", () => {
 			expect(
 				screen.getByText("Initial cap cannot be more than 100%"),
 			).toBeTruthy();
-			expect(screen.queryByRole("table")).toBeNull();
+			expect(
+				screen.queryByRole("table", { name: /^(Payment|Yearly totals) by/ }),
+			).toBeNull();
 			expect(
 				screen.queryByText("Reset risk: this payment is for months 1 to 60"),
 			).toBeNull();
@@ -470,7 +484,9 @@ describe("LoanCalculator", () => {
 				screen.getByText("Interest rate cannot be more than 30%"),
 			).toBeTruthy();
 			expect(estimate().queryByText(/month total/)).toBeNull();
-			expect(screen.queryByRole("table")).toBeNull();
+			expect(
+				screen.queryByRole("table", { name: /^(Payment|Yearly totals) by/ }),
+			).toBeNull();
 		});
 
 		it("shows an error and no result for a rate of -1%", () => {
@@ -503,7 +519,9 @@ describe("LoanCalculator", () => {
 				estimate().getByText(/month total/).parentElement?.textContent,
 			).toBe(before);
 			expect(screen.getByRole("status").textContent).toContain("last valid");
-			expect(screen.getByRole("table")).toBeTruthy();
+			expect(
+				screen.getByRole("table", { name: /^(Payment|Yearly totals) by/ }),
+			).toBeTruthy();
 			// Fixing the field clears the notice and updates the result.
 			type("Monthly HOA", "100");
 			expect(screen.queryByRole("status")).toBeNull();
@@ -682,5 +700,26 @@ describe("LoanCalculator extra payments", () => {
 		render(<LoanCalculator />);
 		fireEvent.click(screen.getByLabelText(/ARM/));
 		expect(screen.getByText(/fixed-rate loans only/)).toBeTruthy();
+	});
+});
+
+describe("LoanCalculator rate sensitivity", () => {
+	const table = () =>
+		within(screen.getByRole("table", { name: /by interest rate/ }));
+
+	it("lists five rates around the base rate", () => {
+		render(<LoanCalculator />);
+		for (const rate of ["5.50%", "6.00%", "6.50%", "7.00%", "7.50%"]) {
+			expect(table().getByText(rate)).toBeTruthy();
+		}
+		expect(table().getByText("$2,528.27")).toBeTruthy();
+	});
+
+	it("moves the rows when the base rate changes", () => {
+		render(<LoanCalculator />);
+		type("Interest rate", "4");
+		expect(table().getByText("3.00%")).toBeTruthy();
+		expect(table().getByText("5.00%")).toBeTruthy();
+		expect(table().queryByText("7.50%")).toBeNull();
 	});
 });

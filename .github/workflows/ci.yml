@@ -38,6 +38,9 @@ jobs:
       - name: Install
         run: yarn install --immutable
 
+      - name: Audit dependencies (full tree)
+        run: yarn npm audit --all --recursive
+
       - name: Lint and format (Biome)
         run: yarn check
 

@@ -52,22 +52,24 @@ const AffordabilityCard = ({ affordability }: AffordabilityCardProps) => (
 		</h2>
 		<div aria-live="polite">
 			{affordability ? (
-				<dl className="mt-2 divide-y divide-slate-100 text-sm">
-					<RatioRow
-						label="Front-end ratio"
-						formula="Housing payment / income"
-						dti={affordability.frontEnd}
-					/>
-					<RatioRow
-						label="Back-end ratio"
-						formula="Housing payment + other debt / income"
-						dti={affordability.backEnd}
-					/>
-					<div className="py-2 text-xs text-slate-600">
+				<>
+					<dl className="mt-2 divide-y divide-slate-100 text-sm">
+						<RatioRow
+							label="Front-end ratio"
+							formula="Housing payment / income"
+							dti={affordability.frontEnd}
+						/>
+						<RatioRow
+							label="Back-end ratio"
+							formula="Housing payment + other debt / income"
+							dti={affordability.backEnd}
+						/>
+					</dl>
+					<p className="py-2 text-xs text-slate-600">
 						Housing payment {formatMoney(affordability.housing)} (lender payment
 						plus HOA), income {formatMoney(affordability.income)}.
-					</div>
-				</dl>
+					</p>
+				</>
 			) : (
 				<p className="mt-1 text-base text-slate-700">
 					Enter your gross monthly income and fix any highlighted fields to see

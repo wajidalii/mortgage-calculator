@@ -1,6 +1,6 @@
 # Mortgage Calculator
 
-Web calculator for U.S. home buyers and owners (see `PRD.md`, `docs/user-stories.md`, `docs/app-roles.md`, `docs/jobs-to-be-done.md` for product scope). This repo holds the boilerplate (routing, layout, tooling, Docker) plus the first foundations: integer money/rate primitives, the defaults registry and the shared Disclaimer. Calculator features are tracked as GitHub issues and milestones (see `PLAN.md` section 9).
+Web calculator for U.S. home buyers and owners (see `PRD.md`, `docs/user-stories.md`, `docs/app-roles.md`, `docs/jobs-to-be-done.md` for product scope). The app is built: home page, full calculator (fixed and 5/6 ARM, tax, insurance, PMI, HOA, closing costs, extra payments, affordability, schedule, print report), loan comparison, refinance break-even and saved scenarios, all on integer money/rate primitives and the defaults registry. It deploys to Vercel from `main`. Work is tracked as GitHub issues and milestones (see `PLAN.md` section 9).
 
 ## Stack
 
@@ -20,7 +20,7 @@ Use `yarn`, not `npm`. If `yarn` is not found, add `~/.local/bin` to PATH (the C
 | Command                         | What it does                                                                                         |
 | ------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | `yarn dev`                      | Local dev server (`vite --host`, port 5173). No `.env` needed                                        |
-| `yarn start`                    | Production: `yarn build && serve -s dist -l ${PORT:-3000}`                                           |
+| `yarn start`                    | Production: `yarn build && serve -c serve.json -l ${PORT:-3000}`                                     |
 | `yarn build`                    | `tsc -b && vite build`                                                                               |
 | `yarn typecheck`                | `tsc -b --noEmit`                                                                                    |
 | `yarn test` / `yarn test:watch` | Vitest: single run / watch mode. Tests are `src/**/*.test.{ts,tsx}`; the default environment is node |
@@ -38,15 +38,15 @@ Yarn Berry does not run `pre*`/`post*` hooks on custom scripts (so `start` calls
 src/
   main.tsx
   vite-env.d.ts          typed ImportMetaEnv
-  app/                   App.tsx, router.tsx, providers.tsx
+  app/                   App.tsx, router.tsx
   layouts/               MainLayout.tsx (AppHeader + Outlet)
   pages/                 HomePage, CalculatorPage, NotFoundPage (one lazy chunk each)
   features/              feature folders: components/ hooks/ types.ts
   components/ui/         Tailwind primitives (Button, Card, segmented-control classes)
   components/layout/     AppHeader (brand + main nav)
   components/feedback/   PageLoader, ErrorBoundary, Disclaimer
-  hooks/                 shared hooks (useDebouncedValue, usePrinting, useInView, useFitsViewport)
-  services/api/client.ts typed fetch wrapper; only code that touches the network
+  hooks/                 shared hooks (usePrinting, useInView, useFitsViewport, useReveal, useValueFlash)
+  services/              networkGuard.test.ts only: the app has no network code
   config/env.ts          reads VITE_* once at import, with built-in defaults
   config/defaults/       defaults registry (values with source, as-of date, confidence) and state tax table
   config/disclaimer.ts   PRD section 11 disclaimer text
@@ -57,7 +57,7 @@ src/
 
 `design/` holds the static HTML design reference for the calculator dashboard. It is not app code and is excluded from Biome.
 
-Root configs: `biome.json`, `biome-plugins/`, `vite.config.ts`, `tsconfig*.json`, `.prettierrc`, `.lintstagedrc.json`, `.husky/`, `.yarnrc.yml`, `.env.example`, `Dockerfile`, `docker-compose.yml`, `.dockerignore`, `.claude/agents/`.
+Root configs: `biome.json`, `biome-plugins/`, `vite.config.ts`, `tsconfig*.json`, `.prettierrc`, `.lintstagedrc.json`, `.husky/`, `.yarnrc.yml`, `.env.example`, `serve.json`, `vercel.json`, `Dockerfile`, `docker-compose.yml`, `.dockerignore`, `.claude/agents/`.
 
 ## Code conventions (enforced by Biome)
 
@@ -73,17 +73,17 @@ Root configs: `biome.json`, `biome-plugins/`, `vite.config.ts`, `tsconfig*.json`
 2. **Known gap:** Biome cannot assert that a file _has_ a default export. The rules ban every other way to export a component, but cannot catch a `.tsx` file with no default export, or one that default-exports something other than the component. Check this in review.
 3. Every page and the layout are loaded with `lazy()` and must default-export. Do not lazy-load tiny leaf components; that causes request waterfalls and hurts LCP.
 4. No `any` (`noExplicitAny` is an error). Use explicit interfaces and `import type` for type-only imports.
-5. `ErrorBoundary.tsx` wraps a non-exported class (error boundaries require a class) inside a default-exported arrow component.
+5. `ErrorBoundary.tsx` is the router's `errorElement`. React Router catches render errors in routes, so it needs no class; it reads the error with `useRouteError`, logs it to the console and shows users a generic message, never the raw error text.
 6. Non-component `.ts` files (hooks, lib, services, config) may use named exports.
 7. Biome style: tabs, double quotes. Run `yarn check:fix` before committing.
 8. Performance: keep state as low in the tree as possible, memoize measured hot paths only, defer or debounce heavy recalculation on text input to protect INP.
 
 ## Environment variables
 
-- A `.env` is optional: `VITE_API_BASE_URL` (default `/api`) and `VITE_APP_NAME` (default `Mortgage Calculator`) have built-in defaults in `src/config/env.ts`. `.env` is gitignored; `.env.example` documents the keys.
+- A `.env` is optional: `VITE_APP_NAME` (default `Mortgage Calculator`) has a built-in default in `src/config/env.ts`. `.env` is gitignored; `.env.example` documents the keys.
 - Only `VITE_*` variables are readable by the client, and **every one is inlined into the public bundle**. Never put secrets, tokens or private keys in them.
 - Read env only through `src/config/env.ts`, never `import.meta.env` directly elsewhere.
-- Current keys: `VITE_API_BASE_URL`, `VITE_APP_NAME`.
+- Current keys: `VITE_APP_NAME`.
 
 ## Git workflow
 
@@ -129,24 +129,25 @@ Rules:
 
 ## Docker
 
-No nginx: production serves the built `dist/` with `serve` (SPA fallback on).
+No nginx: production serves the built `dist/` with `serve`, configured by the root `serve.json` (the same security headers as `vercel.json`, immutable caching for `/assets`, rewrites for the known routes, and a real 404 status for anything else via `dist/404.html`, which a small plugin in `vite.config.ts` copies from `index.html`). When adding a route, add it to the rewrites in both `serve.json` and `vercel.json`.
 
 - Stages: `deps` -> `dev` | `build` -> `prod-deps` -> `prod`.
 - `docker compose --profile dev up --build`: dev server on 5173 with bind mounts (polling enabled for file watching).
 - `docker compose --profile prod up --build`: static server on 3000 (`PORT` env), non-root `node` user, health check on.
-- `VITE_*` values are inlined at build time, so the prod image takes them as build args (`VITE_API_BASE_URL`, `VITE_APP_NAME`).
+- `VITE_*` values are inlined at build time, so the prod image takes them as build args (`VITE_APP_NAME`).
 - Image builds set `HUSKY=0` because there is no `.git` inside the image. `prod-deps` removes the `postinstall` script from its own copy of `package.json` (the repo's file is untouched).
 - If a `public/` directory is added, add a bind mount for it to the compose dev service.
 - Yarn is fetched through Corepack at build time, so builds need network access.
 
 ## Security
 
-- A CVE baseline was taken on 2026-10-30 by querying OSV.dev, GitHub advisories and NVD for every direct dependency at its pinned version. No known vulnerabilities affected any of them. This is a weak signal: the versions are brand new, so advisories may not exist yet, and NVD was searched by keyword only. Re-run a dependency check before releases and when bumping versions.
+- A CVE baseline was taken on 2026-10-30 for the direct dependencies (OSV.dev, GitHub advisories, NVD). An audit on 2026-10-31 of the full tree found two transitive advisories under `serve`: `compression` (fixed by the `resolutions` pin to 1.8.2) and `minimatch` 3.1.5 (ignored in `.yarnrc.yml` because it only sees our own `serve.json` patterns; remove the ignore when `serve` updates). CI runs `yarn npm audit --all --recursive` and Dependabot opens update PRs against `dev`.
 - Do not use `npm audit`/`yarn audit` as the only check.
-- **Privacy:** user inputs never leave the browser. `src/services/api/client.ts` is the only file that may use `fetch` or other network APIs, and nothing outside `src/services/` may import it. `src/services/networkGuard.test.ts` enforces this (and that `index.html` loads nothing from another origin). Saved scenarios use `localStorage` only. If a real API is ever added on purpose, change that test and the privacy statement in the same PR.
+- **Privacy:** user inputs never leave the browser. No source file may use `fetch` or any other network API; `src/services/networkGuard.test.ts` enforces this (and that `index.html` loads nothing from another origin). Saved scenarios use `localStorage` only. If a real API is ever added on purpose, change that test and the privacy statement in the same PR.
 
 ## Open items
 
-- Calculator features from `PRD.md` are not started; only primitives, defaults and the Disclaimer exist. Progress is tracked in GitHub milestones.
-- `Providers` (`src/app/providers.tsx`) is a pass-through.
+- Inputs are not kept across reloads or encoded in the URL; saved scenarios are the only persistence.
+- No browser end-to-end tests run in CI; component tests use jsdom.
+- No LICENSE file has been chosen yet.
 - Closing the default-export lint gap (see Code conventions, item 2) would need a small check script.

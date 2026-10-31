@@ -17,7 +17,7 @@ const PropertyTaxSummary = ({ tax }: PropertyTaxSummaryProps) => (
 		>
 			Estimated property tax
 		</h3>
-		<div aria-live="polite">
+		<div>
 			{tax ? (
 				<>
 					<p className="mt-1 text-xl font-bold tracking-tight text-slate-900 tabular-nums">

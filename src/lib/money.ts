@@ -15,6 +15,10 @@ export const parseMoney = (text: string): ParseResult<Cents> => {
 	return result.ok ? { ok: true, value: result.value as Cents } : result;
 };
 
+/** Whole number to text with thousands commas: 1234567 -> "1,234,567". */
+export const groupThousands = (whole: number): string =>
+	String(whole).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
 /**
  * Integer cents to "$1,234.56", or "-$1,234.56" for negatives. Uses integer
  * math on the absolute value. Throws RangeError for non-integer input.
@@ -26,9 +30,8 @@ export const formatMoney = (cents: Cents): string => {
 	const magnitude = Math.abs(cents);
 	const dollars = Math.floor(magnitude / 100);
 	const rest = magnitude - dollars * 100;
-	const grouped = String(dollars).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 	const sign = cents < 0 ? "-" : "";
-	return `${sign}$${grouped}.${String(rest).padStart(2, "0")}`;
+	return `${sign}$${groupThousands(dollars)}.${String(rest).padStart(2, "0")}`;
 };
 
 /**

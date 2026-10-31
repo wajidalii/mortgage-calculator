@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import type { Cents, Micros } from "@/types/units";
 import {
 	centsToFieldText,
-	DOWN_PAYMENT_TOO_HIGH,
 	deriveLoan,
 	downPaymentFromPercent,
 	ltvFor,
@@ -10,6 +9,7 @@ import {
 	percentFromDownPayment,
 } from "./loanMath";
 import type { CalculatorInputs } from "./types";
+import { DOWN_PAYMENT_TOO_HIGH } from "./validation";
 
 const inputs = (
 	overrides: Partial<CalculatorInputs> = {},

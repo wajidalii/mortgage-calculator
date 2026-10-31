@@ -5,18 +5,18 @@ Changes from v1: nginx removed, Yarn replaces npm, Biome enforces arrow-function
 
 ## 1. Decisions (defaults, change any before approval)
 
-| #   | Topic                   | Decision                                                                                                                     | Why                                                                                                             |
-| --- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| D1  | Formatter               | **Biome** formats and lints JS/TS/JSON/CSS. **Prettier** only for `*.md`, `*.yml`, `*.yaml`                                  | Two tools on the same files fight each other                                                                    |
-| D2  | Package manager         | **Yarn 4 (Berry)** via Corepack, `packageManager` pinned in `package.json`, `.yarnrc.yml` with `nodeLinker: node-modules`    | Node-modules linker keeps Vite, Biome and Husky working without PnP quirks. Say so if you want Yarn 1 (classic) |
-| D3  | Prod serving (no nginx) | `yarn start` runs `yarn build && serve -s dist -l ${PORT:-3000}`. Docker prod runs the same static server as a non-root user | `serve` is a small static server with SPA fallback. `vite preview` is documented as not for production          |
-| D4  | Scripts                 | `yarn dev` (local) and `yarn start` (prod)                                                                                   | Yarn lets you drop `run`                                                                                        |
-| D5  | Tailwind                | v4 via `@tailwindcss/vite`, CSS-first config in `src/styles/index.css`, no `tailwind.config.js`                              | Fewer root configs                                                                                              |
-| D6  | State                   | `useState` and `useReducer` in feature hooks. Context only for stable global data. No Zustand                                | Matches your brief                                                                                              |
-| D7  | Lazy loading            | Layout, every route and heavy features. Not tiny leaf components                                                             | Lazy leaf components cause request waterfalls and hurt LCP. Say so if you want literally everything lazy        |
-| D8  | Git                     | `git init` (folder isn't a repo), needed by Husky                                                                            | Husky prerequisite                                                                                              |
-| D9  | Versions                | Latest stable at execution time, pinned exactly, recorded in the report                                                      | My knowledge has a cutoff                                                                                       |
-| D10 | Sample content          | Home, Calculator placeholder and 404 pages only                                                                              | Boilerplate, not mortgage logic                                                                                 |
+| #   | Topic                   | Decision                                                                                                                           | Why                                                                                                             |
+| --- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| D1  | Formatter               | **Biome** formats and lints JS/TS/JSON/CSS. **Prettier** only for `*.md`, `*.yml`, `*.yaml`                                        | Two tools on the same files fight each other                                                                    |
+| D2  | Package manager         | **Yarn 4 (Berry)** via Corepack, `packageManager` pinned in `package.json`, `.yarnrc.yml` with `nodeLinker: node-modules`          | Node-modules linker keeps Vite, Biome and Husky working without PnP quirks. Say so if you want Yarn 1 (classic) |
+| D3  | Prod serving (no nginx) | `yarn start` runs `yarn build && serve -c serve.json -l ${PORT:-3000}`. Docker prod runs the same static server as a non-root user | `serve` is a small static server with SPA fallback. `vite preview` is documented as not for production          |
+| D4  | Scripts                 | `yarn dev` (local) and `yarn start` (prod)                                                                                         | Yarn lets you drop `run`                                                                                        |
+| D5  | Tailwind                | v4 via `@tailwindcss/vite`, CSS-first config in `src/styles/index.css`, no `tailwind.config.js`                                    | Fewer root configs                                                                                              |
+| D6  | State                   | `useState` and `useReducer` in feature hooks. Context only for stable global data. No Zustand                                      | Matches your brief                                                                                              |
+| D7  | Lazy loading            | Layout, every route and heavy features. Not tiny leaf components                                                                   | Lazy leaf components cause request waterfalls and hurt LCP. Say so if you want literally everything lazy        |
+| D8  | Git                     | `git init` (folder isn't a repo), needed by Husky                                                                                  | Husky prerequisite                                                                                              |
+| D9  | Versions                | Latest stable at execution time, pinned exactly, recorded in the report                                                            | My knowledge has a cutoff                                                                                       |
+| D10 | Sample content          | Home, Calculator placeholder and 404 pages only                                                                                    | Boilerplate, not mortgage logic                                                                                 |
 
 Rule: **code goes in `src/`, every config file goes in the repo root.**
 
@@ -67,7 +67,7 @@ Mortgage_Calculator/
 | ------------- | ----------------------------------------------------------------- |
 | `dev`         | `vite --host`                                                     |
 | `build`       | `tsc -b && vite build`                                            |
-| `start`       | `yarn build && serve -s dist -l ${PORT:-3000}`                    |
+| `start`       | `yarn build && serve -c serve.json -l ${PORT:-3000}`              |
 | `typecheck`   | `tsc -b --noEmit`                                                 |
 | `test`        | `vitest run`                                                      |
 | `test:watch`  | `vitest`                                                          |

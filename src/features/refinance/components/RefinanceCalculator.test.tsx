@@ -36,6 +36,16 @@ describe("RefinanceCalculator", () => {
 		expect(screen.getByText(/same term as the remaining term/)).toBeTruthy();
 	});
 
+	it("asks for input before anything is typed, and to fix fields after an error", () => {
+		render(<RefinanceCalculator />);
+		expect(
+			screen.getByText(/Enter your current loan and the new rate/),
+		).toBeTruthy();
+		expect(screen.queryByText(/Fix the highlighted fields/)).toBeNull();
+		type("Remaining months", "0");
+		expect(screen.getByText(/Fix the highlighted fields/)).toBeTruthy();
+	});
+
 	it("shows an error for a bad month count after leaving the field", () => {
 		render(<RefinanceCalculator />);
 		type("Remaining months", "0");

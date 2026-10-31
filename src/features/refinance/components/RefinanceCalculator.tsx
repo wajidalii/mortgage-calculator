@@ -38,6 +38,9 @@ const RefinanceCalculator = () => {
 	>({});
 	const deferred = useDeferredValue(inputs);
 	const derived = useMemo(() => deriveRefinance(deferred), [deferred]);
+	const showsErrors = FIELDS.some(
+		({ field }) => touched[field] && derived.errors[field] !== undefined,
+	);
 
 	return (
 		<div className="grid gap-6">
@@ -64,7 +67,7 @@ const RefinanceCalculator = () => {
 					))}
 				</form>
 			</Card>
-			<RefinanceResult result={derived.result} />
+			<RefinanceResult result={derived.result} showsErrors={showsErrors} />
 		</div>
 	);
 };

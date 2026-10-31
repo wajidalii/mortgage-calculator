@@ -31,7 +31,6 @@ services:
       # Vite inlines VITE_* at BUILD time, so set them here (build args), not at runtime.
       # They are public in the bundle. Values come from the shell or .env (compose interpolation).
       args:
-        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-}
         VITE_APP_NAME: ${VITE_APP_NAME:-Mortgage Calculator}
     image: mortgage-calculator:prod
     ports:

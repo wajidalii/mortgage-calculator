@@ -47,7 +47,7 @@ const LoanMetrics = ({ loan, closing, rows, isArm }: LoanMetricsProps) => (
 		<h2 id="loan-summary-heading" className="sr-only">
 			Loan summary
 		</h2>
-		<div aria-live="polite">
+		<div>
 			{loan ? (
 				<dl className="grid grid-cols-2 gap-3 sm:grid-cols-3">
 					<Metric

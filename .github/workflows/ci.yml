@@ -16,7 +16,6 @@ concurrency:
 env:
   HUSKY: "0"
   # Public placeholders; VITE_* values are inlined into the bundle (see CLAUDE.md).
-  VITE_API_BASE_URL: http://localhost:8080/api
   VITE_APP_NAME: Mortgage Calculator
 
 jobs:
@@ -38,6 +37,9 @@ jobs:
       - name: Install
         run: yarn install --immutable
 
+      - name: Audit dependencies (full tree)
+        run: yarn npm audit --all --recursive
+
       - name: Lint and format (Biome)
         run: yarn check
 
@@ -49,3 +51,13 @@ jobs:
 
       - name: Build
         run: yarn build
+
+  docker:
+    name: Docker prod image builds
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - name: Build the prod target
+        run: docker build --target prod -t mortgage-calculator:ci .

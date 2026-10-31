@@ -16,3 +16,22 @@ body {
 	font-family: var(--font-sans);
 	-webkit-font-smoothing: antialiased;
 }
+
+@media print {
+	@page {
+		margin: 15mm;
+	}
+
+	body {
+		background-color: white;
+	}
+
+	/* Browsers repeat these groups on every printed page. */
+	thead {
+		display: table-header-group;
+	}
+
+	tfoot {
+		display: table-footer-group;
+	}
+}

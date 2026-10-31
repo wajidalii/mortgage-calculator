@@ -1,8 +1,10 @@
 import { useMemo } from "react";
+import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import SavedScenarios from "@/features/scenarios/components/SavedScenarios";
 import type { StorageLike } from "@/features/scenarios/storage";
 import { parseCalculatorInputs } from "@/features/scenarios/validate";
+import { usePrinting } from "@/hooks/usePrinting";
 import { hasStaleDefault } from "../assumptions";
 import { deriveCostGrowth } from "../costGrowth";
 import { useCalculatorInputs } from "../hooks/useCalculatorInputs";
@@ -25,6 +27,7 @@ import MonthlyCostsSummary from "./MonthlyCostsSummary";
 import MonthlyEstimateCard from "./MonthlyEstimateCard";
 import PmiFields from "./PmiFields";
 import PmiSummary from "./PmiSummary";
+import PrintReport from "./PrintReport";
 import PropertyTaxFields from "./PropertyTaxFields";
 import PropertyTaxSummary from "./PropertyTaxSummary";
 import RateSensitivityTable from "./RateSensitivityTable";
@@ -55,6 +58,8 @@ const LoanCalculator = ({ today, storage }: LoanCalculatorProps) => {
 		showingLastResult,
 	} = useCalculatorInputs(today);
 	const { inputs, touched } = state;
+	const printing = usePrinting();
+	const printDate = useMemo(() => today ?? new Date(), [today]);
 	const growth = useMemo(
 		() => deriveCostGrowth(inputs, results.tax, results.costs),
 		[inputs, results.tax, results.costs],
@@ -82,193 +87,209 @@ const LoanCalculator = ({ today, storage }: LoanCalculatorProps) => {
 				growth.errors[field as keyof typeof growth.errors])
 			: undefined;
 
+	// While printing, only the report is shown; the screen UI is hidden in CSS
+	// too, so Ctrl+P without a Print click prints the same thing.
 	return (
-		<div className="grid gap-6">
-			<SavedScenarios
-				kind="calculator"
-				current={inputs}
-				parse={parseCalculatorInputs}
-				onOpen={(saved) => dispatch({ type: "load", inputs: saved })}
-				{...(storage !== undefined ? { storage } : {})}
-			/>
-			<Card>
-				<form
-					noValidate
-					onSubmit={(event) => event.preventDefault()}
-					className="grid gap-5 sm:grid-cols-2"
-				>
-					<TextField
-						className="sm:col-span-2"
-						label="Home price"
-						prefix="$"
-						value={inputs.homePrice}
-						error={shown("homePrice")}
-						onChange={(value) =>
-							dispatch({ type: "edit", field: "homePrice", value })
-						}
-						onBlur={() => dispatch({ type: "blur", field: "homePrice" })}
-					/>
-					<DownPaymentFields
-						mode={inputs.downPaymentMode}
-						percent={inputs.downPaymentPercent}
-						amount={inputs.downPaymentAmount}
-						error={shown("downPayment")}
-						onModeChange={(mode) =>
-							dispatch({ type: "setDownPaymentMode", mode })
-						}
-						onPercentChange={(value) =>
-							dispatch({ type: "edit", field: "downPaymentPercent", value })
-						}
-						onAmountChange={(value) =>
-							dispatch({ type: "edit", field: "downPaymentAmount", value })
-						}
-						onBlur={(field) => dispatch({ type: "blur", field })}
-					/>
-					<LoanTypeSelector
-						value={inputs.loanType}
-						onChange={(loanType) => dispatch({ type: "setLoanType", loanType })}
-					/>
-					<TermSelector
-						value={inputs.termYears}
-						onChange={(years) => dispatch({ type: "setTerm", years })}
-					/>
-					<TextField
-						label={isArm ? "Start rate" : "Interest rate"}
-						suffix="%"
-						value={inputs.interestRate}
-						error={shown("interestRate")}
-						onChange={(value) =>
-							dispatch({ type: "edit", field: "interestRate", value })
-						}
-						onBlur={() => dispatch({ type: "blur", field: "interestRate" })}
-						{...(isArm
-							? { hint: "The rate for months 1 to 60 (the fixed period)." }
-							: {})}
-					/>
-					{isArm ? (
-						<ArmFields
-							margin={inputs.armMargin}
-							floor={inputs.armFloor}
-							initialCap={inputs.armInitialCap}
-							periodicCap={inputs.armPeriodicCap}
-							lifetimeCap={inputs.armLifetimeCap}
-							preset={inputs.armIndexPreset}
+		<>
+			{printing ? (
+				<div className="hidden print:block">
+					<PrintReport inputs={inputs} results={results} date={printDate} />
+				</div>
+			) : null}
+			<div className="grid gap-6 print:hidden">
+				<div className="flex justify-end">
+					<Button variant="secondary" onClick={() => window.print()}>
+						Print report
+					</Button>
+				</div>
+				<SavedScenarios
+					kind="calculator"
+					current={inputs}
+					parse={parseCalculatorInputs}
+					onOpen={(saved) => dispatch({ type: "load", inputs: saved })}
+					{...(storage !== undefined ? { storage } : {})}
+				/>
+				<Card>
+					<form
+						noValidate
+						onSubmit={(event) => event.preventDefault()}
+						className="grid gap-5 sm:grid-cols-2"
+					>
+						<TextField
+							className="sm:col-span-2"
+							label="Home price"
+							prefix="$"
+							value={inputs.homePrice}
+							error={shown("homePrice")}
+							onChange={(value) =>
+								dispatch({ type: "edit", field: "homePrice", value })
+							}
+							onBlur={() => dispatch({ type: "blur", field: "homePrice" })}
+						/>
+						<DownPaymentFields
+							mode={inputs.downPaymentMode}
+							percent={inputs.downPaymentPercent}
+							amount={inputs.downPaymentAmount}
+							error={shown("downPayment")}
+							onModeChange={(mode) =>
+								dispatch({ type: "setDownPaymentMode", mode })
+							}
+							onPercentChange={(value) =>
+								dispatch({ type: "edit", field: "downPaymentPercent", value })
+							}
+							onAmountChange={(value) =>
+								dispatch({ type: "edit", field: "downPaymentAmount", value })
+							}
+							onBlur={(field) => dispatch({ type: "blur", field })}
+						/>
+						<LoanTypeSelector
+							value={inputs.loanType}
+							onChange={(loanType) =>
+								dispatch({ type: "setLoanType", loanType })
+							}
+						/>
+						<TermSelector
+							value={inputs.termYears}
+							onChange={(years) => dispatch({ type: "setTerm", years })}
+						/>
+						<TextField
+							label={isArm ? "Start rate" : "Interest rate"}
+							suffix="%"
+							value={inputs.interestRate}
+							error={shown("interestRate")}
+							onChange={(value) =>
+								dispatch({ type: "edit", field: "interestRate", value })
+							}
+							onBlur={() => dispatch({ type: "blur", field: "interestRate" })}
+							{...(isArm
+								? { hint: "The rate for months 1 to 60 (the fixed period)." }
+								: {})}
+						/>
+						{isArm ? (
+							<ArmFields
+								margin={inputs.armMargin}
+								floor={inputs.armFloor}
+								initialCap={inputs.armInitialCap}
+								periodicCap={inputs.armPeriodicCap}
+								lifetimeCap={inputs.armLifetimeCap}
+								preset={inputs.armIndexPreset}
+								errorFor={shown}
+								onChange={(field, value) =>
+									dispatch({ type: "edit", field, value })
+								}
+								onBlur={(field) => dispatch({ type: "blur", field })}
+								onPresetChange={(preset) =>
+									dispatch({ type: "setArmIndexPreset", preset })
+								}
+							/>
+						) : null}
+						<PropertyTaxFields
+							state={inputs.state}
+							override={inputs.annualTaxOverride}
+							error={shown("annualTaxOverride")}
+							onStateChange={(value) =>
+								dispatch({ type: "setState", state: value })
+							}
+							onOverrideChange={(value) =>
+								dispatch({ type: "edit", field: "annualTaxOverride", value })
+							}
+							onBlur={() =>
+								dispatch({ type: "blur", field: "annualTaxOverride" })
+							}
+						/>
+						<MonthlyCostsFields
+							values={inputs}
 							errorFor={shown}
 							onChange={(field, value) =>
 								dispatch({ type: "edit", field, value })
 							}
 							onBlur={(field) => dispatch({ type: "blur", field })}
-							onPresetChange={(preset) =>
-								dispatch({ type: "setArmIndexPreset", preset })
+						/>
+						<CostGrowthFields
+							values={inputs}
+							errorFor={shown}
+							onChange={(field, value) =>
+								dispatch({ type: "edit", field, value })
+							}
+							onBlur={(field) => dispatch({ type: "blur", field })}
+						/>
+						<PmiFields
+							required={pmi.required}
+							on={inputs.pmiOn}
+							rate={inputs.pmiRate}
+							error={shown("pmiRate")}
+							onToggle={(on) => dispatch({ type: "setPmiOn", on })}
+							onRateChange={(value) =>
+								dispatch({ type: "edit", field: "pmiRate", value })
+							}
+							onBlur={() => dispatch({ type: "blur", field: "pmiRate" })}
+						/>
+						<ClosingCostsFields
+							closing={inputs.closing}
+							credits={inputs.closingCredits}
+							dollars={closing.dollars}
+							errorFor={shown}
+							onValueChange={(line, value) =>
+								dispatch({ type: "editClosingLine", line, value })
+							}
+							onModeChange={(line, mode) =>
+								dispatch({ type: "setClosingMode", line, mode })
+							}
+							onBlur={(line) => dispatch({ type: "blurClosingLine", line })}
+							onCreditsChange={(value) =>
+								dispatch({ type: "edit", field: "closingCredits", value })
+							}
+							onCreditsBlur={() =>
+								dispatch({ type: "blur", field: "closingCredits" })
 							}
 						/>
-					) : null}
-					<PropertyTaxFields
-						state={inputs.state}
-						override={inputs.annualTaxOverride}
-						error={shown("annualTaxOverride")}
-						onStateChange={(value) =>
-							dispatch({ type: "setState", state: value })
-						}
-						onOverrideChange={(value) =>
-							dispatch({ type: "edit", field: "annualTaxOverride", value })
-						}
-						onBlur={() =>
-							dispatch({ type: "blur", field: "annualTaxOverride" })
-						}
-					/>
-					<MonthlyCostsFields
-						values={inputs}
-						errorFor={shown}
-						onChange={(field, value) =>
-							dispatch({ type: "edit", field, value })
-						}
-						onBlur={(field) => dispatch({ type: "blur", field })}
-					/>
-					<CostGrowthFields
-						values={inputs}
-						errorFor={shown}
-						onChange={(field, value) =>
-							dispatch({ type: "edit", field, value })
-						}
-						onBlur={(field) => dispatch({ type: "blur", field })}
-					/>
-					<PmiFields
-						required={pmi.required}
-						on={inputs.pmiOn}
-						rate={inputs.pmiRate}
-						error={shown("pmiRate")}
-						onToggle={(on) => dispatch({ type: "setPmiOn", on })}
-						onRateChange={(value) =>
-							dispatch({ type: "edit", field: "pmiRate", value })
-						}
-						onBlur={() => dispatch({ type: "blur", field: "pmiRate" })}
-					/>
-					<ClosingCostsFields
-						closing={inputs.closing}
-						credits={inputs.closingCredits}
-						dollars={closing.dollars}
-						errorFor={shown}
-						onValueChange={(line, value) =>
-							dispatch({ type: "editClosingLine", line, value })
-						}
-						onModeChange={(line, mode) =>
-							dispatch({ type: "setClosingMode", line, mode })
-						}
-						onBlur={(line) => dispatch({ type: "blurClosingLine", line })}
-						onCreditsChange={(value) =>
-							dispatch({ type: "edit", field: "closingCredits", value })
-						}
-						onCreditsBlur={() =>
-							dispatch({ type: "blur", field: "closingCredits" })
-						}
-					/>
-					<ExtraPaymentFields
-						values={inputs}
-						errorFor={shown}
-						onChange={(field, value) =>
-							dispatch({ type: "edit", field, value })
-						}
-						onBlur={(field) => dispatch({ type: "blur", field })}
-					/>
-					<AffordabilityFields
-						values={inputs}
-						errorFor={shown}
-						onChange={(field, value) =>
-							dispatch({ type: "edit", field, value })
-						}
-						onBlur={(field) => dispatch({ type: "blur", field })}
-					/>
-				</form>
-			</Card>
-			{showingLastResult ? (
-				<p
-					role="status"
-					className="rounded-md bg-amber-50 p-3 text-sm font-medium text-amber-950 ring-1 ring-amber-400"
-				>
-					<span aria-hidden="true">⚠ </span>A field has text that is not a
-					number. The results below are from your last valid entry.
-				</p>
-			) : null}
-			<MonthlyEstimateCard
-				estimate={results.estimate}
-				arm={results.arm?.summary ?? null}
-				outOfDate={hasStaleDefault(results.assumptions)}
-			/>
-			<CashToCloseCard closing={results.closing} />
-			<AffordabilityCard affordability={results.affordability} />
-			<LoanSummary loan={results.loan} />
-			<RateSensitivityTable rows={sensitivity} />
-			<PropertyTaxSummary tax={results.tax} />
-			<MonthlyCostsSummary costs={results.costs} />
-			<CostGrowthTable growth={growth.result} />
-			<ExtraPaymentsSummary extra={results.extra} />
-			<PmiSummary result={results.pmi} />
-			<AssumptionsPanel items={results.assumptions} />
-			{results.schedule ? (
-				<ScheduleTable rows={results.extra?.rows ?? results.schedule} />
-			) : null}
-		</div>
+						<ExtraPaymentFields
+							values={inputs}
+							errorFor={shown}
+							onChange={(field, value) =>
+								dispatch({ type: "edit", field, value })
+							}
+							onBlur={(field) => dispatch({ type: "blur", field })}
+						/>
+						<AffordabilityFields
+							values={inputs}
+							errorFor={shown}
+							onChange={(field, value) =>
+								dispatch({ type: "edit", field, value })
+							}
+							onBlur={(field) => dispatch({ type: "blur", field })}
+						/>
+					</form>
+				</Card>
+				{showingLastResult ? (
+					<p
+						role="status"
+						className="rounded-md bg-amber-50 p-3 text-sm font-medium text-amber-950 ring-1 ring-amber-400"
+					>
+						<span aria-hidden="true">⚠ </span>A field has text that is not a
+						number. The results below are from your last valid entry.
+					</p>
+				) : null}
+				<MonthlyEstimateCard
+					estimate={results.estimate}
+					arm={results.arm?.summary ?? null}
+					outOfDate={hasStaleDefault(results.assumptions)}
+				/>
+				<CashToCloseCard closing={results.closing} />
+				<AffordabilityCard affordability={results.affordability} />
+				<LoanSummary loan={results.loan} />
+				<RateSensitivityTable rows={sensitivity} />
+				<PropertyTaxSummary tax={results.tax} />
+				<MonthlyCostsSummary costs={results.costs} />
+				<CostGrowthTable growth={growth.result} />
+				<ExtraPaymentsSummary extra={results.extra} />
+				<PmiSummary result={results.pmi} />
+				<AssumptionsPanel items={results.assumptions} />
+				{results.schedule ? (
+					<ScheduleTable rows={results.extra?.rows ?? results.schedule} />
+				) : null}
+			</div>
+		</>
 	);
 };
 

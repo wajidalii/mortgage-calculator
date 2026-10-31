@@ -1,12 +1,13 @@
 // @vitest-environment jsdom
 import {
+	act,
 	cleanup,
 	fireEvent,
 	render,
 	screen,
 	within,
 } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import LoanCalculator from "./LoanCalculator";
 
 afterEach(cleanup);
@@ -741,5 +742,91 @@ describe("LoanCalculator cost growth", () => {
 		expect(growthTable().getAllByText("$833.33").length).toBe(30);
 		type("Property tax growth per year (optional)", "3");
 		expect(growthTable().getByText("$858.33")).toBeTruthy();
+	});
+});
+
+describe("LoanCalculator print report", () => {
+	const startPrint = () =>
+		act(() => {
+			window.dispatchEvent(new Event("beforeprint"));
+		});
+	const report = () =>
+		within(screen.getByRole("table", { name: "Printable report" }));
+
+	it("is not on the page until printing", () => {
+		render(<LoanCalculator />);
+		expect(
+			screen.queryByRole("table", { name: "Printable report" }),
+		).toBeNull();
+	});
+
+	it("prints the Print button through window.print", () => {
+		const print = vi.fn();
+		vi.stubGlobal("print", print);
+		render(<LoanCalculator />);
+		fireEvent.click(screen.getByRole("button", { name: "Print report" }));
+		expect(print).toHaveBeenCalledOnce();
+		vi.unstubAllGlobals();
+	});
+
+	it("contains inputs, estimate, schedule summary, assumptions and disclaimer", () => {
+		render(<LoanCalculator today={new Date("2026-11-01T12:00:00Z")} />);
+		startPrint();
+		for (const heading of [
+			"Inputs",
+			"Itemized monthly estimate",
+			"Schedule summary",
+			"Assumptions and defaults",
+		]) {
+			expect(report().getByRole("heading", { name: heading })).toBeTruthy();
+		}
+		expect(report().getByText("Prepared 2026-11-01")).toBeTruthy();
+		expect(report().getByText("Total per month")).toBeTruthy();
+		expect(report().getByText("Lifetime interest")).toBeTruthy();
+		expect(
+			report().getByText(/It is not a loan offer|not a loan offer/),
+		).toBeTruthy();
+	});
+
+	it("lists every default in use with its as-of date", () => {
+		render(<LoanCalculator />);
+		startPrint();
+		const list = report().getByRole("list");
+		expect(
+			within(list).getByText("Property tax rate (New Jersey)"),
+		).toBeTruthy();
+		expect(within(list).getByText("Homeowners insurance")).toBeTruthy();
+		const illustrative = within(list).getAllByText(
+			/Illustrative · As of 2026-10-30/,
+		);
+		expect(illustrative.length).toBeGreaterThanOrEqual(2);
+	});
+
+	it("keeps the disclaimer in a footer group so it repeats on each page", () => {
+		render(<LoanCalculator />);
+		startPrint();
+		const footer = screen
+			.getByRole("table", { name: "Printable report" })
+			.querySelector("tfoot");
+		expect(footer?.textContent).toContain("not a loan offer");
+	});
+
+	it("prints the disclaimer even when the inputs are incomplete", () => {
+		render(<LoanCalculator />);
+		type("Home price", "");
+		startPrint();
+		expect(report().getByText(/no estimate to print/)).toBeTruthy();
+		expect(report().getByText(/not a loan offer/)).toBeTruthy();
+	});
+
+	it("goes away after printing", () => {
+		render(<LoanCalculator />);
+		startPrint();
+		act(() => {
+			window.dispatchEvent(new Event("afterprint"));
+		});
+		expect(
+			screen.queryByRole("table", { name: "Printable report" }),
+		).toBeNull();
 	});
 });

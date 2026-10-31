@@ -15,7 +15,7 @@ const router = createBrowserRouter([
 		element: <MainLayout />,
 		errorElement: <ErrorBoundary />,
 		children: [
-			{ index: true, element: <HomePage /> },
+			{ index: true, element: <HomePage />, handle: { fullBleed: true } },
 			{ path: "calculator", element: <CalculatorPage /> },
 			{ path: "compare", element: <ComparePage /> },
 			{ path: "refinance", element: <RefinancePage /> },

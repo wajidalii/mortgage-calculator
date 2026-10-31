@@ -4,6 +4,9 @@
 	--font-sans:
 		ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
 		"Helvetica Neue", Arial, sans-serif;
+	/* Headlines only. System serifs keep the page free of font requests. */
+	--font-display:
+		ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
 	/* Deep teal brand. 600 on white is 5.1:1, so it is safe for text and buttons. */
 	--color-brand-50: #eef8f6;
 	--color-brand-100: #d7efea;

@@ -1,6 +1,6 @@
 # Mortgage Calculator
 
-Web calculator for U.S. home buyers and owners (see `PRD.md`, `docs/user-stories.md`, `docs/app-roles.md`, `docs/jobs-to-be-done.md` for product scope). This repo holds the boilerplate (routing, layout, tooling, Docker) plus the first foundations: integer money/rate primitives, the defaults registry and the shared Disclaimer. Calculator features are tracked as GitHub issues and milestones (see `PLAN.md` section 9).
+Web calculator for U.S. home buyers and owners (see `PRD.md`, `docs/user-stories.md`, `docs/app-roles.md`, `docs/jobs-to-be-done.md` for product scope). The app is built: home page, full calculator (fixed and 5/6 ARM, tax, insurance, PMI, HOA, closing costs, extra payments, affordability, schedule, print report), loan comparison, refinance break-even and saved scenarios, all on integer money/rate primitives and the defaults registry. It deploys to Vercel from `main`. Work is tracked as GitHub issues and milestones (see `PLAN.md` section 9).
 
 ## Stack
 
@@ -141,11 +141,13 @@ No nginx: production serves the built `dist/` with `serve`, configured by the ro
 
 ## Security
 
-- A CVE baseline was taken on 2026-10-30 by querying OSV.dev, GitHub advisories and NVD for every direct dependency at its pinned version. No known vulnerabilities affected any of them. This is a weak signal: the versions are brand new, so advisories may not exist yet, and NVD was searched by keyword only. Re-run a dependency check before releases and when bumping versions.
+- A CVE baseline was taken on 2026-10-30 for the direct dependencies (OSV.dev, GitHub advisories, NVD). An audit on 2026-10-31 of the full tree found two transitive advisories under `serve`: `compression` (fixed by the `resolutions` pin to 1.8.2) and `minimatch` 3.1.5 (ignored in `.yarnrc.yml` because it only sees our own `serve.json` patterns; remove the ignore when `serve` updates). CI runs `yarn npm audit --all --recursive` and Dependabot opens update PRs against `dev`.
 - Do not use `npm audit`/`yarn audit` as the only check.
 - **Privacy:** user inputs never leave the browser. No source file may use `fetch` or any other network API; `src/services/networkGuard.test.ts` enforces this (and that `index.html` loads nothing from another origin). Saved scenarios use `localStorage` only. If a real API is ever added on purpose, change that test and the privacy statement in the same PR.
 
 ## Open items
 
-- Calculator features from `PRD.md` are not started; only primitives, defaults and the Disclaimer exist. Progress is tracked in GitHub milestones.
+- Inputs are not kept across reloads or encoded in the URL; saved scenarios are the only persistence.
+- No browser end-to-end tests run in CI; component tests use jsdom.
+- No LICENSE file has been chosen yet.
 - Closing the default-export lint gap (see Code conventions, item 2) would need a small check script.

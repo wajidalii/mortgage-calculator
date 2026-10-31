@@ -38,15 +38,15 @@ Yarn Berry does not run `pre*`/`post*` hooks on custom scripts (so `start` calls
 src/
   main.tsx
   vite-env.d.ts          typed ImportMetaEnv
-  app/                   App.tsx, router.tsx, providers.tsx
+  app/                   App.tsx, router.tsx
   layouts/               MainLayout.tsx (AppHeader + Outlet)
   pages/                 HomePage, CalculatorPage, NotFoundPage (one lazy chunk each)
   features/              feature folders: components/ hooks/ types.ts
   components/ui/         Tailwind primitives (Button, Card, segmented-control classes)
   components/layout/     AppHeader (brand + main nav)
   components/feedback/   PageLoader, ErrorBoundary, Disclaimer
-  hooks/                 shared hooks (useDebouncedValue, usePrinting, useInView, useFitsViewport)
-  services/api/client.ts typed fetch wrapper; only code that touches the network
+  hooks/                 shared hooks (usePrinting, useInView, useFitsViewport, useReveal, useValueFlash)
+  services/              networkGuard.test.ts only: the app has no network code
   config/env.ts          reads VITE_* once at import, with built-in defaults
   config/defaults/       defaults registry (values with source, as-of date, confidence) and state tax table
   config/disclaimer.ts   PRD section 11 disclaimer text
@@ -80,10 +80,10 @@ Root configs: `biome.json`, `biome-plugins/`, `vite.config.ts`, `tsconfig*.json`
 
 ## Environment variables
 
-- A `.env` is optional: `VITE_API_BASE_URL` (default `/api`) and `VITE_APP_NAME` (default `Mortgage Calculator`) have built-in defaults in `src/config/env.ts`. `.env` is gitignored; `.env.example` documents the keys.
+- A `.env` is optional: `VITE_APP_NAME` (default `Mortgage Calculator`) has a built-in default in `src/config/env.ts`. `.env` is gitignored; `.env.example` documents the keys.
 - Only `VITE_*` variables are readable by the client, and **every one is inlined into the public bundle**. Never put secrets, tokens or private keys in them.
 - Read env only through `src/config/env.ts`, never `import.meta.env` directly elsewhere.
-- Current keys: `VITE_API_BASE_URL`, `VITE_APP_NAME`.
+- Current keys: `VITE_APP_NAME`.
 
 ## Git workflow
 
@@ -134,7 +134,7 @@ No nginx: production serves the built `dist/` with `serve`, configured by the ro
 - Stages: `deps` -> `dev` | `build` -> `prod-deps` -> `prod`.
 - `docker compose --profile dev up --build`: dev server on 5173 with bind mounts (polling enabled for file watching).
 - `docker compose --profile prod up --build`: static server on 3000 (`PORT` env), non-root `node` user, health check on.
-- `VITE_*` values are inlined at build time, so the prod image takes them as build args (`VITE_API_BASE_URL`, `VITE_APP_NAME`).
+- `VITE_*` values are inlined at build time, so the prod image takes them as build args (`VITE_APP_NAME`).
 - Image builds set `HUSKY=0` because there is no `.git` inside the image. `prod-deps` removes the `postinstall` script from its own copy of `package.json` (the repo's file is untouched).
 - If a `public/` directory is added, add a bind mount for it to the compose dev service.
 - Yarn is fetched through Corepack at build time, so builds need network access.
@@ -143,10 +143,9 @@ No nginx: production serves the built `dist/` with `serve`, configured by the ro
 
 - A CVE baseline was taken on 2026-10-30 by querying OSV.dev, GitHub advisories and NVD for every direct dependency at its pinned version. No known vulnerabilities affected any of them. This is a weak signal: the versions are brand new, so advisories may not exist yet, and NVD was searched by keyword only. Re-run a dependency check before releases and when bumping versions.
 - Do not use `npm audit`/`yarn audit` as the only check.
-- **Privacy:** user inputs never leave the browser. `src/services/api/client.ts` is the only file that may use `fetch` or other network APIs, and nothing outside `src/services/` may import it. `src/services/networkGuard.test.ts` enforces this (and that `index.html` loads nothing from another origin). Saved scenarios use `localStorage` only. If a real API is ever added on purpose, change that test and the privacy statement in the same PR.
+- **Privacy:** user inputs never leave the browser. No source file may use `fetch` or any other network API; `src/services/networkGuard.test.ts` enforces this (and that `index.html` loads nothing from another origin). Saved scenarios use `localStorage` only. If a real API is ever added on purpose, change that test and the privacy statement in the same PR.
 
 ## Open items
 
 - Calculator features from `PRD.md` are not started; only primitives, defaults and the Disclaimer exist. Progress is tracked in GitHub milestones.
-- `Providers` (`src/app/providers.tsx`) is a pass-through.
 - Closing the default-export lint gap (see Code conventions, item 2) would need a small check script.

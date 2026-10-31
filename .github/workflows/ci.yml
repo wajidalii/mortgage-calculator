@@ -16,7 +16,6 @@ concurrency:
 env:
   HUSKY: "0"
   # Public placeholders; VITE_* values are inlined into the bundle (see CLAUDE.md).
-  VITE_API_BASE_URL: http://localhost:8080/api
   VITE_APP_NAME: Mortgage Calculator
 
 jobs:

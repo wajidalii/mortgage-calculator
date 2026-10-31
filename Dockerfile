@@ -24,10 +24,8 @@ CMD ["yarn", "dev"]
 FROM deps AS build
 # Vite inlines VITE_* at BUILD time, so they must be build args, not runtime env.
 # They end up in the public bundle: never pass secrets.
-ARG VITE_API_BASE_URL
 ARG VITE_APP_NAME
-ENV VITE_API_BASE_URL=${VITE_API_BASE_URL} \
-    VITE_APP_NAME=${VITE_APP_NAME}
+ENV VITE_APP_NAME=${VITE_APP_NAME}
 # .dockerignore keeps node_modules, dist, .env*, .git out of the context.
 COPY . .
 RUN yarn build

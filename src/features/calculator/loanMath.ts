@@ -1,4 +1,4 @@
-import { parseMoney } from "@/lib/money";
+import { groupThousands, parseMoney } from "@/lib/money";
 import { monthlyPayment } from "@/lib/payment";
 import { parseRate } from "@/lib/rate";
 import { roundHalfUp } from "@/lib/rounding";
@@ -15,8 +15,6 @@ const MICROS_PER_WHOLE = 1_000_000;
 
 /** $10,000,000. Keeps every intermediate product inside the safe integer range. */
 export const MAX_HOME_PRICE = 1_000_000_000 as Cents;
-
-export { DOWN_PAYMENT_TOO_HIGH };
 
 /** Down payment in cents from a fraction in millionths: round(price x pct). */
 export const downPaymentFromPercent = (price: Cents, percent: Micros): Cents =>
@@ -38,7 +36,7 @@ export const ltvFor = (price: Cents, loan: Cents): Micros =>
 export const centsToFieldText = (cents: Cents): string => {
 	const dollars = Math.floor(cents / 100);
 	const rest = String(cents - dollars * 100).padStart(2, "0");
-	return `${String(dollars).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}.${rest}`;
+	return `${groupThousands(dollars)}.${rest}`;
 };
 
 /** Plain percent text for a synced field: 200000 -> "20.00". */

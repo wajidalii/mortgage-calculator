@@ -58,7 +58,7 @@ const ToolsSection = () => (
 					<Reveal delay={index * 80} className="h-full">
 						<Link
 							to={tool.to}
-							className="group flex h-full flex-col rounded-2xl bg-white p-6 shadow-panel ring-1 ring-slate-200 motion-safe:transition-[transform,box-shadow] motion-safe:duration-hover motion-safe:ease-out-soft hover:-translate-y-0.5 hover:shadow-lg hover:ring-brand-500 focus-visible:-translate-y-0.5 focus-visible:shadow-lg focus-visible:ring-brand-500 motion-safe:active:translate-y-0 sm:p-8"
+							className="group flex h-full flex-col rounded-2xl bg-white p-6 shadow-panel ring-1 ring-slate-200 motion-safe:transition-[translate,scale,box-shadow] motion-safe:duration-hover motion-safe:ease-out-soft hover:-translate-y-0.5 hover:shadow-lg hover:ring-brand-500 focus-visible:-translate-y-0.5 focus-visible:shadow-lg focus-visible:ring-brand-500 motion-safe:active:translate-y-0 sm:p-8"
 						>
 							<span className="grid size-11 place-items-center rounded-xl bg-brand-50 text-brand-700 motion-safe:transition-colors motion-safe:duration-hover group-hover:bg-brand-600 group-hover:text-white group-focus-visible:bg-brand-600 group-focus-visible:text-white">
 								<Icon name={tool.icon} className="size-6" />

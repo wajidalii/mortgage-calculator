@@ -6,7 +6,7 @@ export type ButtonVariant =
 export type ButtonSize = "md" | "lg";
 
 const BASE =
-	"group inline-flex items-center justify-center gap-2 rounded-lg font-semibold motion-safe:transition-[background-color,box-shadow,transform] motion-safe:duration-hover motion-safe:ease-standard motion-safe:active:translate-y-px focus-visible:outline-3 focus-visible:outline-offset-2 disabled:opacity-50";
+	"group inline-flex items-center justify-center gap-2 rounded-lg font-semibold motion-safe:transition-[background-color,box-shadow,translate,scale] motion-safe:duration-hover motion-safe:ease-standard motion-safe:not-disabled:hover:-translate-y-0.5 motion-safe:not-disabled:active:translate-y-0 motion-safe:not-disabled:active:scale-[0.97] focus-visible:outline-3 focus-visible:outline-offset-2 disabled:opacity-50";
 
 const VARIANTS: Record<ButtonVariant, string> = {
 	primary:

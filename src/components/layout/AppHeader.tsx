@@ -37,9 +37,9 @@ const AppHeader = () => {
 				>
 					<span
 						aria-hidden="true"
-						className="grid size-9 place-items-center rounded-xl bg-brand-600 text-xl text-white"
+						className="grid size-9 place-items-center rounded-full bg-brand-600 text-xs font-extrabold tracking-tight text-white"
 					>
-						⌂
+						ARM
 					</span>
 					{env.appName}
 				</Link>

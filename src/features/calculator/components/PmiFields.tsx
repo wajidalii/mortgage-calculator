@@ -37,7 +37,7 @@ const PmiFields = ({
 				/>
 				<label
 					htmlFor={id}
-					className="py-2 text-sm font-semibold text-slate-800"
+					className="cursor-pointer py-2 text-sm font-semibold text-slate-800"
 				>
 					Include PMI (loan is above 80% of the price)
 				</label>

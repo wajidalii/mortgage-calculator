@@ -126,6 +126,22 @@ body {
 	outline-offset: 2px;
 }
 
+/*
+ * Tailwind 4 resets buttons to the default cursor. Every enabled control gets
+ * the pointer, so toggles, Save, Print and checkbox labels all read as clickable.
+ */
+:where(
+	button:not(:disabled),
+	summary,
+	select,
+	input[type="range"],
+	input[type="checkbox"]:not(:disabled),
+	label:has(> input[type="checkbox"]),
+	label:has(> input[type="radio"])
+) {
+	cursor: pointer;
+}
+
 /* `<details>` markers are drawn by the AdvancedSection component. */
 summary::-webkit-details-marker {
 	display: none;

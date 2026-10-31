@@ -1,16 +1,35 @@
 import { Suspense } from "react";
-import { Outlet } from "react-router";
+import { Outlet, useMatches } from "react-router";
 import PageLoader from "@/components/feedback/PageLoader";
+import AppFooter from "@/components/layout/AppFooter";
+import AppHeader from "@/components/layout/AppHeader";
+import { cn } from "@/lib/cn";
 
-const MainLayout = () => (
-	<div className="flex min-h-screen flex-col">
-		{/* Slot for a future <Navbar /> (render it here, above <main>). */}
-		<main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8">
-			<Suspense fallback={<PageLoader />}>
-				<Outlet />
-			</Suspense>
-		</main>
-	</div>
-);
+/** Routes mark themselves `handle: { fullBleed: true }` to own their width. */
+const isFullBleed = (handle: unknown): boolean =>
+	typeof handle === "object" &&
+	handle !== null &&
+	"fullBleed" in handle &&
+	handle.fullBleed === true;
+
+const MainLayout = () => {
+	const fullBleed = useMatches().some((match) => isFullBleed(match.handle));
+	return (
+		<div className="flex min-h-screen flex-col">
+			<AppHeader />
+			<main
+				className={cn(
+					"w-full flex-1 print:max-w-none print:p-0",
+					!fullBleed && "mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8",
+				)}
+			>
+				<Suspense fallback={<PageLoader />}>
+					<Outlet />
+				</Suspense>
+			</main>
+			<AppFooter />
+		</div>
+	);
+};
 
 export default MainLayout;

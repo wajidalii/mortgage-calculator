@@ -1,6 +1,6 @@
 # Mortgage Calculator: Boilerplate Plan (v2)
 
-Status: **awaiting approval. No code has been written.**
+Status: **boilerplate complete and published** (initial commit `c520f4a` on `main` and `dev`). No mortgage logic exists yet; feature work is tracked in GitHub (see section 9).
 Changes from v1: nginx removed, Yarn replaces npm, Biome enforces arrow-function and default-export components, CVE scouts query real CVE databases, Opus orchestrator with named, colored Sonnet workers.
 
 ## 1. Decisions (defaults, change any before approval)
@@ -69,6 +69,8 @@ Mortgage_Calculator/
 | `build`       | `tsc -b && vite build`                                            |
 | `start`       | `yarn build && serve -s dist -l ${PORT:-3000}`                    |
 | `typecheck`   | `tsc -b --noEmit`                                                 |
+| `test`        | `vitest run`                                                      |
+| `test:watch`  | `vitest`                                                          |
 | `lint`        | `biome lint .`                                                    |
 | `lint:fix`    | `biome lint --write .`                                            |
 | `format`      | `biome format --write . && prettier --write "**/*.{md,yml,yaml}"` |
@@ -154,3 +156,16 @@ Each scout queries a real vulnerability database for its package at the exact pi
 
 1. Switch the session to Opus 5.5 with `/model`.
 2. Reply "go", or tell me which of D1–D10 to change.
+
+## 9. Feature roadmap (GitHub)
+
+Feature work follows `PRD.md` and `docs/user-stories.md` and is tracked as GitHub milestones and issues at https://github.com/wajidalii/mortgage-calculator/milestones. Each release starts only after the previous one passes all tests.
+
+| Milestone        | Issues  | Content                                                                                                    |
+| ---------------- | ------- | ---------------------------------------------------------------------------------------------------------- |
+| Foundations      | #1-#4   | Vitest, money/rate primitives, defaults registry, Disclaimer component                                     |
+| R1 Core          | #5-#17  | S-1 to S-10: loan, tax, insurance, PMI, itemized total, amortization, ARM, assumptions, validation, mobile |
+| R2 Buyer         | #18-#19 | S-11 closing costs, S-12 affordability                                                                     |
+| R3 Owner         | #20-#23 | S-13 extra payments, S-14 refinance, S-15 rate sensitivity, S-16 cost growth                               |
+| R4 Professional  | #24-#26 | S-17 comparison, S-18 saved scenarios, S-19 print report                                                   |
+| Launch readiness | #27-#33 | T-1, Q-4, Q-5 data checks, Q-1 decision, performance, accessibility and privacy audits                     |

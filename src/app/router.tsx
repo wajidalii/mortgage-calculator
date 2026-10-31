@@ -5,6 +5,8 @@ import ErrorBoundary from "@/components/feedback/ErrorBoundary";
 const MainLayout = lazy(() => import("@/layouts/MainLayout"));
 const HomePage = lazy(() => import("@/pages/HomePage"));
 const CalculatorPage = lazy(() => import("@/pages/CalculatorPage"));
+const ComparePage = lazy(() => import("@/pages/ComparePage"));
+const RefinancePage = lazy(() => import("@/pages/RefinancePage"));
 const NotFoundPage = lazy(() => import("@/pages/NotFoundPage"));
 
 const router = createBrowserRouter([
@@ -13,8 +15,10 @@ const router = createBrowserRouter([
 		element: <MainLayout />,
 		errorElement: <ErrorBoundary />,
 		children: [
-			{ index: true, element: <HomePage /> },
+			{ index: true, element: <HomePage />, handle: { fullBleed: true } },
 			{ path: "calculator", element: <CalculatorPage /> },
+			{ path: "compare", element: <ComparePage /> },
+			{ path: "refinance", element: <RefinancePage /> },
 			{ path: "*", element: <NotFoundPage /> },
 		],
 	},

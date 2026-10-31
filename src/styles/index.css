@@ -4,15 +4,203 @@
 	--font-sans:
 		ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
 		"Helvetica Neue", Arial, sans-serif;
-	--color-brand-50: oklch(0.97 0.02 250);
-	--color-brand-500: oklch(0.62 0.18 255);
-	--color-brand-600: oklch(0.55 0.2 257);
-	--color-brand-700: oklch(0.48 0.19 258);
+	/* Headlines only. System serifs keep the page free of font requests. */
+	--font-display:
+		ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+	/* Deep teal brand. 600 on white is 5.1:1, so it is safe for text and buttons. */
+	--color-brand-50: #eef8f6;
+	--color-brand-100: #d7efea;
+	--color-brand-200: #b2ded6;
+	--color-brand-500: #1f9590;
+	--color-brand-600: #137b79;
+	--color-brand-700: #0f6663;
+	--color-brand-800: #0d4f50;
+	--color-brand-900: #0b363d;
+	--color-canvas: #f4f7f8;
+	--shadow-panel: 0 14px 42px rgb(18 50 58 / 0.06);
+	/*
+	 * Motion tokens (see MOTION.md). Entrances ease out, state changes use the
+	 * standard curve. Only transform, opacity and paint properties animate.
+	 */
+	--ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+	--ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+	--duration-micro: 150ms;
+	--duration-hover: 200ms;
+	--duration-expand: 250ms;
+	--duration-enter: 400ms;
+	--animate-rise: rise var(--duration-enter) var(--ease-out-soft) both;
+	--animate-rise-quick: rise var(--duration-expand) var(--ease-out-soft) both;
+	--animate-fade: fade var(--duration-micro) var(--ease-standard) both;
+	--animate-wipe: wipe 700ms var(--ease-out-soft) both;
+	--animate-flash: flash 800ms var(--ease-standard) both;
+
+	@keyframes rise {
+		from {
+			opacity: 0;
+			transform: translateY(0.5rem);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+
+	@keyframes fade {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
+	/* Reveals a chart left to right; clip-path is paint only. */
+	@keyframes wipe {
+		from {
+			clip-path: inset(0 100% 0 0);
+		}
+		to {
+			clip-path: inset(0);
+		}
+	}
+
+	/* A short highlight behind a figure that just changed. */
+	@keyframes flash {
+		from {
+			background-color: var(--flash-color, rgb(19 123 121 / 0.18));
+		}
+		to {
+			background-color: transparent;
+		}
+	}
+}
+
+:root {
+	/*
+	 * Payment breakdown series, read through var() in inline styles, so they
+	 * live outside @theme (Tailwind drops theme variables no utility uses).
+	 * Each series is also named in text next to its color.
+	 */
+	--color-series-pi: #137b79;
+	--color-series-tax: #5b7fc7;
+	--color-series-insurance: #e0a55a;
+	--color-series-pmi: #b0558f;
+	--color-series-hoa: #8fa6ab;
+	--color-series-other: #c7d3d6;
+	--chart-hypothetical: #fffbeb;
+	--chart-grid: #e2e8f0;
+	--chart-base-line: #64748b;
+}
+
+html {
+	/* Keeps focused fields clear of the mobile summary bar (WCAG 2.4.11). */
+	scroll-padding-bottom: 6rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	html {
+		scroll-behavior: smooth;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	::before,
+	::after {
+		animation-duration: 0.01ms;
+		animation-iteration-count: 1;
+		transition-duration: 0.01ms;
+	}
 }
 
 body {
-	background-color: var(--color-slate-50);
+	background-color: var(--color-canvas);
 	color: var(--color-slate-900);
 	font-family: var(--font-sans);
 	-webkit-font-smoothing: antialiased;
+}
+
+/* One visible focus style for every control that has no ring of its own. */
+:where(a, button, summary, select, [tabindex]):focus-visible {
+	outline: 3px solid var(--color-brand-500);
+	outline-offset: 2px;
+}
+
+/*
+ * Tailwind 4 resets buttons to the default cursor. Every enabled control gets
+ * the pointer, so toggles, Save, Print and checkbox labels all read as clickable.
+ */
+:where(
+	button:not(:disabled),
+	summary,
+	select,
+	input[type="range"],
+	input[type="checkbox"]:not(:disabled),
+	label:has(> input[type="checkbox"]),
+	label:has(> input[type="radio"])
+) {
+	cursor: pointer;
+}
+
+/* `<details>` markers are drawn by the AdvancedSection component. */
+summary::-webkit-details-marker {
+	display: none;
+}
+
+/*
+ * Scroll reveal (see Reveal). Content is visible by default; a section only
+ * becomes "pending" once script has checked that it starts below the fold.
+ */
+.reveal-pending {
+	opacity: 0;
+	transform: translateY(0.75rem);
+}
+
+.reveal-shown {
+	transition:
+		opacity var(--duration-enter) var(--ease-out-soft),
+		transform var(--duration-enter) var(--ease-out-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.reveal-pending {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@media print {
+	@page {
+		margin: 15mm;
+	}
+
+	html {
+		scroll-padding-bottom: 0;
+	}
+
+	body {
+		background-color: white;
+	}
+
+	/* Nothing may stay hidden or mid-animation on paper. */
+	*,
+	::before,
+	::after {
+		animation: none;
+		transition: none;
+	}
+
+	.reveal-pending {
+		opacity: 1;
+		transform: none;
+	}
+
+	/* Browsers repeat these groups on every printed page. */
+	thead {
+		display: table-header-group;
+	}
+
+	tfoot {
+		display: table-footer-group;
+	}
 }

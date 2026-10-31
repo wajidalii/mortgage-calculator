@@ -3,7 +3,16 @@
 	"vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
 	"files": {
 		"ignoreUnknown": false,
-		"includes": ["**", "!**/dist", "!**/node_modules", "!**/.yarn"]
+		"includes": [
+			"**",
+			"!**/dist",
+			"!**/node_modules",
+			"!**/.yarn",
+			"!design",
+			"!**/*.md",
+			"!**/*.yml",
+			"!**/*.yaml"
+		]
 	},
 	"formatter": { "enabled": true, "indentStyle": "tab" },
 	"javascript": { "formatter": { "quoteStyle": "double" } },

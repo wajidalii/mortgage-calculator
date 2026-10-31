@@ -249,7 +249,7 @@ For month t, with balance B and monthly rate r:
 
 In the last month, add any small remaining balance to the final payment. The final payment can differ from PI by a few dollars. In the reference tests the difference was $2.61.
 
-The displayed lifetime interest is the sum of the ledger interest. It is not the closed-form value. For the reference loan the closed-form value is $510,177.95 and the ledger value is $510,179.81.
+The displayed lifetime interest is the sum of the ledger interest. It is not the closed-form value, and the two can differ by more than $5 on long, high-rate loans (see 12.2 for the bound). For the reference loan the closed-form value is $510,177.95 and the ledger value is $510,179.81.
 
 ### 8.5 5/6 SOFR ARM
 
@@ -408,7 +408,13 @@ The product must show this text, or text with the same meaning, on every result 
 - No ARM reset may break a cap. Test with flat, rising, shock, and crash index paths.
 - Compare the JavaScript results to a decimal reference on at least 3,000 random loans. Use 15, 20, and 30 year terms, balances of $50,000 to $2,000,000, and rates of 2% to 12% in 0.125% steps.
 - In the earlier prototype, the integer half-up interest matched the reference on all 3,000 cases. Interest computed with a float rate multiplication did not (9 mismatches, up to 4 cents). Do not use the float method.
-- Accept a tolerance of $5 between the ledger interest and the closed-form interest.
+- Compare the ledger interest to the exact closed-form interest `n x PI - L` (PI unrounded) with a rate-dependent tolerance, not a flat $5. With `r` the monthly rate, `n` the number of payments and `S = ((1 + r)^n - 1) / r`, the tolerance in cents is `T(r, n) = S - n / 2`. Assert `|ledger - closed form| <= T` for every case, and also assert `<= $5` whenever `T <= $5`.
+  - Why a flat $5 fails: the ledger rounds the payment once and the interest every month, and the final payment absorbs the difference. A rounding error of half a cent in month `t` grows by `(1 + r)` each later month, so it is worth up to `(1 + r)^(n-t)` cents by the end. With 360 payments at 12% that is far above $5. The 3,000-case run had 180 cases over $5 (179 when the closed form is rounded to the cent), all of them 30 year loans at higher rates (20 year loans can also exceed $5 in principle, above 8.375%). The ledger itself matched the reference on every line, so this is a property of cent rounding and not an engine defect.
+  - Derivation, in cents. Every rounding error is at most half a cent: the payment error `d0` and each month's interest error `e_t`. Let `x_t` be the ledger balance minus the exact balance. Then `x_t = (1 + r) x_(t-1) + e_t - d0` and `x_0 = 0`. The final payment clears the balance, so it equals `PI* + (1 + r) x_(n-1) + e_n`, where `PI*` is the unrounded payment. Summing, `gap = d0 ((n - 1) - G) + sum e_t (1 + r)^(n-t)`, where `G = ((1 + r)^n - (1 + r)) / r >= n - 1`. Bounding each error by half a cent gives `|gap| <= (G - (n - 1)) / 2 + S / 2 = S - n / 2`.
+  - Precondition: no payment before the last may pay the loan off early. This holds when `PI* / (1 + r) > S_(n-1)` (the same sum with `n - 1` terms). The test checks this exactly for every case and for every grid rate and term at $50,000, and it holds. If the precondition fails (very small loans at high rates) the bound does not apply and the case must be reasoned about separately.
+  - Where the flat $5 is guaranteed (`T <= $5`): every rate from 2% to 12% at 15 years, up to 8.375% at 20 years, and up to 3.875% at 30 years. The worst case in the test domain is 12% over 30 years, `T = $33.15`.
+  - The bound uses the exact rational closed form and exact BigInt arithmetic. It is not derived from, and must not be replaced by, the largest gap seen in a sample.
+  - The ledger and final-payment policy in 8.4 is unchanged. Do not change the engine to meet $5.
 - A flat-index ARM may differ from the fixed loan by a few dollars, because each reset rounds to the cent. The prototype difference was $1.32.
 - Test the money parser with `1.005`, `19.99`, `0.1`, and an empty field.
 - Test the 12-month tax split so that the months add up to the annual value.

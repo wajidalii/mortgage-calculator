@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import {
@@ -40,6 +40,9 @@ const CELL = "px-3 py-2 text-right tabular-nums";
 
 const ScheduleTable = ({ rows }: ScheduleTableProps) => {
 	const [view, setView] = useState<View>("yearly");
+	// The buttons follow `view` at once; the table follows the deferred copy, so
+	// switching to the 360 monthly rows does not block the click (INP).
+	const shownView = useDeferredValue(view);
 	const years = useMemo(() => summarizeByYear(rows), [rows]);
 	const totalInterest = useMemo(() => lifetimeInterest(rows), [rows]);
 	const hasExtra = rows.some((row) => row.extra > 0);
@@ -74,9 +77,9 @@ const ScheduleTable = ({ rows }: ScheduleTableProps) => {
 		);
 	}
 
-	const periodLabel = view === "monthly" ? "Month" : "Year";
+	const periodLabel = shownView === "monthly" ? "Month" : "Year";
 	const body =
-		view === "monthly"
+		shownView === "monthly"
 			? rows.map((row) => ({
 					key: row.month,
 					label: row.month,
@@ -129,7 +132,7 @@ const ScheduleTable = ({ rows }: ScheduleTableProps) => {
 			<section
 				// biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be keyboard reachable
 				tabIndex={0}
-				aria-label={`${view === "monthly" ? "Monthly" : "Yearly"} amortization schedule`}
+				aria-label={`${shownView === "monthly" ? "Monthly" : "Yearly"} amortization schedule`}
 				className="max-h-96 overflow-auto rounded-md ring-1 ring-slate-200 focus-visible:outline-2 focus-visible:outline-brand-500"
 			>
 				<table
@@ -139,7 +142,7 @@ const ScheduleTable = ({ rows }: ScheduleTableProps) => {
 					)}
 				>
 					<caption className="sr-only">
-						{view === "monthly" ? "Payment" : "Yearly totals"} by{" "}
+						{shownView === "monthly" ? "Payment" : "Yearly totals"} by{" "}
 						{periodLabel.toLowerCase()}: payment, principal, interest and
 						remaining balance
 					</caption>
@@ -150,7 +153,7 @@ const ScheduleTable = ({ rows }: ScheduleTableProps) => {
 							</th>
 							{isArm ? (
 								<th scope="col" className={HEAD}>
-									{view === "monthly" ? "Rate" : "Rate at year end"}
+									{shownView === "monthly" ? "Rate" : "Rate at year end"}
 								</th>
 							) : null}
 							<th scope="col" className={HEAD}>

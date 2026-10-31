@@ -44,6 +44,13 @@ export const initialCalculatorState: CalculatorState = {
 		armPeriodicCap: microsToPercentText(armTerms.periodicCapMicros),
 		armLifetimeCap: microsToPercentText(armTerms.lifetimeCapMicros),
 		armIndexPreset: "flat",
+		closing: {
+			lender: { mode: "amount", value: "" },
+			title: { mode: "amount", value: "" },
+			prepaids: { mode: "amount", value: "" },
+			other: { mode: "amount", value: "" },
+		},
+		closingCredits: "",
 	},
 	touched: {},
 };
@@ -109,6 +116,37 @@ export const calculatorReducer = (
 			return { ...state, inputs: { ...state.inputs, termYears: action.years } };
 		case "setPmiOn":
 			return { ...state, inputs: { ...state.inputs, pmiOn: action.on } };
+		case "editClosingLine":
+			return {
+				...state,
+				inputs: {
+					...state.inputs,
+					closing: {
+						...state.inputs.closing,
+						[action.line]: {
+							...state.inputs.closing[action.line],
+							value: action.value,
+						},
+					},
+				},
+			};
+		case "setClosingMode":
+			// Dollars and percent are not interchangeable, so the old text is dropped.
+			return {
+				...state,
+				inputs: {
+					...state.inputs,
+					closing: {
+						...state.inputs.closing,
+						[action.line]: { mode: action.mode, value: "" },
+					},
+				},
+			};
+		case "blurClosingLine":
+			return {
+				...state,
+				touched: { ...state.touched, [`closing:${action.line}`]: true },
+			};
 		case "setLoanType":
 			return {
 				...state,

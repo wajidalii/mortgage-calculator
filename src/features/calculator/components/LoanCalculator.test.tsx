@@ -549,4 +549,75 @@ describe("LoanCalculator", () => {
 			}
 		});
 	});
+
+	describe("closing costs and cash to close", () => {
+		const cash = () =>
+			within(screen.getByRole("region", { name: "Cash to close" }));
+
+		it("shows the down payment as the cash to close with no closing costs", () => {
+			render(<LoanCalculator />);
+			expect(cash().getAllByText("$100,000.00").length).toBeGreaterThan(0);
+		});
+
+		it("shows $112,000.00 for $100,000 down and $12,000 of closing costs", () => {
+			render(<LoanCalculator />);
+			type("Other closing costs", "12000");
+			expect(cash().getAllByText("$112,000.00").length).toBeGreaterThan(0);
+			expect(cash().getByText("Closing costs total")).toBeTruthy();
+		});
+
+		it("shows the dollar value next to a percent closing cost", () => {
+			render(<LoanCalculator />);
+			fireEvent.click(
+				screen.getByRole("button", {
+					name: "Other closing costs as percent of price",
+				}),
+			);
+			type("Other closing costs", "2.5");
+			expect(screen.getByText("= $12,500.00")).toBeTruthy();
+			expect(cash().getAllByText("$112,500.00").length).toBeGreaterThan(0);
+		});
+
+		it("lists each line and they add up to the total", () => {
+			render(<LoanCalculator />);
+			type("Lender fees", "3000");
+			type("Title and settlement fees", "2000");
+			type("Prepaids and escrow deposits", "7000");
+			expect(cash().getByText("$3,000.00")).toBeTruthy();
+			expect(cash().getByText("$2,000.00")).toBeTruthy();
+			expect(cash().getByText("$7,000.00")).toBeTruthy();
+			const total = cash().getByText("Closing costs total").nextElementSibling;
+			expect(total?.textContent).toBe("$12,000.00");
+		});
+
+		it("subtracts credits", () => {
+			render(<LoanCalculator />);
+			type("Other closing costs", "12000");
+			type("Credits (seller or lender)", "2500");
+			expect(cash().getAllByText("$109,500.00").length).toBeGreaterThan(0);
+			expect(cash().getByText("-$2,500.00")).toBeTruthy();
+		});
+
+		it("shows an error and no cash to close for credits that are too large", () => {
+			render(<LoanCalculator />);
+			type("Credits (seller or lender)", "200000");
+			expect(
+				screen.getByText(
+					"Credits cannot be more than the down payment plus closing costs",
+				),
+			).toBeTruthy();
+			expect(cash().queryByText("Down payment")).toBeNull();
+		});
+
+		it("clears the text when switching between dollars and percent", () => {
+			render(<LoanCalculator />);
+			type("Other closing costs", "12000");
+			fireEvent.click(
+				screen.getByRole("button", {
+					name: "Other closing costs as percent of price",
+				}),
+			);
+			expect(field("Other closing costs").value).toBe("");
+		});
+	});
 });

@@ -7,6 +7,26 @@ export type LoanTerm = (typeof LOAN_TERMS)[number];
 
 export type DownPaymentMode = "percent" | "amount";
 
+/** Closing cost lines the user can fill in. None is estimated for them (PRD 2.2). */
+export const CLOSING_LINES = [
+	{ id: "lender", label: "Lender fees" },
+	{ id: "title", label: "Title and settlement fees" },
+	{ id: "prepaids", label: "Prepaids and escrow deposits" },
+	{
+		id: "other",
+		label: "Other closing costs",
+		hint: "Enter one total here if you have no breakdown.",
+	},
+] as const;
+export type ClosingLineId = (typeof CLOSING_LINES)[number]["id"];
+export type ClosingMode = "amount" | "percent";
+
+/** A closing cost typed as dollars or as a percent of the home price. */
+export interface ClosingLineInput {
+	mode: ClosingMode;
+	value: string;
+}
+
 export type LoanType = "fixed" | "arm";
 export type IndexPresetId = IndexPreset["id"];
 
@@ -25,7 +45,9 @@ export type ErrorField =
 	| "armFloor"
 	| "armInitialCap"
 	| "armPeriodicCap"
-	| "armLifetimeCap";
+	| "armLifetimeCap"
+	| `closing:${ClosingLineId}`
+	| "closingCredits";
 
 /** Raw text the user typed, plus which down payment form is the source. */
 export interface CalculatorInputs {
@@ -58,6 +80,9 @@ export interface CalculatorInputs {
 	armPeriodicCap: string;
 	armLifetimeCap: string;
 	armIndexPreset: IndexPresetId;
+	closing: Record<ClosingLineId, ClosingLineInput>;
+	/** Optional seller or lender credits in dollars. Empty means none. */
+	closingCredits: string;
 }
 
 export interface CalculatorState {
@@ -80,7 +105,8 @@ export type EditableField =
 	| "armFloor"
 	| "armInitialCap"
 	| "armPeriodicCap"
-	| "armLifetimeCap";
+	| "armLifetimeCap"
+	| "closingCredits";
 
 export type CalculatorAction =
 	| { type: "edit"; field: EditableField; value: string }
@@ -90,7 +116,10 @@ export type CalculatorAction =
 	| { type: "setState"; state: StateCode }
 	| { type: "setPmiOn"; on: boolean }
 	| { type: "setLoanType"; loanType: LoanType }
-	| { type: "setArmIndexPreset"; preset: IndexPresetId };
+	| { type: "setArmIndexPreset"; preset: IndexPresetId }
+	| { type: "editClosingLine"; line: ClosingLineId; value: string }
+	| { type: "setClosingMode"; line: ClosingLineId; mode: ClosingMode }
+	| { type: "blurClosingLine"; line: ClosingLineId };
 
 export interface LoanDerivation {
 	homePrice: Cents;

@@ -12,6 +12,7 @@ import {
 	calculatorReducer,
 	initialCalculatorState,
 } from "../calculatorReducer";
+import { type ClosingCosts, deriveClosingCosts } from "../closingCosts";
 import { deriveLoan } from "../loanMath";
 import { deriveMonthlyCosts, type MonthlyCosts } from "../monthlyCosts";
 import { buildMonthlyEstimate, type MonthlyEstimate } from "../monthlyEstimate";
@@ -28,6 +29,7 @@ export interface ResultSet {
 	costs: MonthlyCosts | null;
 	pmi: PmiResult | null;
 	estimate: MonthlyEstimate | null;
+	closing: ClosingCosts | null;
 	schedule: ScheduleRow[] | null;
 	assumptions: AssumptionItem[];
 }
@@ -56,6 +58,10 @@ export const useCalculatorInputs = (today?: Date) => {
 	const propertyTax = useMemo(
 		() => derivePropertyTax(deferredInputs),
 		[deferredInputs],
+	);
+	const closing = useMemo(
+		() => deriveClosingCosts(deferredInputs, loan),
+		[deferredInputs, loan],
 	);
 	const monthlyCosts = useMemo(
 		() => deriveMonthlyCosts(deferredInputs),
@@ -112,6 +118,7 @@ export const useCalculatorInputs = (today?: Date) => {
 			costs: monthlyCosts.costs,
 			pmi: pmi.result,
 			estimate,
+			closing: closing.costs,
 			schedule,
 			assumptions,
 		}),
@@ -122,6 +129,7 @@ export const useCalculatorInputs = (today?: Date) => {
 			monthlyCosts.costs,
 			pmi.result,
 			estimate,
+			closing.costs,
 			schedule,
 			assumptions,
 		],
@@ -135,6 +143,7 @@ export const useCalculatorInputs = (today?: Date) => {
 		...monthlyCosts.errors,
 		...arm.errors,
 		...pmi.errors,
+		...closing.errors,
 	};
 	const isComplete =
 		estimate !== null &&
@@ -155,6 +164,7 @@ export const useCalculatorInputs = (today?: Date) => {
 		propertyTax,
 		monthlyCosts,
 		pmi,
+		closing,
 		results: held ?? current,
 		showingLastResult: held !== null,
 	};

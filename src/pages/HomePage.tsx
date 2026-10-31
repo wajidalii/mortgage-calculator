@@ -1,34 +1,26 @@
-import { Link } from "react-router";
-import Card from "@/components/ui/Card";
-import { env } from "@/config/env";
+import AudienceSection from "@/features/home/components/AudienceSection";
+import CapabilitiesSection from "@/features/home/components/CapabilitiesSection";
+import FinalCta from "@/features/home/components/FinalCta";
+import HeroSection from "@/features/home/components/HeroSection";
+import HowItWorksSection from "@/features/home/components/HowItWorksSection";
+import ToolsSection from "@/features/home/components/ToolsSection";
+import TransparencySection from "@/features/home/components/TransparencySection";
+
+const DESCRIPTION =
+	"Estimate the full monthly cost of a home with tax, insurance, PMI and HOA. See cash to close, compare loans, test extra payments and check refinance break-even. Estimates only.";
 
 const HomePage = () => (
-	<Card className="mx-auto w-full max-w-3xl">
-		<h1 className="text-3xl font-bold">{env.appName}</h1>
-		<p className="mt-2 text-slate-600">
-			Estimate your monthly mortgage payment.
-		</p>
-		<div className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
-			<Link
-				to="/calculator"
-				className="font-medium text-brand-600 hover:underline"
-			>
-				Open calculator
-			</Link>
-			<Link
-				to="/compare"
-				className="font-medium text-brand-600 hover:underline"
-			>
-				Compare two loans
-			</Link>
-			<Link
-				to="/refinance"
-				className="font-medium text-brand-600 hover:underline"
-			>
-				Refinance break-even
-			</Link>
-		</div>
-	</Card>
+	<>
+		<title>Mortgage Calculator: plan the true cost of your home</title>
+		<meta name="description" content={DESCRIPTION} />
+		<HeroSection />
+		<ToolsSection />
+		<CapabilitiesSection />
+		<HowItWorksSection />
+		<AudienceSection />
+		<TransparencySection />
+		<FinalCta />
+	</>
 );
 
 export default HomePage;

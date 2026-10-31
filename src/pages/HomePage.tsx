@@ -16,6 +16,12 @@ const HomePage = () => (
 				Open calculator
 			</Link>
 			<Link
+				to="/compare"
+				className="font-medium text-brand-600 hover:underline"
+			>
+				Compare two loans
+			</Link>
+			<Link
 				to="/refinance"
 				className="font-medium text-brand-600 hover:underline"
 			>

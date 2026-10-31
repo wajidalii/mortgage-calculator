@@ -1,11 +1,7 @@
 import { useDeferredValue, useMemo, useState } from "react";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
-import {
-	lifetimeInterest,
-	type ScheduleRow,
-	summarizeByYear,
-} from "@/lib/amortization";
+import { type ScheduleRow, summarizeByYear } from "@/lib/amortization";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/money";
 import { formatRate } from "@/lib/rate";
@@ -44,7 +40,6 @@ const ScheduleTable = ({ rows }: ScheduleTableProps) => {
 	// switching to the 360 monthly rows does not block the click (INP).
 	const shownView = useDeferredValue(view);
 	const years = useMemo(() => summarizeByYear(rows), [rows]);
-	const totalInterest = useMemo(() => lifetimeInterest(rows), [rows]);
 	const hasExtra = rows.some((row) => row.extra > 0);
 	const isArm = rows.some((row) => row.rate !== undefined);
 	// Loan years holding any month after the fixed period, and each year's last rate.
@@ -100,13 +95,7 @@ const ScheduleTable = ({ rows }: ScheduleTableProps) => {
 			<div className="flex flex-wrap items-center justify-between gap-3">
 				<div>
 					<h2 className="text-lg font-semibold">Amortization schedule</h2>
-					<p className="text-sm text-slate-600">
-						Lifetime interest{" "}
-						<strong className="font-semibold text-slate-900">
-							{formatMoney(totalInterest)}
-						</strong>{" "}
-						over {rows.length} payments
-					</p>
+					<p className="text-sm text-slate-600">{rows.length} payments</p>
 				</div>
 				<fieldset>
 					<legend className="sr-only">Schedule view</legend>

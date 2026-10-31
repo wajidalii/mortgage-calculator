@@ -29,7 +29,7 @@ const DownPaymentFields = ({
 	onAmountChange,
 	onBlur,
 }: DownPaymentFieldsProps) => (
-	<fieldset className="sm:col-span-2">
+	<fieldset className="@md:col-span-2">
 		<div className="flex flex-wrap items-center justify-between gap-2">
 			<legend className="text-sm font-medium text-slate-800">
 				Down payment
@@ -51,7 +51,7 @@ const DownPaymentFields = ({
 				))}
 			</fieldset>
 		</div>
-		<div className="mt-1 grid gap-4 sm:grid-cols-2">
+		<div className="mt-1 grid grid-cols-1 gap-4 @md:grid-cols-2">
 			<TextField
 				label="Down payment (%)"
 				suffix="%"

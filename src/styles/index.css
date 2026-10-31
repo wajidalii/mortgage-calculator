@@ -4,10 +4,17 @@
 	--font-sans:
 		ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
 		"Helvetica Neue", Arial, sans-serif;
-	--color-brand-50: oklch(0.97 0.02 250);
-	--color-brand-500: oklch(0.62 0.18 255);
-	--color-brand-600: oklch(0.55 0.2 257);
-	--color-brand-700: oklch(0.48 0.19 258);
+	--color-brand-50: #e9f6f3;
+	--color-brand-100: #cfece6;
+	--color-brand-500: #1a8f8c;
+	--color-brand-600: #137b79;
+	--color-brand-700: #0f6360;
+	--color-brand-800: #0a4148;
+	--color-brand-900: #0c343c;
+}
+
+fieldset {
+	min-width: 0;
 }
 
 body {
@@ -17,9 +24,31 @@ body {
 	-webkit-font-smoothing: antialiased;
 }
 
+/* Pin the results beside the form only where they fit the viewport. */
+@media (min-width: 1024px) and (min-height: 820px) {
+	.results-sticky {
+		position: sticky;
+		top: 1rem;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation: none;
+		transition: none;
+		scroll-behavior: auto;
+	}
+}
+
 @media print {
 	@page {
 		margin: 15mm;
+	}
+
+	fieldset {
+		min-width: 0;
 	}
 
 	body {

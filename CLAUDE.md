@@ -39,10 +39,11 @@ src/
   main.tsx
   vite-env.d.ts          typed ImportMetaEnv
   app/                   App.tsx, router.tsx, providers.tsx
-  layouts/               MainLayout.tsx (Outlet + commented slot for a future Navbar)
+  layouts/               MainLayout.tsx (AppHeader + Outlet)
   pages/                 HomePage, CalculatorPage, NotFoundPage (one lazy chunk each)
   features/              feature folders: components/ hooks/ types.ts
-  components/ui/         Tailwind primitives (Button, Card)
+  components/ui/         Tailwind primitives (Button, Card, Collapsible)
+  components/layout/     AppHeader (brand + nav)
   components/feedback/   PageLoader, ErrorBoundary, Disclaimer
   hooks/                 shared hooks (useDebouncedValue)
   services/api/client.ts typed fetch wrapper; only code that touches the network
@@ -74,6 +75,10 @@ Root configs: `biome.json`, `biome-plugins/`, `vite.config.ts`, `tsconfig*.json`
 6. Non-component `.ts` files (hooks, lib, services, config) may use named exports.
 7. Biome style: tabs, double quotes. Run `yarn check:fix` before committing.
 8. Performance: keep state as low in the tree as possible, memoize measured hot paths only, defer or debounce heavy recalculation on text input to protect INP.
+
+## Calculator UI
+
+Two columns from 1024 px (inputs left, results right), one column below. `LoanCalculator` composes `MortgageInputPanel` (basics plus `<details>` sections that open themselves when a field inside has an error), `MonthlyEstimateCard` (the hero total with `PaymentBreakdown`), `LoanMetrics`, `BalanceChart` (inline SVG from the existing ledger via `chartSeries.ts`), `ScheduleTable` and the detail summaries. `MobileSummaryBar` pins the total on small screens. Field grids use Tailwind container queries (`@container`, `@md:`), not viewport breakpoints. The visual reference is `design/mortgage-calculator-ui.html` (a concept only; its math is not used).
 
 ## Environment variables
 
@@ -145,6 +150,5 @@ No nginx: production serves the built `dist/` with `serve` (SPA fallback on).
 ## Open items
 
 - Calculator features from `PRD.md` are not started; only primitives, defaults and the Disclaimer exist. Progress is tracked in GitHub milestones.
-- Navbar is a placeholder slot in `MainLayout`.
 - `Providers` (`src/app/providers.tsx`) is a pass-through.
 - Closing the default-export lint gap (see Code conventions, item 2) would need a small check script.

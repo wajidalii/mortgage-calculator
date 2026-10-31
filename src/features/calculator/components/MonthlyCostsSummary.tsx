@@ -34,12 +34,12 @@ const MonthlyCostsSummary = ({ costs }: MonthlyCostsSummaryProps) => (
 		</h2>
 		<div aria-live="polite">
 			{costs ? (
-				<div className="mt-3 grid gap-5 text-sm sm:grid-cols-2">
+				<div className="mt-3 grid grid-cols-1 gap-5 text-sm sm:grid-cols-2">
 					<div>
 						<h3 className="font-medium text-slate-800">
 							Lender payment (escrow)
 						</h3>
-						<dl className="mt-2 grid gap-3">
+						<dl className="mt-2 grid grid-cols-1 gap-3">
 							<Row
 								label="Homeowners insurance"
 								value={formatMoney(costs.monthlyInsurance)}
@@ -53,7 +53,7 @@ const MonthlyCostsSummary = ({ costs }: MonthlyCostsSummaryProps) => (
 					</div>
 					<div>
 						<h3 className="font-medium text-slate-800">Non-escrow</h3>
-						<dl className="mt-2 grid gap-3">
+						<dl className="mt-2 grid grid-cols-1 gap-3">
 							<Row label="HOA" value={formatMoney(costs.monthlyHoa)} />
 							<Row
 								label="Other monthly cost"

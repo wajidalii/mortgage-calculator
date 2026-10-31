@@ -5,35 +5,26 @@ import SavedScenarios from "@/features/scenarios/components/SavedScenarios";
 import type { StorageLike } from "@/features/scenarios/storage";
 import { parseCalculatorInputs } from "@/features/scenarios/validate";
 import { usePrinting } from "@/hooks/usePrinting";
+import { lifetimeInterest } from "@/lib/amortization";
 import { hasStaleDefault } from "../assumptions";
 import { deriveCostGrowth } from "../costGrowth";
 import { useCalculatorInputs } from "../hooks/useCalculatorInputs";
 import { buildRateSensitivity } from "../rateSensitivity";
 import AffordabilityCard from "./AffordabilityCard";
-import AffordabilityFields from "./AffordabilityFields";
-import ArmFields from "./ArmFields";
 import AssumptionsPanel from "./AssumptionsPanel";
-import CashToCloseCard from "./CashToCloseCard";
-import ClosingCostsFields from "./ClosingCostsFields";
-import CostGrowthFields from "./CostGrowthFields";
+import BalanceChart from "./BalanceChart";
 import CostGrowthTable from "./CostGrowthTable";
-import DownPaymentFields from "./DownPaymentFields";
-import ExtraPaymentFields from "./ExtraPaymentFields";
 import ExtraPaymentsSummary from "./ExtraPaymentsSummary";
-import LoanSummary from "./LoanSummary";
-import LoanTypeSelector from "./LoanTypeSelector";
-import MonthlyCostsFields from "./MonthlyCostsFields";
+import LoanMetrics from "./LoanMetrics";
+import MobileSummaryBar from "./MobileSummaryBar";
 import MonthlyCostsSummary from "./MonthlyCostsSummary";
 import MonthlyEstimateCard from "./MonthlyEstimateCard";
-import PmiFields from "./PmiFields";
+import MortgageInputPanel from "./MortgageInputPanel";
 import PmiSummary from "./PmiSummary";
 import PrintReport from "./PrintReport";
-import PropertyTaxFields from "./PropertyTaxFields";
 import PropertyTaxSummary from "./PropertyTaxSummary";
 import RateSensitivityTable from "./RateSensitivityTable";
 import ScheduleTable from "./ScheduleTable";
-import TermSelector from "./TermSelector";
-import TextField from "./TextField";
 
 interface LoanCalculatorProps {
 	/** Fixes "today" for the stale-default check. Defaults to the current date. */
@@ -87,6 +78,9 @@ const LoanCalculator = ({ today, storage }: LoanCalculatorProps) => {
 				growth.errors[field as keyof typeof growth.errors])
 			: undefined;
 
+	const scheduleRows = results.extra?.rows ?? results.schedule;
+	const interestTotal = scheduleRows ? lifetimeInterest(scheduleRows) : null;
+
 	// While printing, only the report is shown; the screen UI is hidden in CSS
 	// too, so Ctrl+P without a Print click prints the same thing.
 	return (
@@ -96,199 +90,98 @@ const LoanCalculator = ({ today, storage }: LoanCalculatorProps) => {
 					<PrintReport inputs={inputs} results={results} date={printDate} />
 				</div>
 			) : null}
-			<div className="grid gap-6 print:hidden">
-				<div className="flex justify-end">
-					<Button variant="secondary" onClick={() => window.print()}>
-						Print report
-					</Button>
-				</div>
-				<SavedScenarios
-					kind="calculator"
-					current={inputs}
-					parse={parseCalculatorInputs}
-					onOpen={(saved) => dispatch({ type: "load", inputs: saved })}
-					{...(storage !== undefined ? { storage } : {})}
-				/>
-				<Card>
-					<form
-						noValidate
-						onSubmit={(event) => event.preventDefault()}
-						className="grid gap-5 sm:grid-cols-2"
+			<div className="grid grid-cols-1 gap-6 pb-20 lg:pb-0 print:hidden">
+				<div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
+					<div className="grid grid-cols-1 gap-6">
+						<MortgageInputPanel
+							inputs={inputs}
+							dispatch={dispatch}
+							errorFor={shown}
+							pmiRequired={pmi.required}
+							closingDollars={closing.dollars}
+						/>
+						<SavedScenarios
+							kind="calculator"
+							current={inputs}
+							parse={parseCalculatorInputs}
+							onOpen={(saved) => dispatch({ type: "load", inputs: saved })}
+							{...(storage !== undefined ? { storage } : {})}
+						/>
+					</div>
+					<div
+						id="results"
+						tabIndex={-1}
+						className="results-sticky grid scroll-mt-4 grid-cols-1 gap-4 outline-none"
 					>
-						<TextField
-							className="sm:col-span-2"
-							label="Home price"
-							prefix="$"
-							value={inputs.homePrice}
-							error={shown("homePrice")}
-							onChange={(value) =>
-								dispatch({ type: "edit", field: "homePrice", value })
-							}
-							onBlur={() => dispatch({ type: "blur", field: "homePrice" })}
-						/>
-						<DownPaymentFields
-							mode={inputs.downPaymentMode}
-							percent={inputs.downPaymentPercent}
-							amount={inputs.downPaymentAmount}
-							error={shown("downPayment")}
-							onModeChange={(mode) =>
-								dispatch({ type: "setDownPaymentMode", mode })
-							}
-							onPercentChange={(value) =>
-								dispatch({ type: "edit", field: "downPaymentPercent", value })
-							}
-							onAmountChange={(value) =>
-								dispatch({ type: "edit", field: "downPaymentAmount", value })
-							}
-							onBlur={(field) => dispatch({ type: "blur", field })}
-						/>
-						<LoanTypeSelector
-							value={inputs.loanType}
-							onChange={(loanType) =>
-								dispatch({ type: "setLoanType", loanType })
-							}
-						/>
-						<TermSelector
-							value={inputs.termYears}
-							onChange={(years) => dispatch({ type: "setTerm", years })}
-						/>
-						<TextField
-							label={isArm ? "Start rate" : "Interest rate"}
-							suffix="%"
-							value={inputs.interestRate}
-							error={shown("interestRate")}
-							onChange={(value) =>
-								dispatch({ type: "edit", field: "interestRate", value })
-							}
-							onBlur={() => dispatch({ type: "blur", field: "interestRate" })}
-							{...(isArm
-								? { hint: "The rate for months 1 to 60 (the fixed period)." }
-								: {})}
-						/>
-						{isArm ? (
-							<ArmFields
-								margin={inputs.armMargin}
-								floor={inputs.armFloor}
-								initialCap={inputs.armInitialCap}
-								periodicCap={inputs.armPeriodicCap}
-								lifetimeCap={inputs.armLifetimeCap}
-								preset={inputs.armIndexPreset}
-								errorFor={shown}
-								onChange={(field, value) =>
-									dispatch({ type: "edit", field, value })
-								}
-								onBlur={(field) => dispatch({ type: "blur", field })}
-								onPresetChange={(preset) =>
-									dispatch({ type: "setArmIndexPreset", preset })
-								}
-							/>
+						{showingLastResult ? (
+							<p
+								role="status"
+								className="rounded-md bg-amber-50 p-3 text-sm font-medium text-amber-950 ring-1 ring-amber-400"
+							>
+								<span aria-hidden="true">⚠ </span>A field has text that is not a
+								number. The results below are from your last valid entry.
+							</p>
 						) : null}
-						<PropertyTaxFields
-							state={inputs.state}
-							override={inputs.annualTaxOverride}
-							error={shown("annualTaxOverride")}
-							onStateChange={(value) =>
-								dispatch({ type: "setState", state: value })
-							}
-							onOverrideChange={(value) =>
-								dispatch({ type: "edit", field: "annualTaxOverride", value })
-							}
-							onBlur={() =>
-								dispatch({ type: "blur", field: "annualTaxOverride" })
-							}
+						<MonthlyEstimateCard
+							estimate={results.estimate}
+							arm={results.arm?.summary ?? null}
+							outOfDate={hasStaleDefault(results.assumptions)}
+							stale={showingLastResult}
 						/>
-						<MonthlyCostsFields
-							values={inputs}
-							errorFor={shown}
-							onChange={(field, value) =>
-								dispatch({ type: "edit", field, value })
-							}
-							onBlur={(field) => dispatch({ type: "blur", field })}
+						<LoanMetrics
+							loan={results.loan}
+							closing={results.closing}
+							lifetimeInterest={interestTotal}
+							isArm={isArm}
 						/>
-						<CostGrowthFields
-							values={inputs}
-							errorFor={shown}
-							onChange={(field, value) =>
-								dispatch({ type: "edit", field, value })
-							}
-							onBlur={(field) => dispatch({ type: "blur", field })}
-						/>
-						<PmiFields
-							required={pmi.required}
-							on={inputs.pmiOn}
-							rate={inputs.pmiRate}
-							error={shown("pmiRate")}
-							onToggle={(on) => dispatch({ type: "setPmiOn", on })}
-							onRateChange={(value) =>
-								dispatch({ type: "edit", field: "pmiRate", value })
-							}
-							onBlur={() => dispatch({ type: "blur", field: "pmiRate" })}
-						/>
-						<ClosingCostsFields
-							closing={inputs.closing}
-							credits={inputs.closingCredits}
-							dollars={closing.dollars}
-							errorFor={shown}
-							onValueChange={(line, value) =>
-								dispatch({ type: "editClosingLine", line, value })
-							}
-							onModeChange={(line, mode) =>
-								dispatch({ type: "setClosingMode", line, mode })
-							}
-							onBlur={(line) => dispatch({ type: "blurClosingLine", line })}
-							onCreditsChange={(value) =>
-								dispatch({ type: "edit", field: "closingCredits", value })
-							}
-							onCreditsBlur={() =>
-								dispatch({ type: "blur", field: "closingCredits" })
-							}
-						/>
-						<ExtraPaymentFields
-							values={inputs}
-							errorFor={shown}
-							onChange={(field, value) =>
-								dispatch({ type: "edit", field, value })
-							}
-							onBlur={(field) => dispatch({ type: "blur", field })}
-						/>
-						<AffordabilityFields
-							values={inputs}
-							errorFor={shown}
-							onChange={(field, value) =>
-								dispatch({ type: "edit", field, value })
-							}
-							onBlur={(field) => dispatch({ type: "blur", field })}
-						/>
-					</form>
-				</Card>
-				{showingLastResult ? (
-					<p
-						role="status"
-						className="rounded-md bg-amber-50 p-3 text-sm font-medium text-amber-950 ring-1 ring-amber-400"
+						<div className="mt-1">
+							<Button variant="secondary" onClick={() => window.print()}>
+								Print report
+							</Button>
+						</div>
+					</div>
+				</div>
+				{scheduleRows && scheduleRows.length > 0 ? (
+					<Card>
+						<h2 className="text-lg font-semibold text-slate-900">
+							How your balance changes
+						</h2>
+						<p className="mb-4 text-sm text-slate-600">
+							{isArm
+								? "Rates after month 60 are hypothetical."
+								: "Remaining balance and interest paid over the loan."}
+						</p>
+						<BalanceChart rows={scheduleRows} />
+					</Card>
+				) : null}
+				{scheduleRows ? <ScheduleTable rows={scheduleRows} /> : null}
+				<section
+					aria-labelledby="details-heading"
+					className="grid grid-cols-1 gap-4"
+				>
+					<h2
+						id="details-heading"
+						className="text-lg font-semibold text-slate-900"
 					>
-						<span aria-hidden="true">⚠ </span>A field has text that is not a
-						number. The results below are from your last valid entry.
-					</p>
-				) : null}
-				<MonthlyEstimateCard
-					estimate={results.estimate}
-					arm={results.arm?.summary ?? null}
-					outOfDate={hasStaleDefault(results.assumptions)}
-				/>
-				<CashToCloseCard closing={results.closing} />
-				<AffordabilityCard affordability={results.affordability} />
-				<LoanSummary loan={results.loan} />
-				<RateSensitivityTable rows={sensitivity} />
-				<PropertyTaxSummary tax={results.tax} />
-				<MonthlyCostsSummary costs={results.costs} />
-				<CostGrowthTable growth={growth.result} />
-				<ExtraPaymentsSummary extra={results.extra} />
-				<PmiSummary result={results.pmi} />
+						Where these numbers come from
+					</h2>
+					<div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
+						<PropertyTaxSummary tax={results.tax} />
+						<MonthlyCostsSummary costs={results.costs} />
+						<PmiSummary result={results.pmi} />
+						<ExtraPaymentsSummary extra={results.extra} />
+						<CostGrowthTable growth={growth.result} />
+						<RateSensitivityTable rows={sensitivity} />
+						<AffordabilityCard affordability={results.affordability} />
+					</div>
+				</section>
 				<AssumptionsPanel items={results.assumptions} />
-				{results.schedule ? (
-					<ScheduleTable rows={results.extra?.rows ?? results.schedule} />
-				) : null}
 			</div>
+			<MobileSummaryBar
+				total={results.estimate?.total ?? null}
+				targetId="results"
+				stale={showingLastResult}
+			/>
 		</>
 	);
 };

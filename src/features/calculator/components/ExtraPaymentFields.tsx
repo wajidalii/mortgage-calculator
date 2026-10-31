@@ -21,7 +21,7 @@ const ExtraPaymentFields = ({
 }: ExtraPaymentFieldsProps) => {
 	if (values.loanType === "arm") {
 		return (
-			<p className="text-sm text-slate-700 sm:col-span-2">
+			<p className="text-sm text-slate-700 @md:col-span-2">
 				Extra payments are available for fixed-rate loans only.
 			</p>
 		);

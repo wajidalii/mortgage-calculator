@@ -9,6 +9,7 @@
 			"!**/node_modules",
 			"!**/.yarn",
 			"!**/*.md",
+			"!design",
 			"!**/*.yml",
 			"!**/*.yaml"
 		]

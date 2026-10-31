@@ -14,7 +14,10 @@ const ExtraPaymentsSummary = ({ extra }: ExtraPaymentsSummaryProps) =>
 			<h2 id="extra-heading" className="text-sm font-medium text-slate-700">
 				With extra payments
 			</h2>
-			<dl aria-live="polite" className="mt-2 grid gap-3 text-sm sm:grid-cols-3">
+			<dl
+				aria-live="polite"
+				className="mt-2 grid grid-cols-1 gap-3 text-sm sm:grid-cols-3"
+			>
 				<div>
 					<dt className="text-slate-600">Paid off in</dt>
 					<dd className="mt-0.5 text-lg font-semibold text-slate-900">

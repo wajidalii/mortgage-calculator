@@ -39,10 +39,8 @@ const ClosingCostsFields = ({
 	onCreditsChange,
 	onCreditsBlur,
 }: ClosingCostsFieldsProps) => (
-	<fieldset className="grid gap-5 sm:col-span-2 sm:grid-cols-2">
-		<legend className="text-sm font-semibold text-slate-900">
-			Closing costs (optional)
-		</legend>
+	<fieldset className="grid grid-cols-1 gap-5 @md:col-span-2 @md:grid-cols-2">
+		<legend className="sr-only">Closing costs (optional)</legend>
 		{CLOSING_LINES.map((item) => {
 			const line = closing[item.id];
 			const dollar = dollars[item.id];

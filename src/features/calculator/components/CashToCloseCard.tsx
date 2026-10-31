@@ -23,23 +23,14 @@ const Row = ({
 );
 
 const CashToCloseCard = ({ closing }: CashToCloseCardProps) => (
-	<section
-		aria-labelledby="cash-to-close-heading"
-		className="rounded-lg bg-white p-4 ring-1 ring-slate-300 sm:p-6"
-	>
-		<h2
-			id="cash-to-close-heading"
-			className="text-sm font-medium text-slate-700"
-		>
+	<section aria-labelledby="cash-to-close-heading">
+		<h2 id="cash-to-close-heading" className="sr-only">
 			Cash to close
 		</h2>
 		<div aria-live="polite">
 			{closing ? (
 				<>
-					<p className="mt-1 text-4xl font-bold tracking-tight text-slate-900">
-						{formatMoney(closing.cashToClose)}
-					</p>
-					<dl className="mt-4 border-t border-slate-300/60 pt-4 text-sm">
+					<dl className="text-sm">
 						<Row
 							label="Down payment"
 							amount={formatMoney(closing.downPayment)}
@@ -75,7 +66,7 @@ const CashToCloseCard = ({ closing }: CashToCloseCardProps) => (
 					</p>
 				</>
 			) : (
-				<p className="mt-1 text-base text-slate-700">
+				<p className="text-sm text-slate-700">
 					Fix the highlighted fields to see the cash to close.
 				</p>
 			)}

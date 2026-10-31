@@ -2,7 +2,8 @@ import Disclaimer from "@/components/feedback/Disclaimer";
 import { formatMoney } from "@/lib/money";
 import { formatRate } from "@/lib/rate";
 import type { ArmSummary } from "../armSchedule";
-import type { EstimateLine, MonthlyEstimate } from "../monthlyEstimate";
+import type { MonthlyEstimate } from "../monthlyEstimate";
+import PaymentBreakdown from "./PaymentBreakdown";
 
 interface MonthlyEstimateCardProps {
 	estimate: MonthlyEstimate | null;
@@ -10,28 +11,9 @@ interface MonthlyEstimateCardProps {
 	arm?: ArmSummary | null;
 	/** An illustrative default behind this estimate is past the stale limit. */
 	outOfDate?: boolean;
+	/** The numbers are from the last valid entry, not the fields as typed. */
+	stale?: boolean;
 }
-
-const Lines = ({
-	lines,
-	piLabel,
-}: {
-	lines: readonly EstimateLine[];
-	piLabel?: string | undefined;
-}) => (
-	<>
-		{lines.map((line) => (
-			<div key={line.id} className="flex justify-between gap-4 py-1">
-				<dt className="text-slate-700">
-					{line.id === "pi" && piLabel ? piLabel : line.label}
-				</dt>
-				<dd className="font-medium text-slate-900">
-					{formatMoney(line.amount)}
-				</dd>
-			</div>
-		))}
-	</>
-);
 
 const ResetRisk = ({ arm }: { arm: ArmSummary }) => (
 	<div className="mt-4 rounded-md bg-amber-50 p-3 text-sm text-amber-950 ring-1 ring-amber-400">
@@ -66,67 +48,51 @@ const MonthlyEstimateCard = ({
 	estimate,
 	arm,
 	outOfDate = false,
+	stale = false,
 }: MonthlyEstimateCardProps) => (
 	<section
 		aria-labelledby="monthly-estimate-heading"
-		className="rounded-lg bg-brand-50 p-4 sm:p-6 ring-1 ring-brand-500/30"
+		className="rounded-2xl bg-brand-900 p-4 text-white shadow-sm sm:p-6"
 	>
-		<h2
-			id="monthly-estimate-heading"
-			className="text-sm font-medium text-slate-700"
-		>
-			Estimated monthly cost
-		</h2>
+		<div className="flex flex-wrap items-start justify-between gap-2">
+			<h2
+				id="monthly-estimate-heading"
+				className="text-xs font-bold uppercase tracking-widest text-brand-100"
+			>
+				Estimated monthly cost
+			</h2>
+			{stale ? (
+				<span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-950">
+					<span aria-hidden="true">⚠ </span>Last valid entry
+				</span>
+			) : (
+				<span className="rounded-full bg-white/15 px-2.5 py-1 text-xs font-semibold text-brand-50">
+					Live estimate
+				</span>
+			)}
+		</div>
 		<div aria-live="polite">
 			{estimate ? (
 				<>
-					<p className="mt-1 text-4xl font-bold tracking-tight text-slate-900">
+					<p className="mt-2 text-5xl font-extrabold tracking-tight tabular-nums">
 						{formatMoney(estimate.total)}
-						<span className="ml-1 text-base font-normal text-slate-600">
+						<span className="ml-1 whitespace-nowrap text-base font-normal text-brand-100">
 							/ month total
 						</span>
 					</p>
-					<div className="mt-4 grid gap-5 border-t border-slate-300/60 pt-4 text-sm sm:grid-cols-2">
-						<div>
-							<h3 className="font-semibold text-slate-800">
-								Lender payment (escrow)
-							</h3>
-							<dl className="mt-1">
-								<Lines
-									lines={estimate.lender}
-									piLabel={
-										arm ? "Principal and interest (months 1–60)" : undefined
-									}
-								/>
-								<div className="mt-1 flex justify-between gap-4 border-t border-slate-300 pt-2">
-									<dt className="font-semibold text-slate-800">
-										Lender payment
-									</dt>
-									<dd className="font-semibold text-slate-900">
-										{formatMoney(estimate.lenderPayment)}
-									</dd>
-								</div>
-							</dl>
-						</div>
-						<div>
-							<h3 className="font-semibold text-slate-800">Non-escrow</h3>
-							<dl className="mt-1">
-								<Lines lines={estimate.nonEscrow} />
-								<div className="mt-1 flex justify-between gap-4 border-t border-slate-300 pt-2">
-									<dt className="font-semibold text-slate-800">
-										Non-escrow total
-									</dt>
-									<dd className="font-semibold text-slate-900">
-										{formatMoney(estimate.nonEscrowTotal)}
-									</dd>
-								</div>
-							</dl>
-						</div>
+					<p className="mt-1 text-sm text-brand-100">
+						Principal, interest, tax, insurance and other ownership costs
+					</p>
+					<div className="mt-5 rounded-xl bg-white p-4 text-slate-900">
+						<PaymentBreakdown
+							estimate={estimate}
+							piLabel={arm ? "Principal and interest (months 1–60)" : undefined}
+						/>
 					</div>
 					{arm ? <ResetRisk arm={arm} /> : null}
 					{outOfDate ? (
-						<p className="mt-4 text-sm text-amber-950">
-							<span className="rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium ring-1 ring-amber-400">
+						<p className="mt-4 text-sm">
+							<span className="rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-950 ring-1 ring-amber-400">
 								May be out of date
 							</span>{" "}
 							Some illustrative defaults behind this estimate are over a year
@@ -135,7 +101,7 @@ const MonthlyEstimateCard = ({
 					) : null}
 				</>
 			) : (
-				<p className="mt-1 text-base text-slate-700">
+				<p className="mt-2 text-base text-brand-50">
 					Fix the highlighted fields to see the itemized monthly estimate.
 				</p>
 			)}

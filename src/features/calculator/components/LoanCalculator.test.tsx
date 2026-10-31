@@ -13,10 +13,12 @@ import LoanCalculator from "./LoanCalculator";
 afterEach(cleanup);
 
 const field = (name: string) => screen.getByLabelText(name) as HTMLInputElement;
-/** The standalone P&I result, not the line in the itemized estimate. */
+/** The principal and interest line of the itemized monthly estimate. */
 const piSummary = () =>
 	within(
-		screen.getByRole("region", { name: "Monthly principal and interest" }),
+		within(screen.getByRole("region", { name: "Estimated monthly cost" }))
+			.getByText("Principal and interest")
+			.closest("div") as HTMLElement,
 	);
 const type = (name: string, value: string) => {
 	const input = field(name);
@@ -28,7 +30,7 @@ describe("LoanCalculator", () => {
 	it("shows $400,000 and 80.00% LTV for $500,000 with 20% down", () => {
 		render(<LoanCalculator />);
 		expect(screen.getByText("$400,000.00")).toBeTruthy();
-		expect(screen.getByText("80.00%")).toBeTruthy();
+		expect(screen.getByText("80.00% loan-to-value")).toBeTruthy();
 	});
 
 	it("shows monthly principal and interest for each term", () => {
@@ -82,11 +84,12 @@ describe("LoanCalculator", () => {
 		render(<LoanCalculator />);
 		type("Down payment (%)", "100");
 		// Loan amount and monthly principal and interest are both $0.00.
-		const summary = screen.getByRole("region", {
-			name: "Monthly principal and interest",
-		});
-		expect(within(summary).getAllByText("$0.00")).toHaveLength(2);
-		expect(screen.getByText("0.00%")).toBeTruthy();
+		const metrics = screen.getByRole("region", { name: "Loan summary" });
+		expect(
+			within(metrics).getByText("Loan amount").nextElementSibling?.textContent,
+		).toBe("$0.00");
+		expect(piSummary().getByText("$0.00")).toBeTruthy();
+		expect(screen.getByText("0.00% loan-to-value")).toBeTruthy();
 	});
 
 	it("shows an accessible error after leaving an invalid field", () => {
@@ -280,7 +283,7 @@ describe("LoanCalculator", () => {
 		it("is on at 10% down with LTV 90.00%, removal month 95 and end month 109", () => {
 			render(<LoanCalculator />);
 			type("Down payment (%)", "10");
-			expect(screen.getByText("90.00%")).toBeTruthy();
+			expect(screen.getByText("90.00% loan-to-value")).toBeTruthy();
 			expect(within(section()).getByText("$281.25")).toBeTruthy();
 			expect(within(section()).getByText("Month 95")).toBeTruthy();
 			expect(within(section()).getByText("Month 109")).toBeTruthy();
@@ -828,5 +831,77 @@ describe("LoanCalculator print report", () => {
 		expect(
 			screen.queryByRole("table", { name: "Printable report" }),
 		).toBeNull();
+	});
+
+	describe("dashboard layout", () => {
+		const estimateRegion = () =>
+			screen.getByRole("region", { name: "Estimated monthly cost" });
+
+		it("pins the monthly total in a bar that jumps to the results", () => {
+			render(<LoanCalculator />);
+			const bar = screen.getByRole("region", { name: "Monthly total" });
+			expect(within(bar).getByText("$3,561.60")).toBeTruthy();
+			const link = within(bar).getByRole("link", { name: "See details" });
+			expect(link.getAttribute("href")).toBe("#results");
+			expect(document.getElementById("results")).toBeTruthy();
+		});
+
+		it("shows a live estimate when every field is valid", () => {
+			render(<LoanCalculator />);
+			expect(within(estimateRegion()).getByText("Live estimate")).toBeTruthy();
+		});
+
+		it("labels the bar and the estimate as the last valid entry while a field has text", () => {
+			render(<LoanCalculator />);
+			type("Monthly HOA", "abc");
+			const bar = screen.getByRole("region", { name: "Monthly total" });
+			expect(within(bar).getByText("Last valid entry")).toBeTruthy();
+			expect(
+				within(estimateRegion()).getByText(/Last valid entry/),
+			).toBeTruthy();
+			expect(within(estimateRegion()).queryByText("Live estimate")).toBeNull();
+		});
+
+		it("keeps advanced sections closed until opened, and opens one with an error", () => {
+			render(<LoanCalculator />);
+			const section = (title: string) =>
+				screen.getByText(title).closest("details") as HTMLDetailsElement;
+			expect(section("Closing costs").open).toBe(false);
+			expect(section("Taxes, insurance and HOA").open).toBe(true);
+			type("Credits (seller or lender)", "abc");
+			expect(section("Closing costs").open).toBe(true);
+			expect(
+				within(section("Closing costs")).getByText(/Needs attention/),
+			).toBeTruthy();
+		});
+
+		it("describes the balance chart in text and keeps the table as its data", () => {
+			render(<LoanCalculator />);
+			const chart = screen.getByRole("img", {
+				name: /Line chart over 30 years/,
+			});
+			expect(chart.getAttribute("aria-label")).toContain("$400,000.00");
+			expect(chart.getAttribute("aria-label")).toContain("$510,179.81");
+			expect(
+				screen.getByRole("table", { name: /^(Payment|Yearly totals) by/ }),
+			).toBeTruthy();
+		});
+
+		it("marks the hypothetical-rate part of the chart for an ARM", () => {
+			render(<LoanCalculator />);
+			fireEvent.click(screen.getByLabelText("5/6 ARM"));
+			const chart = screen.getByRole("img", { name: /Line chart/ });
+			expect(chart.getAttribute("aria-label")).toContain("hypothetical");
+			expect(screen.getByText("Shaded: hypothetical rate")).toBeTruthy();
+		});
+
+		it("lists each cost line once, split into lender and non-escrow groups", () => {
+			render(<LoanCalculator />);
+			const estimate = within(estimateRegion());
+			expect(estimate.getAllByText("Property tax")).toHaveLength(1);
+			expect(
+				estimate.getByRole("heading", { name: "Non-escrow" }),
+			).toBeTruthy();
+		});
 	});
 });

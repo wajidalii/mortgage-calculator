@@ -50,7 +50,7 @@ const ArmFields = ({
 	);
 
 	return (
-		<fieldset className="grid gap-5 sm:col-span-2 sm:grid-cols-2">
+		<fieldset className="grid grid-cols-1 gap-5 @md:col-span-2 @md:grid-cols-2">
 			<legend className="text-sm font-semibold text-slate-900">
 				5/6 ARM terms
 			</legend>
@@ -74,11 +74,11 @@ const ArmFields = ({
 				lifetimeCap,
 				"Above the start rate, in points.",
 			)}
-			<fieldset className="sm:col-span-2">
+			<fieldset className="@md:col-span-2">
 				<legend className="text-sm font-medium text-slate-800">
 					Index path after month 60
 				</legend>
-				<div className="mt-1 grid gap-2 sm:grid-cols-3">
+				<div className="mt-1 grid grid-cols-1 gap-2 @md:grid-cols-3">
 					{DEFAULTS.indexPathPresets.value.map((item) => (
 						<label key={item.id} className="relative">
 							<input

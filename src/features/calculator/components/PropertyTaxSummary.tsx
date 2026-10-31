@@ -26,7 +26,7 @@ const PropertyTaxSummary = ({ tax }: PropertyTaxSummaryProps) => (
 							/ month
 						</span>
 					</p>
-					<dl className="mt-3 grid gap-3 text-sm sm:grid-cols-2">
+					<dl className="mt-3 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
 						<div>
 							<dt className="text-slate-600">Annual property tax</dt>
 							<dd className="mt-0.5 text-lg font-semibold text-slate-900">

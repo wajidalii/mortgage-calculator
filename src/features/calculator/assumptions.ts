@@ -4,6 +4,7 @@ import type { Confidence, IsoDate } from "@/config/defaults/types";
 import { formatMoney } from "@/lib/money";
 import { formatPercent, formatRate, parseRate } from "@/lib/rate";
 import type { Cents, Micros } from "@/types/units";
+import type { Affordability } from "./affordability";
 import { INDEX_PRESET_HINTS } from "./armSchedule";
 import type { MonthlyCosts } from "./monthlyCosts";
 import type { PmiResult } from "./pmi";
@@ -88,6 +89,7 @@ export interface AssumptionsSource {
 	tax: PropertyTax | null;
 	costs: MonthlyCosts | null;
 	pmi: PmiResult | null;
+	affordability?: Affordability | null;
 	/** Injectable so tests can fix the stale check. */
 	today: Date;
 }
@@ -140,6 +142,7 @@ export const buildAssumptions = ({
 	tax,
 	costs,
 	pmi,
+	affordability,
 	today,
 }: AssumptionsSource): AssumptionItem[] => {
 	const items: AssumptionItem[] = [];
@@ -212,6 +215,28 @@ export const buildAssumptions = ({
 	}
 
 	if (loan && inputs.loanType === "arm") items.push(...armItems(inputs, today));
+
+	if (affordability) {
+		const { frontEnd, backEnd } = affordability;
+		items.push(
+			fromDefault(
+				"dti-front-end",
+				"Front-end limit (housing / income)",
+				formatPercent(frontEnd.threshold, 1),
+				DEFAULTS.dtiThresholds,
+				!frontEnd.thresholdIsDefault,
+				today,
+			),
+			fromDefault(
+				"dti-back-end",
+				"Back-end limit (housing + other debt / income)",
+				formatPercent(backEnd.threshold, 1),
+				DEFAULTS.dtiThresholds,
+				!backEnd.thresholdIsDefault,
+				today,
+			),
+		);
+	}
 
 	return items;
 };

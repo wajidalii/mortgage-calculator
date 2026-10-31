@@ -1,6 +1,8 @@
 import Card from "@/components/ui/Card";
 import { hasStaleDefault } from "../assumptions";
 import { useCalculatorInputs } from "../hooks/useCalculatorInputs";
+import AffordabilityCard from "./AffordabilityCard";
+import AffordabilityFields from "./AffordabilityFields";
 import ArmFields from "./ArmFields";
 import AssumptionsPanel from "./AssumptionsPanel";
 import CashToCloseCard from "./CashToCloseCard";
@@ -34,6 +36,7 @@ const LoanCalculator = ({ today }: LoanCalculatorProps) => {
 		monthlyCosts,
 		pmi,
 		closing,
+		affordability,
 		results,
 		showingLastResult,
 	} = useCalculatorInputs(today);
@@ -47,7 +50,8 @@ const LoanCalculator = ({ today }: LoanCalculatorProps) => {
 				monthlyCosts.errors[field] ??
 				arm.errors[field as keyof typeof arm.errors] ??
 				pmi.errors[field] ??
-				closing.errors[field])
+				closing.errors[field] ??
+				affordability.errors[field])
 			: undefined;
 
 	return (
@@ -176,6 +180,14 @@ const LoanCalculator = ({ today }: LoanCalculatorProps) => {
 							dispatch({ type: "blur", field: "closingCredits" })
 						}
 					/>
+					<AffordabilityFields
+						values={inputs}
+						errorFor={shown}
+						onChange={(field, value) =>
+							dispatch({ type: "edit", field, value })
+						}
+						onBlur={(field) => dispatch({ type: "blur", field })}
+					/>
 				</form>
 			</Card>
 			{showingLastResult ? (
@@ -193,6 +205,7 @@ const LoanCalculator = ({ today }: LoanCalculatorProps) => {
 				outOfDate={hasStaleDefault(results.assumptions)}
 			/>
 			<CashToCloseCard closing={results.closing} />
+			<AffordabilityCard affordability={results.affordability} />
 			<LoanSummary loan={results.loan} />
 			<PropertyTaxSummary tax={results.tax} />
 			<MonthlyCostsSummary costs={results.costs} />

@@ -14,6 +14,7 @@ import {
 	initialCalculatorState,
 } from "../calculatorReducer";
 import { type ClosingCosts, deriveClosingCosts } from "../closingCosts";
+import { deriveExtraPayments, type ExtraPayments } from "../extraPayments";
 import { deriveLoan } from "../loanMath";
 import { deriveMonthlyCosts, type MonthlyCosts } from "../monthlyCosts";
 import { buildMonthlyEstimate, type MonthlyEstimate } from "../monthlyEstimate";
@@ -33,6 +34,7 @@ export interface ResultSet {
 	closing: ClosingCosts | null;
 	affordability: Affordability | null;
 	schedule: ScheduleRow[] | null;
+	extra: ExtraPayments | null;
 	assumptions: AssumptionItem[];
 }
 
@@ -78,9 +80,13 @@ export const useCalculatorInputs = (today?: Date) => {
 			payments: loan.termYears * 12,
 		});
 	}, [loan, deferredInputs.loanType, arm.result]);
-	const pmi = useMemo(
-		() => derivePmi(deferredInputs, loan, schedule),
+	const extra = useMemo(
+		() => deriveExtraPayments(deferredInputs, loan, schedule),
 		[deferredInputs, loan, schedule],
+	);
+	const pmi = useMemo(
+		() => derivePmi(deferredInputs, loan, schedule, extra.result?.rows ?? null),
+		[deferredInputs, loan, schedule, extra.result],
 	);
 	const estimate = useMemo(
 		() =>
@@ -131,6 +137,7 @@ export const useCalculatorInputs = (today?: Date) => {
 			closing: closing.costs,
 			affordability: affordability.result,
 			schedule,
+			extra: extra.result,
 			assumptions,
 		}),
 		[
@@ -143,6 +150,7 @@ export const useCalculatorInputs = (today?: Date) => {
 			closing.costs,
 			affordability.result,
 			schedule,
+			extra.result,
 			assumptions,
 		],
 	);
@@ -178,6 +186,7 @@ export const useCalculatorInputs = (today?: Date) => {
 		pmi,
 		closing,
 		affordability,
+		extra,
 		results: held ?? current,
 		showingLastResult: held !== null,
 	};

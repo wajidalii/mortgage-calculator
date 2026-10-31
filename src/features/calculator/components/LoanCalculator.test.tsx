@@ -659,3 +659,28 @@ describe("LoanCalculator affordability", () => {
 		expect(screen.getAllByText("Overridden").length).toBeGreaterThan(0);
 	});
 });
+
+describe("LoanCalculator extra payments", () => {
+	it("shows payoff month and interest saved", () => {
+		render(<LoanCalculator />);
+		type("Extra payment each month (optional)", "200");
+		const summary = within(
+			screen.getByRole("region", { name: "With extra payments" }),
+		);
+		expect(summary.getByText("Month 293")).toBeTruthy();
+		expect(summary.getByText("$111,892.52")).toBeTruthy();
+	});
+
+	it("shows an error for a lump sum without a month", () => {
+		render(<LoanCalculator />);
+		type("One-time lump sum (optional)", "5000");
+		type("Lump sum month", "");
+		expect(screen.getByText("Enter the month of the lump sum")).toBeTruthy();
+	});
+
+	it("says extras are for fixed-rate loans when ARM is chosen", () => {
+		render(<LoanCalculator />);
+		fireEvent.click(screen.getByLabelText(/ARM/));
+		expect(screen.getByText(/fixed-rate loans only/)).toBeTruthy();
+	});
+});

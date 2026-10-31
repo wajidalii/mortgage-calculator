@@ -58,12 +58,15 @@ export interface PmiDerivation {
 
 /**
  * PMI estimate (PRD 8.8). `schedule` must be the original schedule with no
- * extra payments: the 78% month never moves with extra payments.
+ * extra payments: the 78% month never moves with extra payments. The 80%
+ * removal month reads `extraSchedule` when there is one, since extra payments
+ * can bring the request date forward.
  */
 export const derivePmi = (
 	inputs: CalculatorInputs,
 	loan: LoanDerivation | null,
 	schedule: readonly ScheduleRow[] | null,
+	extraSchedule: readonly ScheduleRow[] | null = null,
 ): PmiDerivation => {
 	if (!loan || !schedule) return { required: false, result: null, errors: {} };
 	const required = isPmiRequired(loan.loanAmount, loan.homePrice);
@@ -102,7 +105,7 @@ export const derivePmi = (
 		PMI_END_PERCENT,
 	);
 	const removalMonth = firstMonthAtOrBelow(
-		schedule,
+		extraSchedule ?? schedule,
 		loan.homePrice,
 		PMI_LTV_PERCENT,
 	);

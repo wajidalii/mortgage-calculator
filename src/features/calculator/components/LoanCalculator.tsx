@@ -352,7 +352,8 @@ const LoanCalculator = ({ today, storage }: LoanCalculatorProps) => {
 						tabIndex={-1}
 						className={cn(
 							"grid min-w-0 grid-cols-1 scroll-mt-4 gap-4 outline-none",
-							resultsFit && "lg:sticky lg:top-6",
+							resultsFit &&
+								"lg:sticky lg:top-[calc(var(--header-h,4.5rem)+1.5rem)]",
 						)}
 					>
 						{showingLastResult ? (

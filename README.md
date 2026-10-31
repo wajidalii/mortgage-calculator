@@ -2,6 +2,8 @@
 
 A free, no-account web calculator that helps U.S. homebuyers and homeowners estimate **the full cost of a mortgage**, not just the monthly principal and interest, and explore the tradeoffs between loan choices. All calculations run in the browser. Nothing you type is sent anywhere.
 
+**Live demo: <https://arm.wajidali.dev>**
+
 ![Mortgage Calculator homepage on desktop](docs/screenshots/homepage-desktop.png)
 
 > **Status:** an assignment submission for KnowledgeCity's Technology Division (AI-assisted Calculator Web App). Results are **estimates for planning**. They are not a loan offer, a lender quote or financial advice. See [Financial assumptions and limitations](#financial-assumptions-and-limitations).
@@ -118,6 +120,8 @@ You do **not** need a paid service, a cloud account, an API key, credentials or 
 - Node.js 22 or newer (`.nvmrc` pins 22).
 - Git.
 - Corepack (ships with Node) to provide Yarn 4. If `yarn` is not found, run `corepack enable`. If that is not permitted, use `corepack yarn` instead of `yarn` in the commands below.
+
+The app is also deployed at <https://arm.wajidali.dev> (Vercel, built from `main`), so you can try it without installing anything.
 
 **Run the app**
 

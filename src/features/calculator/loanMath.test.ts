@@ -46,6 +46,9 @@ const inputs = (
 	otherMonthlyDebt: "",
 	dtiFrontEnd: "",
 	dtiBackEnd: "",
+	extraMonthly: "",
+	lumpSum: "",
+	lumpMonth: "",
 	...overrides,
 });
 

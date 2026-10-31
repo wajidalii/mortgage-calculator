@@ -55,6 +55,9 @@ export const initialCalculatorState: CalculatorState = {
 		otherMonthlyDebt: "",
 		dtiFrontEnd: "",
 		dtiBackEnd: "",
+		extraMonthly: "",
+		lumpSum: "",
+		lumpMonth: "",
 	},
 	touched: {},
 };

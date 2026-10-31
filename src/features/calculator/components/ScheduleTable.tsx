@@ -42,6 +42,7 @@ const ScheduleTable = ({ rows }: ScheduleTableProps) => {
 	const [view, setView] = useState<View>("yearly");
 	const years = useMemo(() => summarizeByYear(rows), [rows]);
 	const totalInterest = useMemo(() => lifetimeInterest(rows), [rows]);
+	const hasExtra = rows.some((row) => row.extra > 0);
 	const isArm = rows.some((row) => row.rate !== undefined);
 	// Loan years holding any month after the fixed period, and each year's last rate.
 	const hypotheticalYears = useMemo(
@@ -134,7 +135,7 @@ const ScheduleTable = ({ rows }: ScheduleTableProps) => {
 				<table
 					className={cn(
 						"w-full text-sm",
-						isArm ? "min-w-[40rem]" : "min-w-[32rem]",
+						isArm || hasExtra ? "min-w-[40rem]" : "min-w-[32rem]",
 					)}
 				>
 					<caption className="sr-only">
@@ -158,6 +159,11 @@ const ScheduleTable = ({ rows }: ScheduleTableProps) => {
 							<th scope="col" className={HEAD}>
 								Principal
 							</th>
+							{hasExtra ? (
+								<th scope="col" className={HEAD}>
+									Extra
+								</th>
+							) : null}
 							<th scope="col" className={HEAD}>
 								Interest
 							</th>
@@ -180,6 +186,9 @@ const ScheduleTable = ({ rows }: ScheduleTableProps) => {
 								) : null}
 								<td className={CELL}>{formatMoney(row.payment)}</td>
 								<td className={CELL}>{formatMoney(row.principal)}</td>
+								{hasExtra ? (
+									<td className={CELL}>{formatMoney(row.extra)}</td>
+								) : null}
 								<td className={CELL}>{formatMoney(row.interest)}</td>
 								<td className={CELL}>{formatMoney(row.balance)}</td>
 							</tr>

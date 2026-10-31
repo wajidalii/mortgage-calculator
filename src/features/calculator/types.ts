@@ -51,7 +51,10 @@ export type ErrorField =
 	| "grossMonthlyIncome"
 	| "otherMonthlyDebt"
 	| "dtiFrontEnd"
-	| "dtiBackEnd";
+	| "dtiBackEnd"
+	| "extraMonthly"
+	| "lumpSum"
+	| "lumpMonth";
 
 /** Raw text the user typed, plus which down payment form is the source. */
 export interface CalculatorInputs {
@@ -95,6 +98,12 @@ export interface CalculatorInputs {
 	dtiFrontEnd: string;
 	/** Back-end limit in percent. Empty means use the default. */
 	dtiBackEnd: string;
+	/** Recurring extra principal per month, from month 1. Empty means none. */
+	extraMonthly: string;
+	/** One-time extra principal. Empty means none. */
+	lumpSum: string;
+	/** Payment number (1-based) the lump sum is paid in. */
+	lumpMonth: string;
 }
 
 export interface CalculatorState {
@@ -122,7 +131,10 @@ export type EditableField =
 	| "grossMonthlyIncome"
 	| "otherMonthlyDebt"
 	| "dtiFrontEnd"
-	| "dtiBackEnd";
+	| "dtiBackEnd"
+	| "extraMonthly"
+	| "lumpSum"
+	| "lumpMonth";
 
 export type CalculatorAction =
 	| { type: "edit"; field: EditableField; value: string }

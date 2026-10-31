@@ -8,6 +8,8 @@ import AssumptionsPanel from "./AssumptionsPanel";
 import CashToCloseCard from "./CashToCloseCard";
 import ClosingCostsFields from "./ClosingCostsFields";
 import DownPaymentFields from "./DownPaymentFields";
+import ExtraPaymentFields from "./ExtraPaymentFields";
+import ExtraPaymentsSummary from "./ExtraPaymentsSummary";
 import LoanSummary from "./LoanSummary";
 import LoanTypeSelector from "./LoanTypeSelector";
 import MonthlyCostsFields from "./MonthlyCostsFields";
@@ -37,6 +39,7 @@ const LoanCalculator = ({ today }: LoanCalculatorProps) => {
 		pmi,
 		closing,
 		affordability,
+		extra,
 		results,
 		showingLastResult,
 	} = useCalculatorInputs(today);
@@ -51,7 +54,8 @@ const LoanCalculator = ({ today }: LoanCalculatorProps) => {
 				arm.errors[field as keyof typeof arm.errors] ??
 				pmi.errors[field] ??
 				closing.errors[field] ??
-				affordability.errors[field])
+				affordability.errors[field] ??
+				extra.errors[field])
 			: undefined;
 
 	return (
@@ -180,6 +184,14 @@ const LoanCalculator = ({ today }: LoanCalculatorProps) => {
 							dispatch({ type: "blur", field: "closingCredits" })
 						}
 					/>
+					<ExtraPaymentFields
+						values={inputs}
+						errorFor={shown}
+						onChange={(field, value) =>
+							dispatch({ type: "edit", field, value })
+						}
+						onBlur={(field) => dispatch({ type: "blur", field })}
+					/>
 					<AffordabilityFields
 						values={inputs}
 						errorFor={shown}
@@ -209,9 +221,12 @@ const LoanCalculator = ({ today }: LoanCalculatorProps) => {
 			<LoanSummary loan={results.loan} />
 			<PropertyTaxSummary tax={results.tax} />
 			<MonthlyCostsSummary costs={results.costs} />
+			<ExtraPaymentsSummary extra={results.extra} />
 			<PmiSummary result={results.pmi} />
 			<AssumptionsPanel items={results.assumptions} />
-			{results.schedule ? <ScheduleTable rows={results.schedule} /> : null}
+			{results.schedule ? (
+				<ScheduleTable rows={results.extra?.rows ?? results.schedule} />
+			) : null}
 		</div>
 	);
 };

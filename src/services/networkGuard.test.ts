@@ -2,14 +2,10 @@ import { describe, expect, it } from "vitest";
 import indexHtml from "../../index.html?raw";
 
 /**
- * Privacy guard (PRD NFR "Privacy"): user inputs never leave the browser.
- * `src/services/api/client.ts` is the only file allowed to touch the network,
- * and no calculator, page, hook or library code may import it. If you add a
- * real API on purpose, change this test in the same PR and update the privacy
- * statement.
+ * Privacy guard (PRD NFR "Privacy"): user inputs never leave the browser, so
+ * no source file may use a network API. If you add a real API on purpose,
+ * change this test in the same PR and update the privacy statement.
  */
-
-const ALLOWED_NETWORK_FILE = "/src/services/api/client.ts";
 
 /** Every non-test source file, by absolute path from the project root. */
 const sources = import.meta.glob(
@@ -38,30 +34,17 @@ const NETWORK_APIS: readonly [string, RegExp][] = [
 describe("network guard", () => {
 	it("finds the source files it is meant to scan", () => {
 		expect(paths.length).toBeGreaterThan(50);
-		expect(paths).toContain(ALLOWED_NETWORK_FILE);
+		expect(paths).toContain("/src/lib/money.ts");
 	});
 
-	it("uses network APIs only in services/api/client.ts", () => {
-		const offenders = paths
-			.filter((file) => file !== ALLOWED_NETWORK_FILE)
-			.flatMap((file) => {
-				const text = code(file);
-				return NETWORK_APIS.filter(([, pattern]) => pattern.test(text)).map(
-					([name]) => `${file}: ${name}`,
-				);
-			});
+	it("uses no network APIs in any source file", () => {
+		const offenders = paths.flatMap((file) => {
+			const text = code(file);
+			return NETWORK_APIS.filter(([, pattern]) => pattern.test(text)).map(
+				([name]) => `${file}: ${name}`,
+			);
+		});
 		expect(offenders).toEqual([]);
-	});
-
-	it("keeps the API client's only network call inside apiRequest", () => {
-		expect(code(ALLOWED_NETWORK_FILE).match(/\bfetch\s*\(/g)).toHaveLength(1);
-	});
-
-	it("does not import the API client from calculator code", () => {
-		const importers = paths
-			.filter((file) => !file.startsWith("/src/services/"))
-			.filter((file) => /from\s+["'][^"']*services\/api/.test(code(file)));
-		expect(importers).toEqual([]);
 	});
 
 	it("loads nothing from other origins in index.html", () => {

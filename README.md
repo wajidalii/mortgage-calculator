@@ -139,7 +139,7 @@ Open <http://localhost:5173>.
 
 ```bash
 yarn build     # type-checks, then builds to dist/
-yarn start     # builds, then serves dist/ with SPA fallback on http://localhost:3000
+yarn start     # builds, then serves dist/ with serve.json (headers, routes, 404) on http://localhost:3000
 ```
 
 **With Docker (optional)**
@@ -149,7 +149,7 @@ docker compose --profile dev up --build    # dev server on http://localhost:5173
 docker compose --profile prod up --build   # production build on http://localhost:3000
 ```
 
-**Configuration.** Two optional variables exist, `VITE_APP_NAME` (default "Mortgage Calculator") and `VITE_API_BASE_URL` (default `/api`, currently unused because the app makes no network calls). See `.env.example`. Every `VITE_*` value is inlined into the public bundle, so never put secrets in them.
+**Configuration.** One optional variable exists, `VITE_APP_NAME` (default "Mortgage Calculator"). See `.env.example`. Every `VITE_*` value is inlined into the public bundle, so never put secrets in them.
 
 ## Testing and verification
 
@@ -170,7 +170,7 @@ The major suites cover:
 - **Product rules:** property tax, PMI and its end months, closing costs, affordability, extra payments, cost growth, rate sensitivity, refinance, comparison and defaults.
 - **Error handling and boundaries:** validation messages, 0% rate, 100% down payment, rates above 30% or below 0%, text in money fields, and storage that is blocked.
 - **UI behaviour:** calculator, assumptions panel, saved scenarios, compare, refinance and homepage components.
-- **Privacy guard** (`services/networkGuard.test.ts`): fails if any code outside `src/services/` can reach the network, or if `index.html` loads anything from another origin.
+- **Privacy guard** (`services/networkGuard.test.ts`): fails if any source file can reach the network, or if `index.html` loads anything from another origin.
 
 The acceptance criteria in [docs/user-stories.md](docs/user-stories.md) were also checked by hand-driven browser automation against the running app. The same sample values appear in the tests.
 
@@ -217,7 +217,7 @@ Complete, unmodified Claude Code session exports, in order, are in [`transcripts
 
 ```
 src/
-  app/            router and providers
+  app/            App and router
   layouts/        main layout (header + page outlet)
   pages/          one lazy-loaded page per route
   features/
@@ -229,7 +229,7 @@ src/
   components/     shared UI, layout and feedback (Disclaimer, ErrorBoundary)
   lib/            pure helpers: money (cents), rate (micros), payment, amortization, ARM
   config/         env defaults, defaults registry, state tax table, disclaimer text
-  services/       the only place network code may live (currently unused)
+  services/       the privacy guard test (the app has no network code)
 docs/             product documents and design screenshots
 transcripts/      full AI session exports
 design/           static HTML design reference (not app code)

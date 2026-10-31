@@ -66,6 +66,17 @@ describe("saved scenarios", () => {
 		expect(field("Interest rate").value).toBe("5.75");
 	});
 
+	it("refuses a second scenario with the same name, ignoring case", () => {
+		render(<LoanCalculator storage={memory()} />);
+		save("Condo");
+		save("condo");
+		expect(
+			saved().getByText(/A scenario named "condo" already exists/),
+		).toBeTruthy();
+		expect(saved().getAllByRole("button", { name: /^Open / })).toHaveLength(1);
+		expect(field("Scenario name").value).toBe("condo");
+	});
+
 	it("shows a not-available message when storage is blocked and keeps working", () => {
 		render(<LoanCalculator storage={throwing} />);
 		expect(saved().getByText(/Saving is not available/)).toBeTruthy();

@@ -2,6 +2,7 @@ import CompareView from "@/features/compare/components/CompareView";
 
 const ComparePage = () => (
 	<div className="grid w-full grid-cols-1 gap-6">
+		<title>Compare two mortgages side by side | Mortgage Calculator</title>
 		<header>
 			<p className="text-xs font-bold tracking-widest text-brand-700 uppercase">
 				Loan comparison

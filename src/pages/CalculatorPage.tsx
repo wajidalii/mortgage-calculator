@@ -2,6 +2,7 @@ import LoanCalculator from "@/features/calculator/components/LoanCalculator";
 
 const CalculatorPage = () => (
 	<div className="grid grid-cols-1 gap-6">
+		<title>Mortgage calculator: monthly cost and cash to close</title>
 		<header className="print:hidden">
 			<p className="text-xs font-bold tracking-widest text-brand-700 uppercase">
 				Mortgage planner

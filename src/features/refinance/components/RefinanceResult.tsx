@@ -3,6 +3,8 @@ import type { Refinance } from "../refinance";
 
 interface RefinanceResultProps {
 	result: Refinance | null;
+	/** True once a field the user has left shows an error. */
+	showsErrors: boolean;
 }
 
 /** AR-2: every result states its cost and term assumptions. */
@@ -19,7 +21,7 @@ const Assumptions = ({ termMonths }: { termMonths: number }) => (
 	</ul>
 );
 
-const RefinanceResult = ({ result }: RefinanceResultProps) => (
+const RefinanceResult = ({ result, showsErrors }: RefinanceResultProps) => (
 	<section
 		aria-labelledby="refinance-heading"
 		className="rounded-lg bg-white p-4 ring-1 ring-slate-300 sm:p-6"
@@ -74,7 +76,9 @@ const RefinanceResult = ({ result }: RefinanceResultProps) => (
 				</>
 			) : (
 				<p className="mt-1 text-base text-slate-700">
-					Fix the highlighted fields to see the break-even.
+					{showsErrors
+						? "Fix the highlighted fields to see the break-even."
+						: "Enter your current loan and the new rate to see the break-even."}
 				</p>
 			)}
 		</div>

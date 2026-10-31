@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://arm.wajidali.dev/sitemap.xml

@@ -11,7 +11,7 @@ const PmiSummary = ({ result }: PmiSummaryProps) => (
 		<h3 id="pmi-heading" className="text-sm font-semibold text-slate-900">
 			Private mortgage insurance (PMI)
 		</h3>
-		<div aria-live="polite">
+		<div>
 			{result?.status === "on" ? (
 				<>
 					<p className="mt-1 text-xl font-bold tracking-tight text-slate-900 tabular-nums">

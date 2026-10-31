@@ -37,6 +37,7 @@ export const getBrowserStorage = (): StorageLike | null => {
 		const probe = `${STORAGE_KEY}:probe`;
 		storage.setItem(probe, "1");
 		storage.getItem(probe);
+		storage.removeItem(probe);
 		return storage;
 	} catch {
 		return null;

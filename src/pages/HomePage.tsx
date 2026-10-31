@@ -8,12 +8,20 @@ const HomePage = () => (
 		<p className="mt-2 text-slate-600">
 			Estimate your monthly mortgage payment.
 		</p>
-		<Link
-			to="/calculator"
-			className="mt-6 inline-block font-medium text-brand-600 hover:underline"
-		>
-			Open calculator
-		</Link>
+		<div className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
+			<Link
+				to="/calculator"
+				className="font-medium text-brand-600 hover:underline"
+			>
+				Open calculator
+			</Link>
+			<Link
+				to="/refinance"
+				className="font-medium text-brand-600 hover:underline"
+			>
+				Refinance break-even
+			</Link>
+		</div>
 	</Card>
 );
 

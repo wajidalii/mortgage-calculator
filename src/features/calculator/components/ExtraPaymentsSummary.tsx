@@ -9,12 +9,12 @@ const ExtraPaymentsSummary = ({ extra }: ExtraPaymentsSummaryProps) =>
 	extra ? (
 		<section
 			aria-labelledby="extra-heading"
-			className="rounded-lg bg-white p-4 ring-1 ring-slate-300 sm:p-6"
+			className="rounded-2xl bg-brand-50 p-4 ring-1 ring-brand-200 sm:p-5"
 		>
-			<h2 id="extra-heading" className="text-sm font-medium text-slate-700">
+			<h2 id="extra-heading" className="text-sm font-semibold text-brand-900">
 				With extra payments
 			</h2>
-			<dl aria-live="polite" className="mt-2 grid gap-3 text-sm sm:grid-cols-3">
+			<dl aria-live="polite" className="mt-2 grid grid-cols-2 gap-3 text-sm">
 				<div>
 					<dt className="text-slate-600">Paid off in</dt>
 					<dd className="mt-0.5 text-lg font-semibold text-slate-900">
@@ -29,18 +29,15 @@ const ExtraPaymentsSummary = ({ extra }: ExtraPaymentsSummaryProps) =>
 					<dd className="mt-0.5 text-lg font-semibold text-slate-900">
 						{formatMoney(extra.interestSaved)}
 					</dd>
-					<dd className="text-xs text-slate-600">Versus the base schedule</dd>
-				</div>
-				<div>
-					<dt className="text-slate-600">Total interest</dt>
-					<dd className="mt-0.5 text-lg font-semibold text-slate-900">
-						{formatMoney(extra.totalInterest)}
+					<dd className="text-xs text-slate-600">
+						Versus the original schedule
 					</dd>
 				</div>
 			</dl>
 			<p className="mt-3 text-xs text-slate-600">
-				The schedule below includes your extra payments. PMI can be requested
-				sooner; it still ends at the 78% month of the original schedule.
+				Lifetime interest, the chart and the schedule include your extra
+				payments. PMI can be requested sooner; it still ends at the 78% month of
+				the original schedule.
 			</p>
 		</section>
 	) : null;

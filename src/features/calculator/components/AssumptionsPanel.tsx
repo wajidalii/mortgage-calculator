@@ -33,9 +33,21 @@ const Item = ({ item }: { item: AssumptionItem }) => (
 );
 
 const AssumptionsPanel = ({ items }: AssumptionsPanelProps) => (
-	<details className="rounded-lg bg-white p-4 ring-1 ring-slate-200">
-		<summary className="cursor-pointer text-lg font-semibold focus-visible:outline-2 focus-visible:outline-brand-500">
+	<details className="group rounded-2xl bg-white p-4 shadow-panel ring-1 ring-slate-200 sm:p-6">
+		<summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-lg text-lg font-semibold">
 			Assumptions and defaults
+			<span
+				aria-hidden="true"
+				className="text-2xl leading-none font-normal text-brand-600 group-open:hidden"
+			>
+				+
+			</span>
+			<span
+				aria-hidden="true"
+				className="hidden text-2xl leading-none font-normal text-brand-600 group-open:inline"
+			>
+				−
+			</span>
 		</summary>
 		{items.length > 0 ? (
 			<>

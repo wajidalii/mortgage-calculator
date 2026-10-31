@@ -1,4 +1,5 @@
 import { useId } from "react";
+import { SEGMENT_GROUP, SEGMENT_OPTION } from "@/components/ui/segmented";
 import { DEFAULTS } from "@/config/defaults/defaults";
 import { INDEX_PRESET_HINTS } from "../armSchedule";
 import type { EditableField, ErrorField, IndexPresetId } from "../types";
@@ -75,10 +76,10 @@ const ArmFields = ({
 				"Above the start rate, in points.",
 			)}
 			<fieldset className="sm:col-span-2">
-				<legend className="text-sm font-medium text-slate-800">
+				<legend className="text-sm font-semibold text-slate-800">
 					Index path after month 60
 				</legend>
-				<div className="mt-1 grid gap-2 sm:grid-cols-3">
+				<div className={`${SEGMENT_GROUP} sm:grid-cols-3`}>
 					{DEFAULTS.indexPathPresets.value.map((item) => (
 						<label key={item.id} className="relative">
 							<input
@@ -89,13 +90,11 @@ const ArmFields = ({
 								onChange={() => onPresetChange(item.id)}
 								className="peer sr-only"
 							/>
-							<span className="flex min-h-11 cursor-pointer items-center justify-center rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-700 ring-1 ring-slate-300 peer-checked:bg-brand-600 peer-checked:text-white peer-checked:ring-brand-600 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand-500">
-								{item.label}
-							</span>
+							<span className={SEGMENT_OPTION}>{item.label}</span>
 						</label>
 					))}
 				</div>
-				<p className="mt-1 text-xs text-slate-500">
+				<p className="mt-1.5 text-xs leading-relaxed text-slate-600">
 					{INDEX_PRESET_HINTS[preset]} This is an assumption, not a forecast.
 				</p>
 			</fieldset>

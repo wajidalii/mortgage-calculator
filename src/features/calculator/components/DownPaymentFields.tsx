@@ -1,5 +1,4 @@
-import Button from "@/components/ui/Button";
-import { cn } from "@/lib/cn";
+import { TOGGLE_GROUP, toggleOption } from "@/components/ui/segmented";
 import type { DownPaymentMode } from "../types";
 import TextField from "./TextField";
 
@@ -31,27 +30,25 @@ const DownPaymentFields = ({
 }: DownPaymentFieldsProps) => (
 	<fieldset className="sm:col-span-2">
 		<div className="flex flex-wrap items-center justify-between gap-2">
-			<legend className="text-sm font-medium text-slate-800">
+			<legend className="text-sm font-semibold text-slate-800">
 				Down payment
 			</legend>
-			<fieldset>
+			<fieldset className={TOGGLE_GROUP}>
 				<legend className="sr-only">Enter down payment as</legend>
 				{MODES.map((item) => (
-					<Button
+					<button
 						key={item.mode}
-						variant={mode === item.mode ? "primary" : "secondary"}
+						type="button"
 						aria-pressed={mode === item.mode}
 						onClick={() => onModeChange(item.mode)}
-						className={cn(
-							"min-h-11 px-3 py-1 first:rounded-r-none last:rounded-l-none",
-						)}
+						className={toggleOption(mode === item.mode)}
 					>
 						{item.label}
-					</Button>
+					</button>
 				))}
 			</fieldset>
 		</div>
-		<div className="mt-1 grid gap-4 sm:grid-cols-2">
+		<div className="mt-2 grid gap-4 sm:grid-cols-2">
 			<TextField
 				label="Down payment (%)"
 				suffix="%"

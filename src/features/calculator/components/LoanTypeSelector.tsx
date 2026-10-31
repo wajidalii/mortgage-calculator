@@ -1,4 +1,5 @@
 import { useId } from "react";
+import { SEGMENT_GROUP, SEGMENT_OPTION } from "@/components/ui/segmented";
 import type { LoanType } from "../types";
 
 interface LoanTypeSelectorProps {
@@ -15,8 +16,10 @@ const LoanTypeSelector = ({ value, onChange }: LoanTypeSelectorProps) => {
 	const name = useId();
 	return (
 		<fieldset>
-			<legend className="text-sm font-medium text-slate-800">Loan type</legend>
-			<div className="mt-1 grid grid-cols-2 gap-2">
+			<legend className="text-sm font-semibold text-slate-800">
+				Loan type
+			</legend>
+			<div className={`${SEGMENT_GROUP} grid-cols-2`}>
 				{OPTIONS.map((option) => (
 					<label key={option.value} className="relative">
 						<input
@@ -27,9 +30,7 @@ const LoanTypeSelector = ({ value, onChange }: LoanTypeSelectorProps) => {
 							onChange={() => onChange(option.value)}
 							className="peer sr-only"
 						/>
-						<span className="flex min-h-11 cursor-pointer items-center justify-center rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-700 ring-1 ring-slate-300 peer-checked:bg-brand-600 peer-checked:text-white peer-checked:ring-brand-600 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand-500">
-							{option.label}
-						</span>
+						<span className={SEGMENT_OPTION}>{option.label}</span>
 					</label>
 				))}
 			</div>

@@ -29,7 +29,7 @@ const PropertyTaxFields = ({
 			<div>
 				<label
 					htmlFor={id}
-					className="block text-sm font-medium text-slate-800"
+					className="block text-sm font-semibold text-slate-800"
 				>
 					State
 				</label>
@@ -37,7 +37,7 @@ const PropertyTaxFields = ({
 					id={id}
 					value={state}
 					onChange={(event) => onStateChange(event.target.value as StateCode)}
-					className="mt-1 min-h-11 w-full rounded-md bg-white px-3 py-2 text-base ring-1 ring-slate-300 focus-visible:outline-2 focus-visible:outline-brand-500"
+					className="mt-1.5 min-h-12 w-full rounded-xl bg-white px-3 py-2 text-base font-semibold text-slate-900 ring-1 ring-slate-300 hover:ring-slate-400 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
 				>
 					{STATES.map((code) => (
 						<option key={code} value={code}>

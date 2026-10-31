@@ -24,21 +24,21 @@ const Row = ({
 const MonthlyCostsSummary = ({ costs }: MonthlyCostsSummaryProps) => (
 	<section
 		aria-labelledby="monthly-costs-heading"
-		className="rounded-lg bg-white p-4 sm:p-6 ring-1 ring-slate-300"
+		className="py-5 first:pt-0 last:pb-0"
 	>
-		<h2
+		<h3
 			id="monthly-costs-heading"
-			className="text-sm font-medium text-slate-700"
+			className="text-sm font-semibold text-slate-900"
 		>
 			Insurance, HOA and other monthly costs
-		</h2>
+		</h3>
 		<div aria-live="polite">
 			{costs ? (
 				<div className="mt-3 grid gap-5 text-sm sm:grid-cols-2">
 					<div>
-						<h3 className="font-medium text-slate-800">
+						<h4 className="font-medium text-slate-800">
 							Lender payment (escrow)
-						</h3>
+						</h4>
 						<dl className="mt-2 grid gap-3">
 							<Row
 								label="Homeowners insurance"
@@ -52,7 +52,7 @@ const MonthlyCostsSummary = ({ costs }: MonthlyCostsSummaryProps) => (
 						</dl>
 					</div>
 					<div>
-						<h3 className="font-medium text-slate-800">Non-escrow</h3>
+						<h4 className="font-medium text-slate-800">Non-escrow</h4>
 						<dl className="mt-2 grid gap-3">
 							<Row label="HOA" value={formatMoney(costs.monthlyHoa)} />
 							<Row

@@ -8,7 +8,7 @@ const TOOLS = [
 ] as const;
 
 const LINK =
-	"inline-flex min-h-11 items-center rounded text-slate-700 hover:text-brand-700 hover:underline";
+	"inline-flex min-h-11 items-center rounded text-slate-700 motion-safe:transition-colors motion-safe:duration-micro hover:text-brand-700 hover:underline";
 
 const AppFooter = () => (
 	<footer className="border-t border-slate-200 bg-white print:hidden">

@@ -73,7 +73,7 @@ Root configs: `biome.json`, `biome-plugins/`, `vite.config.ts`, `tsconfig*.json`
 2. **Known gap:** Biome cannot assert that a file _has_ a default export. The rules ban every other way to export a component, but cannot catch a `.tsx` file with no default export, or one that default-exports something other than the component. Check this in review.
 3. Every page and the layout are loaded with `lazy()` and must default-export. Do not lazy-load tiny leaf components; that causes request waterfalls and hurts LCP.
 4. No `any` (`noExplicitAny` is an error). Use explicit interfaces and `import type` for type-only imports.
-5. `ErrorBoundary.tsx` wraps a non-exported class (error boundaries require a class) inside a default-exported arrow component.
+5. `ErrorBoundary.tsx` is the router's `errorElement`. React Router catches render errors in routes, so it needs no class; it reads the error with `useRouteError`, logs it to the console and shows users a generic message, never the raw error text.
 6. Non-component `.ts` files (hooks, lib, services, config) may use named exports.
 7. Biome style: tabs, double quotes. Run `yarn check:fix` before committing.
 8. Performance: keep state as low in the tree as possible, memoize measured hot paths only, defer or debounce heavy recalculation on text input to protect INP.

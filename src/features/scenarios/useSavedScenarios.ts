@@ -75,6 +75,16 @@ export const useSavedScenarios = ({ kind, storage, now }: Options) => {
 				setMessage("Enter a name for the scenario.");
 				return false;
 			}
+			const taken = all.some(
+				(item) =>
+					item.kind === kind && item.name.toLowerCase() === clean.toLowerCase(),
+			);
+			if (taken) {
+				setMessage(
+					`A scenario named "${clean}" already exists. Choose another name or delete the old one.`,
+				);
+				return false;
+			}
 			const scenario: SavedScenario = {
 				id: newId(),
 				name: clean,
@@ -86,7 +96,7 @@ export const useSavedScenarios = ({ kind, storage, now }: Options) => {
 			if (saved) setMessage(`Saved "${clean}".`);
 			return saved;
 		},
-		[blocked, blockedMessage, commit, kind, now],
+		[all, blocked, blockedMessage, commit, kind, now],
 	);
 
 	const remove = useCallback(

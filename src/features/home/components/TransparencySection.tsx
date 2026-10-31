@@ -1,6 +1,6 @@
 import Disclaimer from "@/components/feedback/Disclaimer";
+import Icon from "@/components/ui/Icon";
 import Reveal from "@/components/ui/Reveal";
-import Icon from "./Icon";
 import SectionHeading from "./SectionHeading";
 
 const NOTES = [

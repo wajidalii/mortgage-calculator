@@ -1,5 +1,5 @@
+import Icon, { type IconName } from "@/components/ui/Icon";
 import Reveal from "@/components/ui/Reveal";
-import Icon, { type IconName } from "./Icon";
 import SectionHeading from "./SectionHeading";
 
 interface Audience {

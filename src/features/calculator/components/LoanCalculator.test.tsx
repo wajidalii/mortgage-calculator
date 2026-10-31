@@ -723,3 +723,23 @@ describe("LoanCalculator rate sensitivity", () => {
 		expect(table().queryByText("7.50%")).toBeNull();
 	});
 });
+
+describe("LoanCalculator cost growth", () => {
+	const growthTable = () =>
+		within(screen.getByRole("table", { name: /for each loan year/ }));
+
+	it("labels applied growth as an Assumption", () => {
+		render(<LoanCalculator />);
+		expect(screen.queryByText("Assumption")).toBeNull();
+		type("Property tax growth per year (optional)", "3");
+		expect(screen.getByText("Assumption")).toBeTruthy();
+	});
+
+	it("shows year 2 tax at 3% growth and a flat table at 0%", () => {
+		render(<LoanCalculator />);
+		type("Annual property tax (optional)", "10000");
+		expect(growthTable().getAllByText("$833.33").length).toBe(30);
+		type("Property tax growth per year (optional)", "3");
+		expect(growthTable().getByText("$858.33")).toBeTruthy();
+	});
+});

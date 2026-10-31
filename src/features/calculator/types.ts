@@ -54,7 +54,9 @@ export type ErrorField =
 	| "dtiBackEnd"
 	| "extraMonthly"
 	| "lumpSum"
-	| "lumpMonth";
+	| "lumpMonth"
+	| "taxGrowth"
+	| "insuranceGrowth";
 
 /** Raw text the user typed, plus which down payment form is the source. */
 export interface CalculatorInputs {
@@ -104,6 +106,10 @@ export interface CalculatorInputs {
 	lumpSum: string;
 	/** Payment number (1-based) the lump sum is paid in. */
 	lumpMonth: string;
+	/** Yearly property tax growth in percent. Empty means 0%. */
+	taxGrowth: string;
+	/** Yearly insurance growth in percent. Empty means 0%. */
+	insuranceGrowth: string;
 }
 
 export interface CalculatorState {
@@ -134,7 +140,9 @@ export type EditableField =
 	| "dtiBackEnd"
 	| "extraMonthly"
 	| "lumpSum"
-	| "lumpMonth";
+	| "lumpMonth"
+	| "taxGrowth"
+	| "insuranceGrowth";
 
 export type CalculatorAction =
 	| { type: "edit"; field: EditableField; value: string }

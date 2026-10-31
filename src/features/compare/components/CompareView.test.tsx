@@ -48,8 +48,6 @@ describe("CompareView", () => {
 
 	it("shows the disclaimer", () => {
 		render(<CompareView />);
-		expect(
-			screen.getByRole("complementary", { name: "Disclaimer" }),
-		).toBeTruthy();
+		expect(screen.getByRole("note", { name: "Disclaimer" })).toBeTruthy();
 	});
 });
